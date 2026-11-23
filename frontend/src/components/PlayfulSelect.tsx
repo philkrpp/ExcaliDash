@@ -160,6 +160,7 @@ export const PlayfulSelect: React.FC<PlayfulSelectProps> = ({
         ref={buttonRef}
         type="button"
         aria-label={ariaLabel}
+        title={ariaLabel ? `${ariaLabel}: ${current?.label ?? ""}` : undefined}
         aria-haspopup="listbox"
         aria-expanded={open}
         disabled={disabled}
