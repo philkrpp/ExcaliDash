@@ -186,7 +186,7 @@ export const StorageManageModal: React.FC<StorageManageModalProps> = ({
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-3xl max-h-[90vh] flex flex-col bg-white dark:bg-neutral-900 rounded-2xl border-2 border-slate-800 dark:border-neutral-700 shadow-[3px_3px_0px_0px_rgba(30,41,59,0.9)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.18)] animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-3xl max-h-[90dvh] flex flex-col bg-white dark:bg-neutral-900 rounded-2xl border-2 border-slate-800 dark:border-neutral-700 shadow-[3px_3px_0px_0px_rgba(30,41,59,0.9)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.18)] animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center gap-3 p-5 pb-4 border-b-2 border-slate-800 dark:border-neutral-700">
           <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/30">

@@ -17,12 +17,30 @@ const Probe = ({ autoHideEnabled }: { autoHideEnabled: boolean }) => {
   return null;
 };
 
+let pointerListeners: Array<() => void> = [];
+let hoverNoneNow = false;
 const stubEnvironment = (hoverNone: boolean) => {
+  hoverNoneNow = hoverNone;
+  pointerListeners = [];
   vi.stubGlobal("document", { title: "" });
   vi.stubGlobal("window", {
-    matchMedia: (query: string) => ({ matches: query === "(hover: none)" && hoverNone }),
+    matchMedia: (query: string) => ({
+      get matches() {
+        return query === "(hover: none)" && hoverNoneNow;
+      },
+      addEventListener: (_type: string, listener: () => void) => pointerListeners.push(listener),
+      removeEventListener: (_type: string, listener: () => void) => {
+        pointerListeners = pointerListeners.filter((l) => l !== listener);
+      },
+    }),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
+  });
+};
+const switchPointer = async (hoverNone: boolean) => {
+  hoverNoneNow = hoverNone;
+  await act(async () => {
+    pointerListeners.forEach((listener) => listener());
   });
 };
 
@@ -61,5 +79,15 @@ describe("useEditorChrome auto-hide", () => {
       vi.advanceTimersByTime(3500);
     });
     expect(visible).toBe(true);
+  });
+
+  it("follows a pointer change at runtime, e.g. a trackpad attached to the iPad", async () => {
+    stubEnvironment(true);
+    await render(true);
+    await switchPointer(false);
+    await act(async () => {
+      vi.advanceTimersByTime(3500);
+    });
+    expect(visible).toBe(false);
   });
 });

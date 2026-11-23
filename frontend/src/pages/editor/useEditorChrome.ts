@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import throttle from "lodash/throttle";
 
+const TOUCH_ONLY_QUERY = "(hover: none)";
+const isTouchOnlyPointer = () =>
+  typeof window !== "undefined" && !!window.matchMedia?.(TOUCH_ONLY_QUERY).matches;
+
 type UseEditorChromeOptions = {
   drawingName: string;
   autoHideEnabled: boolean;
@@ -15,6 +19,17 @@ export const useEditorChrome = ({
   isShareOpen,
 }: UseEditorChromeOptions) => {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  // Touch screens (iPad) have no mouse to reach the top trigger zone, so a hidden header could never come back.
+  const [isTouchOnly, setIsTouchOnly] = useState(isTouchOnlyPointer);
+
+  useEffect(() => {
+    const query = window.matchMedia?.(TOUCH_ONLY_QUERY);
+    if (!query) return;
+    const update = () => setIsTouchOnly(query.matches);
+    update();
+    query.addEventListener?.("change", update);
+    return () => query.removeEventListener?.("change", update);
+  }, []);
 
   useEffect(() => {
     document.title = `${drawingName} - ExcaliDash`;
@@ -24,9 +39,7 @@ export const useEditorChrome = ({
   }, [drawingName]);
 
   useEffect(() => {
-    // Touch devices (iPad) have no mouse to reach the top trigger zone, so a hidden header could never come back.
-    const hasHoverPointer = !window.matchMedia?.("(hover: none)").matches;
-    if (!autoHideEnabled || !hasHoverPointer || isRenaming || isShareOpen) {
+    if (!autoHideEnabled || isTouchOnly || isRenaming || isShareOpen) {
       setIsHeaderVisible(true);
       return;
     }
@@ -64,7 +77,7 @@ export const useEditorChrome = ({
       handleMouseMove.cancel();
       if (hideTimeout !== null) clearTimeout(hideTimeout);
     };
-  }, [autoHideEnabled, isRenaming, isShareOpen]);
+  }, [autoHideEnabled, isTouchOnly, isRenaming, isShareOpen]);
 
   return {
     isHeaderVisible,

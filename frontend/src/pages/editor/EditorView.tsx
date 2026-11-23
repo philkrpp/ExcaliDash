@@ -198,7 +198,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
           onPointerEnter={onBackIntent}
           onFocus={onBackIntent}
           disabled={isSavingOnLeave}
-          className={`flex shrink-0 items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-full text-gray-600 dark:text-gray-300 disabled:opacity-50 disabled:cursor-wait transition-all duration-200 ${isSavingOnLeave ? "pr-4" : ""}`}
+          className={`flex shrink-0 items-center gap-2 p-2 [@media(hover:none)]:p-3 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-full text-gray-600 dark:text-gray-300 disabled:opacity-50 disabled:cursor-wait transition-all duration-200 ${isSavingOnLeave ? "pr-4" : ""}`}
         >
           {isSavingOnLeave ? (
             <>
@@ -221,9 +221,13 @@ export const EditorView: React.FC<EditorViewProps> = ({
           />
         ) : (
           <h1
-            className="min-w-0 truncate font-medium text-gray-900 dark:text-white px-2 py-1 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded cursor-text"
+            className="min-w-0 truncate touch-manipulation font-medium text-gray-900 dark:text-white px-2 py-1 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded cursor-text"
             title={drawingName}
             onDoubleClick={onRenameStart}
+            onClick={() => {
+              // Touch screens: a tap shows the full (truncated) name in the rename field; no tooltip, no dblclick.
+              if (window.matchMedia?.("(hover: none)").matches) onRenameStart();
+            }}
           >
             {drawingName}
           </h1>

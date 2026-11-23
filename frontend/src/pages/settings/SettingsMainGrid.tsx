@@ -130,7 +130,7 @@ export const SettingsMainGrid = ({
         tileClassName="border-black bg-cyan-400 text-black dark:border-neutral-700 dark:bg-cyan-400 dark:text-black"
         title="Auto-hide editor header"
         description={
-          editorAutoHide ? "Hide by default" : "Keep visible by default"
+          `${editorAutoHide ? "Hide by default" : "Keep visible by default"} (mouse only; always visible on touch screens)`
         }
       >
         <PlayfulSwitch

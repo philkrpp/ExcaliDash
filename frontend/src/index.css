@@ -95,6 +95,13 @@
     @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-0 bg-transparent text-slate-600 shadow-none transition-colors hover:bg-slate-100 hover:text-indigo-600 disabled:pointer-events-none disabled:opacity-40 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-indigo-300;
   }
 
+  /* 44px touch targets on touch screens (iPad) */
+  @media (hover: none) {
+    .ui-toolbar-button {
+      @apply h-11 w-11;
+    }
+  }
+
   .ui-input {
     @apply rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 hover:border-slate-300 focus:border-indigo-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:hover:border-neutral-600;
   }
