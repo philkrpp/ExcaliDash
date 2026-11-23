@@ -1,0 +1,74 @@
+# Coolify deployment of the philkrpp fork (branch philippkrapp) at https://whiteboard.philippkrapp.de.
+# Coolify project "Philipp Krapp" / production, server s4-coolify, "Connect to Predefined Network" on.
+# Coolify maps the domain to frontend:8080; the frontend nginx proxies /api and /socket.io to backend:8000.
+# Env comes from Phase app `whiteboard` (Production, path /coolify) via compleadly-proxmox scripts/phase_sync:
+#   DATABASE_URL (Shared Infra postgresql, DB/role whiteboard), JWT_SECRET, CSRF_SECRET, API_KEY_HASH_PEPPER,
+#   OIDC_CLIENT_ID, OIDC_CLIENT_SECRET, S3_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY.
+# Runbook: compleadly-proxmox docs/whiteboard.md.
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    init: true
+    restart: unless-stopped
+    environment:
+      DATABASE_PROVIDER: postgresql
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: "8000"
+      NODE_ENV: production
+      FRONTEND_URL: https://whiteboard.philippkrapp.de
+      # Traefik -> frontend nginx -> backend
+      TRUST_PROXY: "2"
+      JWT_SECRET: ${JWT_SECRET}
+      CSRF_SECRET: ${CSRF_SECRET}
+      API_KEY_HASH_PEPPER: ${API_KEY_HASH_PEPPER}
+      AUTH_MODE: oidc_enforced
+      OIDC_PROVIDER_NAME: Authentik
+      OIDC_ISSUER_URL: https://auth.philippkrapp.de/application/o/whiteboard/
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      OIDC_REDIRECT_URI: https://whiteboard.philippkrapp.de/api/auth/oidc/callback
+      OIDC_REQUIRE_EMAIL_VERIFIED: "true"
+      OIDC_ADMIN_GROUPS: whiteboard-admins
+      # Private bucket: no S3_PUBLIC_URL, images go out as presigned redirects (backend/src/routes/files.ts).
+      S3_BUCKET: whiteboard-philippkrapp
+      S3_REGION: auto
+      S3_FORCE_PATH_STYLE: "true"
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      SNAPSHOT_RETENTION_DAYS: "30"
+    volumes:
+      - backend-data:/app/prisma
+    mem_limit: 768m
+    memswap_limit: 960m
+    mem_reservation: 256m
+    cpus: 2
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:8000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      BACKEND_URL: backend:8000
+    mem_limit: 128m
+    memswap_limit: 160m
+    mem_reservation: 32m
+    cpus: 1
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  backend-data:
