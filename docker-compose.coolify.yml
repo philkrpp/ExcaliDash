@@ -18,8 +18,8 @@ services:
       PORT: "8000"
       NODE_ENV: production
       FRONTEND_URL: https://whiteboard.philippkrapp.de
-      # Traefik -> frontend nginx -> backend
-      TRUST_PROXY: "2"
+      # Cloudflare (proxied) -> Traefik (trusts CF ranges) -> frontend nginx -> backend; "2" made req.ip the CF edge
+      TRUST_PROXY: "3"
       JWT_SECRET: ${JWT_SECRET}
       CSRF_SECRET: ${CSRF_SECRET}
       API_KEY_HASH_PEPPER: ${API_KEY_HASH_PEPPER}
