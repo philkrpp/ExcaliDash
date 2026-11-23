@@ -90,7 +90,7 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
   return (
     <div className="mb-6 flex flex-col items-stretch justify-between gap-3 lg:mb-8 2xl:flex-row 2xl:items-center">
       <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap 2xl:flex-1">
-        <div className="group relative w-full transition-transform duration-200 focus-within:-translate-y-0.5 sm:max-w-sm sm:flex-1 xl:max-w-md">
+        <div className="group relative w-full transition-transform duration-200 focus-within:-translate-y-0.5 sm:flex-1 2xl:max-w-md">
           <input
             ref={searchInputRef}
             type="text"
