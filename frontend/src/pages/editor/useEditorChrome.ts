@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import throttle from "lodash/throttle";
 
+// shortcut: "(hover: none)" means the primary pointer cannot hover, so a hybrid laptop with mouse and
+// touchscreen keeps mouse auto-hide; add a tap trigger zone if touch-only use there becomes a need.
 const TOUCH_ONLY_QUERY = "(hover: none)";
-const isTouchOnlyPointer = () =>
-  typeof window !== "undefined" && !!window.matchMedia?.(TOUCH_ONLY_QUERY).matches;
+
+const getTouchOnlyQuery = (): MediaQueryList | null =>
+  typeof window !== "undefined" && typeof window.matchMedia === "function"
+    ? window.matchMedia(TOUCH_ONLY_QUERY)
+    : null;
+
+const readTouchOnly = (): boolean => getTouchOnlyQuery()?.matches ?? false;
 
 type UseEditorChromeOptions = {
   drawingName: string;
@@ -20,15 +27,15 @@ export const useEditorChrome = ({
 }: UseEditorChromeOptions) => {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   // Touch screens (iPad) have no mouse to reach the top trigger zone, so a hidden header could never come back.
-  const [isTouchOnly, setIsTouchOnly] = useState(isTouchOnlyPointer);
+  const [isTouchOnly, setIsTouchOnly] = useState(readTouchOnly);
 
   useEffect(() => {
-    const query = window.matchMedia?.(TOUCH_ONLY_QUERY);
-    if (!query) return;
-    const update = () => setIsTouchOnly(query.matches);
-    update();
-    query.addEventListener?.("change", update);
-    return () => query.removeEventListener?.("change", update);
+    const mq = getTouchOnlyQuery();
+    if (!mq) return;
+    const sync = () => setIsTouchOnly(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
   }, []);
 
   useEffect(() => {
@@ -82,5 +89,6 @@ export const useEditorChrome = ({
   return {
     isHeaderVisible,
     setIsHeaderVisible,
+    isTouchOnly,
   };
 };

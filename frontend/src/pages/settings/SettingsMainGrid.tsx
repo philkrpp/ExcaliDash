@@ -129,9 +129,7 @@ export const SettingsMainGrid = ({
         icon={editorAutoHide ? <EyeOff size={20} /> : <Eye size={20} />}
         tileClassName="border-black bg-cyan-400 text-black dark:border-neutral-700 dark:bg-cyan-400 dark:text-black"
         title="Auto-hide editor header"
-        description={
-          `${editorAutoHide ? "Hide by default" : "Keep visible by default"} (mouse only; always visible on touch screens)`
-        }
+        description={`${editorAutoHide ? "Hide by default" : "Keep visible by default"} (mouse only)`}
       >
         <PlayfulSwitch
           checked={editorAutoHide}

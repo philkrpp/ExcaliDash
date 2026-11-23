@@ -190,6 +190,12 @@ body {
   padding: 0;
 }
 
+/* No rubber-band scroll of the page while the editor is open (iPad Safari). */
+html:has([data-editor-root]),
+html:has([data-editor-root]) body {
+  overscroll-behavior: none;
+}
+
 body {
   @apply bg-slate-50 text-slate-900 dark:bg-neutral-950 dark:text-neutral-50;
   background-image: radial-gradient(#cbd5e1 1px, transparent 1px);

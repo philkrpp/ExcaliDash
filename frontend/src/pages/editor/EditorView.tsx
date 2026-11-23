@@ -33,6 +33,7 @@ type EditorViewProps = {
   editorContainerRef: React.RefObject<HTMLDivElement>;
   initialData: any;
   isHeaderVisible: boolean;
+  isTouchOnly: boolean;
   isHistoryOpen: boolean;
   historyPreview: DrawingSnapshotFull | null;
   historyButtonRef: React.RefObject<HTMLButtonElement>;
@@ -138,6 +139,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
   editorContainerRef,
   initialData,
   isHeaderVisible,
+  isTouchOnly,
   isHistoryOpen,
   historyPreview,
   historyButtonRef,
@@ -177,7 +179,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
   onToggleTheme,
 }) => (
   <div
-    className="h-dvh flex flex-col bg-white dark:bg-neutral-950 overflow-hidden overscroll-none"
+    data-editor-root
+    className="h-dvh flex flex-col bg-white dark:bg-neutral-950 overflow-hidden"
     onKeyDownCapture={(event) => {
       if (event.altKey && event.shiftKey && event.code === "KeyD") {
         event.preventDefault();
@@ -224,10 +227,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
             className="min-w-0 truncate touch-manipulation font-medium text-gray-900 dark:text-white px-2 py-1 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded cursor-text"
             title={drawingName}
             onDoubleClick={onRenameStart}
-            onClick={() => {
-              // Touch screens: a tap shows the full (truncated) name in the rename field; no tooltip, no dblclick.
-              if (window.matchMedia?.("(hover: none)").matches) onRenameStart();
-            }}
+            // Touch screens have no tooltip or dblclick: a tap shows the full (truncated) name in the rename field.
+            onClick={isTouchOnly ? onRenameStart : undefined}
           >
             {drawingName}
           </h1>

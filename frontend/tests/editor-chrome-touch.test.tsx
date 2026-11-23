@@ -28,7 +28,8 @@ const stubEnvironment = (hoverNone: boolean) => {
       get matches() {
         return query === "(hover: none)" && hoverNoneNow;
       },
-      addEventListener: (_type: string, listener: () => void) => pointerListeners.push(listener),
+      addEventListener: (_type: string, listener: () => void) =>
+        pointerListeners.push(listener),
       removeEventListener: (_type: string, listener: () => void) => {
         pointerListeners = pointerListeners.filter((l) => l !== listener);
       },

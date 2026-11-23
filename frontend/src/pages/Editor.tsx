@@ -73,7 +73,7 @@ const ExcalidrawEditor: React.FC = () => {
   const shareButtonRef = useRef<HTMLButtonElement>(null);
   const [historyPreview, setHistoryPreview] =
     useState<api.DrawingSnapshotFull | null>(null);
-  const { isHeaderVisible, setIsHeaderVisible } = useEditorChrome({
+  const { isHeaderVisible, setIsHeaderVisible, isTouchOnly } = useEditorChrome({
     drawingName,
     autoHideEnabled,
     isRenaming,
@@ -382,6 +382,7 @@ const ExcalidrawEditor: React.FC = () => {
         editorContainerRef={editorContainerRef}
         initialData={initialData}
         isHeaderVisible={isHeaderVisible}
+        isTouchOnly={isTouchOnly}
         isHistoryOpen={isHistoryOpen}
         historyPreview={isHistoryOpen ? historyPreview : null}
         historyButtonRef={historyButtonRef}
