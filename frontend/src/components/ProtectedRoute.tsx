@@ -28,7 +28,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     }, [returnTo]);
 
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center">
         <div className="text-gray-600 dark:text-gray-400">
           Redirecting to sign-in...
         </div>
@@ -47,7 +47,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       );
     }
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center">
         <div className="text-gray-600 dark:text-gray-400">Loading...</div>
       </div>
     );

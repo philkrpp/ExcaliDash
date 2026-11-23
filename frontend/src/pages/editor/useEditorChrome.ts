@@ -24,7 +24,9 @@ export const useEditorChrome = ({
   }, [drawingName]);
 
   useEffect(() => {
-    if (!autoHideEnabled || isRenaming || isShareOpen) {
+    // Touch devices (iPad) have no mouse to reach the top trigger zone, so a hidden header could never come back.
+    const hasHoverPointer = !window.matchMedia?.("(hover: none)").matches;
+    if (!autoHideEnabled || !hasHoverPointer || isRenaming || isShareOpen) {
       setIsHeaderVisible(true);
       return;
     }

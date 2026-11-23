@@ -177,7 +177,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
   onToggleTheme,
 }) => (
   <div
-    className="h-screen flex flex-col bg-white dark:bg-neutral-950 overflow-hidden"
+    className="h-dvh flex flex-col bg-white dark:bg-neutral-950 overflow-hidden overscroll-none"
     onKeyDownCapture={(event) => {
       if (event.altKey && event.shiftKey && event.code === "KeyD") {
         event.preventDefault();
@@ -188,17 +188,17 @@ export const EditorView: React.FC<EditorViewProps> = ({
   >
     <header
       className={clsx(
-        "h-16 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 flex items-center px-4 justify-between z-10 fixed top-0 left-0 right-0 transition-all duration-300",
+        "h-16 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 flex items-center gap-3 px-4 justify-between z-10 fixed top-0 left-0 right-0 transition-all duration-300",
         isHeaderVisible || isShareOpen ? "translate-y-0" : "-translate-y-full",
       )}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex min-w-0 flex-1 items-center gap-4">
         <button
           onClick={onBackClick}
           onPointerEnter={onBackIntent}
           onFocus={onBackIntent}
           disabled={isSavingOnLeave}
-          className={`flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-full text-gray-600 dark:text-gray-300 disabled:opacity-50 disabled:cursor-wait transition-all duration-200 ${isSavingOnLeave ? "pr-4" : ""}`}
+          className={`flex shrink-0 items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-full text-gray-600 dark:text-gray-300 disabled:opacity-50 disabled:cursor-wait transition-all duration-200 ${isSavingOnLeave ? "pr-4" : ""}`}
         >
           {isSavingOnLeave ? (
             <>
@@ -216,19 +216,20 @@ export const EditorView: React.FC<EditorViewProps> = ({
             onChange={(e) => onNewNameChange(e.target.value)}
             onCommit={onRenameSubmit}
             onCancel={onRenameCancel}
-            className="font-medium text-gray-900 dark:text-white bg-transparent px-2 py-1 border-2 border-indigo-500 rounded-md outline-none min-w-[200px]"
+            className="font-medium text-gray-900 dark:text-white bg-transparent px-2 py-1 border-2 border-indigo-500 rounded-md outline-none min-w-0 max-w-full"
             style={{ width: `${Math.max(200, newName.length * 9 + 20)}px` }}
           />
         ) : (
           <h1
-            className="font-medium text-gray-900 dark:text-white px-2 py-1 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded cursor-text"
+            className="min-w-0 truncate font-medium text-gray-900 dark:text-white px-2 py-1 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded cursor-text"
+            title={drawingName}
             onDoubleClick={onRenameStart}
           >
             {drawingName}
           </h1>
         )}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-3">
         {canEdit && autosaveFailing ? (
           <span
             className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800"
@@ -268,7 +269,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
         ) : null}
         <button
           onClick={onToggleAutoHide}
-          className="ui-toolbar-button"
+          className="ui-toolbar-button [@media(hover:none)]:hidden"
           title={autoHideEnabled ? "Disable auto-hide" : "Enable auto-hide"}
         >
           {autoHideEnabled ? (
@@ -329,7 +330,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
         onCanvasDropCapture(event);
       }}
       style={{
-        height: isHeaderVisible ? "calc(100vh - 4rem)" : "100vh",
+        height: isHeaderVisible ? "calc(100dvh - 4rem)" : "100dvh",
         marginTop: isHeaderVisible ? "4rem" : "0",
       }}
     >

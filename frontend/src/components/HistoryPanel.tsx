@@ -186,7 +186,7 @@ export const HistoryPanel: React.FC<Props> = ({
         aria-hidden="true"
       />
       <div
-        className="ui-card fixed z-[160] flex max-h-[min(32rem,calc(100vh-5.75rem))] w-[min(360px,calc(100vw-24px))] flex-col overflow-hidden animate-in fade-in slide-in-from-top-3 duration-200"
+        className="ui-card fixed z-[160] flex max-h-[min(32rem,calc(100dvh-5.75rem))] w-[min(360px,calc(100vw-24px))] flex-col overflow-hidden animate-in fade-in slide-in-from-top-3 duration-200"
         style={position}
         role="dialog"
         aria-modal="false"

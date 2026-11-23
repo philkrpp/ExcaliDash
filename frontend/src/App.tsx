@@ -51,7 +51,7 @@ const AuthSetupChoice = lazy(() =>
 );
 
 const PageLoader = () => (
-  <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 flex items-center justify-center">
+  <div className="min-h-dvh bg-slate-50 dark:bg-neutral-950 flex items-center justify-center">
     <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
   </div>
 );
@@ -83,7 +83,7 @@ class EditorLoadBoundary extends Component<
     if (!this.state.failed) return this.props.children;
     return (
       <div
-        className="min-h-screen bg-slate-50 dark:bg-neutral-950 flex flex-col items-center justify-center gap-4 px-6"
+        className="min-h-dvh bg-slate-50 dark:bg-neutral-950 flex flex-col items-center justify-center gap-4 px-6"
         role="alert"
       >
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
@@ -118,7 +118,7 @@ const EditorRouteContent = () => {
     <Suspense
       fallback={
         <div
-          className="min-h-screen bg-slate-50 dark:bg-neutral-950 flex flex-col items-center justify-center gap-3"
+          className="min-h-dvh bg-slate-50 dark:bg-neutral-950 flex flex-col items-center justify-center gap-3"
           role="status"
           aria-label="Opening drawing"
         >

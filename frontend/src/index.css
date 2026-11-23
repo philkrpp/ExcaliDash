@@ -112,7 +112,7 @@
   }
 
   .auth-page {
-    @apply flex min-h-screen items-center justify-center bg-transparent px-4 py-8;
+    @apply flex min-h-dvh items-center justify-center bg-transparent px-4 py-8;
   }
 
   .auth-wrap {
