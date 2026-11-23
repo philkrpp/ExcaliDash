@@ -2,7 +2,7 @@
 # Coolify project "Philipp Krapp" / production, server s4-coolify, "Connect to Predefined Network" on.
 # Coolify maps the domain to frontend:8080; the frontend nginx proxies /api and /socket.io to backend:8000.
 # Env comes from Phase app `whiteboard` (Production, path /coolify) via compleadly-proxmox scripts/phase_sync:
-#   DATABASE_URL (Shared Infra postgresql, DB/role whiteboard), JWT_SECRET, CSRF_SECRET, API_KEY_HASH_PEPPER,
+#   WHITEBOARD_DATABASE_URL (Shared Infra postgresql, DB/role whiteboard), JWT_SECRET, CSRF_SECRET, API_KEY_HASH_PEPPER,
 #   OIDC_CLIENT_ID, OIDC_CLIENT_SECRET, S3_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY.
 # Runbook: compleadly-proxmox docs/whiteboard.md.
 services:
@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_PROVIDER: postgresql
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: ${WHITEBOARD_DATABASE_URL}
       PORT: "8000"
       NODE_ENV: production
       FRONTEND_URL: https://whiteboard.philippkrapp.de
