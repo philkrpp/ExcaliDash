@@ -22,9 +22,12 @@ export const NewDrawingControl: React.FC<NewDrawingControlProps> = ({
         onCreate();
       }}
       disabled={disabled}
-      className="ui-button-primary h-[42px] flex-1 whitespace-nowrap px-5 sm:flex-none"
+      aria-label="New drawing"
+      title="New drawing"
+      className="ui-button-primary h-[42px] flex-1 whitespace-nowrap px-5 sm:flex-none md:w-[42px] md:px-0 2xl:w-auto 2xl:px-5"
     >
-      <Plus size={18} strokeWidth={2.5} /> New Drawing
+      <Plus size={18} strokeWidth={2.5} />
+      <span className="md:hidden 2xl:inline">New Drawing</span>
     </button>
   );
 };

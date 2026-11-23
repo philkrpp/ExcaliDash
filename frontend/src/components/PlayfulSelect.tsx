@@ -18,6 +18,7 @@ type PlayfulSelectProps = {
   disabled?: boolean;
   className?: string;
   buttonClassName?: string;
+  labelClassName?: string;
   menuClassName?: string;
   align?: "left" | "right";
   size?: "sm" | "md";
@@ -34,6 +35,7 @@ export const PlayfulSelect: React.FC<PlayfulSelectProps> = ({
   disabled,
   className,
   buttonClassName,
+  labelClassName,
   menuClassName,
   align = "left",
   size = "md",
@@ -191,7 +193,9 @@ export const PlayfulSelect: React.FC<PlayfulSelectProps> = ({
             {current.icon}
           </span>
         ) : null}
-        <span className="min-w-0 flex-1 truncate text-left">
+        <span
+          className={clsx("min-w-0 flex-1 truncate text-left", labelClassName)}
+        >
           {current?.label}
         </span>
         <ChevronDown

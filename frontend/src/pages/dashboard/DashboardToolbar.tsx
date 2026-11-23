@@ -88,9 +88,9 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
     (!isSharedCollection || currentCollection?.sharedRole === "edit");
 
   return (
-    <div className="mb-6 flex flex-col items-stretch justify-between gap-3 lg:mb-8 2xl:flex-row 2xl:items-center">
-      <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap 2xl:flex-1">
-        <div className="group relative w-full transition-transform duration-200 focus-within:-translate-y-0.5 sm:flex-1 2xl:max-w-md">
+    <div className="mb-6 flex flex-col items-stretch justify-between gap-3 md:flex-row md:items-center lg:mb-8">
+      <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap md:flex-1">
+        <div className="group relative w-full transition-transform duration-200 focus-within:-translate-y-0.5 sm:min-w-0 sm:flex-1 2xl:max-w-md">
           <input
             ref={searchInputRef}
             type="text"
@@ -133,7 +133,8 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
               icon: option.icon,
             }))}
             className="min-w-0 flex-1 sm:flex-none"
-            buttonClassName="h-[42px] w-full sm:w-[184px] px-3"
+            buttonClassName="h-[42px] w-full sm:w-[184px] md:w-auto 2xl:w-[184px] px-3"
+            labelClassName="md:hidden 2xl:inline"
             menuClassName="min-w-[184px]"
           />
           <button
@@ -158,7 +159,7 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
           </button>
         </div>
       </div>
-      <div className="flex w-full flex-wrap items-center gap-2 sm:flex-nowrap 2xl:w-auto 2xl:justify-end">
+      <div className="flex w-full flex-wrap items-center gap-2 sm:flex-nowrap md:w-auto md:justify-end">
         <div className="flex items-center gap-2 sm:mr-1">
           <div className="ui-button-group" role="group" aria-label="Selection">
             <button
@@ -275,15 +276,17 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
               document.getElementById("dashboard-import")?.click();
             }}
             disabled={isTrashView || isSharedView}
+            aria-label="Import drawings"
+            title="Import drawings"
             className={clsx(
-              "ui-button-secondary h-[42px] flex-1 whitespace-nowrap px-4 sm:flex-none",
+              "ui-button-secondary h-[42px] flex-1 whitespace-nowrap px-4 sm:flex-none md:w-[42px] md:px-0 2xl:w-auto 2xl:px-4",
               !(isTrashView || isSharedView) &&
                 "text-indigo-700 dark:text-indigo-300",
             )}
           >
             <Upload size={17} strokeWidth={2.5} />
-            <span className="sm:hidden">Import</span>
-            <span className="hidden sm:inline">Import drawings</span>
+            <span className="md:hidden">Import</span>
+            <span className="hidden 2xl:inline">Import drawings</span>
           </button>
           <NewDrawingControl
             disabled={isTrashView || isSharedView}
