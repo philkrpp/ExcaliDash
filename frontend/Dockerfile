@@ -21,7 +21,7 @@ ENV VITE_APP_BUILD_LABEL=$VITE_APP_BUILD_LABEL
 RUN npm run build
 
 # Production stage
-FROM nginxinc/nginx-unprivileged:alpine
+FROM nginxinc/nginx-unprivileged:1.31.7-alpine3.24
 
 # Apply Alpine security fixes that may postdate the nginx base image.
 # Refresh the package layer when the image's build label changes.
