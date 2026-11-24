@@ -3,11 +3,7 @@ import { createPortal } from "react-dom";
 import { Eye, Globe, Lock, Pencil, Clock, Check } from "lucide-react";
 import * as api from "../../api";
 import { PlayfulSelect } from "../PlayfulSelect";
-import {
-  EXPIRY_OPTIONS_FOR_EDIT,
-  calculateExpiresAt,
-  EXPIRY_OPTIONS,
-} from "./shareUtils";
+import { calculateExpiresAt, EXPIRY_OPTIONS } from "./shareUtils";
 import clsx from "clsx";
 
 type Props = {
@@ -34,14 +30,12 @@ export const LinkExpirySelect: React.FC<{
     permission?: "view" | "edit",
     expiresAt?: string | null,
   ) => void | Promise<void>;
-  linkPermission: "view" | "edit";
 }> = ({
   expiryOption,
   customExpiry,
   setExpiryOption,
   setCustomExpiry,
   handleUpdateLink,
-  linkPermission,
 }) => {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -110,9 +104,6 @@ export const LinkExpirySelect: React.FC<{
     };
   }, [open]);
 
-  const options =
-    linkPermission === "edit" ? EXPIRY_OPTIONS_FOR_EDIT : EXPIRY_OPTIONS;
-
   const menu = open ? (
     <div
       ref={menuRef}
@@ -120,7 +111,7 @@ export const LinkExpirySelect: React.FC<{
       style={portalPosition}
       className="ui-menu fixed z-[210] w-60 animate-in fade-in zoom-in-95 duration-100 flex flex-col p-1.5 gap-0.5"
     >
-      {options.map((option) => {
+      {EXPIRY_OPTIONS.map((option) => {
         const selected = expiryOption === option.value;
         return (
           <button
@@ -244,7 +235,6 @@ export const GeneralAccessSection: React.FC<Props> = ({
             setExpiryOption={setExpiryOption}
             setCustomExpiry={setCustomExpiry}
             handleUpdateLink={handleUpdateLink}
-            linkPermission={linkPermission}
           />
           <PlayfulSelect
             ariaLabel="Link permission"

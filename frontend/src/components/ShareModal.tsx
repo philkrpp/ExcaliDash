@@ -13,7 +13,7 @@ import { GeneralAccessSection } from "./share-modal/GeneralAccessSection";
 import { SharePeopleSection } from "./share-modal/SharePeopleSection";
 import {
   calculateExpiresAt,
-  DEFAULT_EDIT_EXPIRY_OPTION,
+  DEFAULT_EXPIRY_OPTION,
   toDatetimeLocalFromIso,
 } from "./share-modal/shareUtils";
 
@@ -62,7 +62,7 @@ export const ShareModal: React.FC<Props> = ({
   const [userResults, setUserResults] = useState<api.ShareResolvedUser[]>([]);
   const [userPermission, setUserPermission] = useState<"view" | "edit">("view");
   const [linkPermission, setLinkPermission] = useState<"view" | "edit">("view");
-  const [expiryOption, setExpiryOption] = useState("1h");
+  const [expiryOption, setExpiryOption] = useState(DEFAULT_EXPIRY_OPTION);
   const [customExpiry, setCustomExpiry] = useState("");
   const [isCopied, setIsCopied] = useState(false);
 
@@ -122,7 +122,7 @@ export const ShareModal: React.FC<Props> = ({
     setUserResults([]);
     setUserPermission("view");
     setLinkPermission("view");
-    setExpiryOption("1h");
+    setExpiryOption(DEFAULT_EXPIRY_OPTION);
     setCustomExpiry("");
     setIsCopied(false);
     void refresh();
@@ -252,14 +252,10 @@ export const ShareModal: React.FC<Props> = ({
     try {
       const perm = newPermission ?? linkPermission;
       setLinkPermission(perm);
-      let expiresAt =
+      const expiresAt =
         newExpiry !== undefined
           ? newExpiry
           : calculateExpiresAt(expiryOption, customExpiry);
-      if (perm === "edit" && expiresAt === null) {
-        expiresAt = calculateExpiresAt(DEFAULT_EDIT_EXPIRY_OPTION);
-        setExpiryOption(DEFAULT_EDIT_EXPIRY_OPTION);
-      }
       await api.createLinkShare(drawingId, { permission: perm, expiresAt });
       await refresh();
       void handleCopy(shareableEditorUrl);

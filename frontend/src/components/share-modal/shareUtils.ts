@@ -8,11 +8,9 @@ export const EXPIRY_OPTIONS = [
   { label: "Disable at...", value: "custom" },
 ];
 
-export const EXPIRY_OPTIONS_FOR_EDIT = EXPIRY_OPTIONS.filter(
-  (option) => option.value !== "never",
-);
-
-export const DEFAULT_EDIT_EXPIRY_OPTION = "7d";
+// Fork: one default for view and edit links. Upstream preselected 1 hour,
+// which silently cut off shared links; edit links could not be "never".
+export const DEFAULT_EXPIRY_OPTION = "30d";
 
 export const toIsoFromDatetimeLocal = (value: string): string | undefined => {
   const trimmed = (value || "").trim();
