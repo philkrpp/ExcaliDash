@@ -103,11 +103,17 @@ const DashboardView: React.FC = () => {
     sortField: sortConfig.field,
     sortDirection: sortConfig.direction,
     pageSize: PAGE_SIZE,
-    onRefreshSuccess: resetSelection,
   });
-  const [selectionView, setSelectionView] = useState(listKey);
-  if (selectionView !== listKey) {
-    setSelectionView(listKey);
+  // Not the search: typing already clears the selection, and the debounced
+  // list switch would clear a selection made right after typing.
+  const selectionKey = JSON.stringify([
+    selectedCollectionId === undefined ? "all" : selectedCollectionId,
+    sortConfig.field,
+    sortConfig.direction,
+  ]);
+  const [selectionView, setSelectionView] = useState(selectionKey);
+  if (selectionView !== selectionKey) {
+    setSelectionView(selectionKey);
     setSelectedIds(new Set());
     setShowBulkMoveMenu(false);
   }
@@ -155,6 +161,7 @@ const DashboardView: React.FC = () => {
   );
   const selection = useDashboardSelection({
     drawings: sortedDrawings,
+    isLoading,
     selectedIds,
     setSelectedIds,
     searchInputRef,

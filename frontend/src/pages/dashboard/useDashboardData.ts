@@ -191,7 +191,6 @@ type UseDashboardDataOptions = {
   sortField: DrawingSortField;
   sortDirection: SortDirection;
   pageSize: number;
-  onRefreshSuccess?: () => void;
 };
 
 export const useDashboardData = ({
@@ -200,7 +199,6 @@ export const useDashboardData = ({
   sortField,
   sortDirection,
   pageSize,
-  onRefreshSuccess,
 }: UseDashboardDataOptions) => {
   const params: ListParams = {
     selectedCollectionId,
@@ -268,8 +266,7 @@ export const useDashboardData = ({
     setTotalCount(0);
     setIsFetchingMore(false);
     setIsLoading(false);
-    onRefreshSuccess?.();
-  }, [onRefreshSuccess]);
+  }, []);
 
   const loadCollections = useCallback(async () => {
     if (session !== sessionGeneration || !activeList.current) return;
@@ -341,7 +338,6 @@ export const useDashboardData = ({
         setDrawings(next);
         setTotalCount(result.totalCount);
         nextOffset.current = offset + result.drawings.length;
-        if (!append) onRefreshSuccess?.();
       } catch (err) {
         if (session !== sessionGeneration) return;
         const current = isCurrent();
@@ -390,7 +386,6 @@ export const useDashboardData = ({
       pageSize,
       sortField,
       sortDirection,
-      onRefreshSuccess,
       clearShownDrawings,
     ],
   );

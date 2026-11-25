@@ -11,6 +11,8 @@ import { getSelectionBounds, type Point, type SelectionBounds } from "./shared";
 
 type UseDashboardSelectionParams = {
   drawings: DrawingSummary[];
+  /** The list is a placeholder while true; ids missing from it may still exist. */
+  isLoading: boolean;
   selectedIds: Set<string>;
   setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>;
   searchInputRef: React.RefObject<HTMLInputElement>;
@@ -18,6 +20,7 @@ type UseDashboardSelectionParams = {
 
 export const useDashboardSelection = ({
   drawings,
+  isLoading,
   selectedIds,
   setSelectedIds,
   searchInputRef,
@@ -34,6 +37,17 @@ export const useDashboardSelection = ({
   const resetSelection = useCallback(() => {
     setSelectedIds(new Set());
   }, [setSelectedIds]);
+
+  // A list refresh keeps the selection; only drawings that left the list drop out.
+  useEffect(() => {
+    if (isLoading) return;
+    setSelectedIds((previous) => {
+      if (previous.size === 0) return previous;
+      const listed = new Set(drawings.map((drawing) => drawing.id));
+      const kept = [...previous].filter((id) => listed.has(id));
+      return kept.length === previous.size ? previous : new Set(kept);
+    });
+  }, [drawings, isLoading, setSelectedIds]);
 
   const selectionBounds = useMemo<SelectionBounds | null>(() => {
     if (!dragStart || !dragCurrent) return null;
