@@ -110,9 +110,7 @@ export const SettingsMainGrid = ({
           options={[
             { value: "en", label: "English" },
             { value: "zh-CN", label: "简体中文" },
-            ...(languageOption === language &&
-            language !== "en" &&
-            language !== "zh-CN"
+            ...(languageOption !== "en" && languageOption !== "zh-CN"
               ? [{ value: language, label: getEditorLanguageLabel(language) }]
               : []),
           ]}

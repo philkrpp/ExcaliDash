@@ -93,7 +93,7 @@ export const Login: React.FC = () => {
   if (authStatusError) {
     return (
       <AuthStatusErrorPanel
-        message={authStatusError}
+        {...authStatusError}
         onRetry={retryAuthStatus}
         fullScreen
       />

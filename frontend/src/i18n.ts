@@ -53,5 +53,12 @@ export type TranslationKey = keyof (typeof messages)["en"];
 export const resolveLocale = (value: string | null | undefined): Locale =>
   value?.toLowerCase().startsWith("zh") ? "zh-CN" : "en";
 
-export const translate = (locale: Locale, key: TranslationKey): string =>
-  messages[locale][key] ?? messages.en[key];
+export const translate = (
+  locale: Locale,
+  key: TranslationKey,
+  params?: Record<string, string>,
+): string =>
+  Object.entries(params ?? {}).reduce(
+    (text, [name, value]) => text.replace(`{${name}}`, value),
+    (messages[locale][key] ?? messages.en[key]) as string,
+  );

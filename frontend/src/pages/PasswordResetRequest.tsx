@@ -50,7 +50,7 @@ export const PasswordResetRequest: React.FC = () => {
           <h2 className="auth-heading">
             {enabled ? "Reset your password" : "Password help"}
           </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-sm text-slate-600 dark:text-neutral-400">
             {enabled
               ? "Enter your email address and we’ll send you a reset link."
               : enabled === null
@@ -94,16 +94,16 @@ export const PasswordResetRequest: React.FC = () => {
               </button>
             </form>
           ) : enabled && submitted ? (
-            <div className="ui-card p-5 text-sm text-gray-700 dark:text-gray-200">
+            <div className="ui-card p-5 text-sm text-slate-700 dark:text-neutral-200">
               If an account with that email exists, a password reset link has
               been sent. The link is valid for 60 minutes and can be used once.
             </div>
           ) : enabled === false ? (
             <div className="ui-card p-5 text-left space-y-3">
-              <div className="text-sm text-gray-700 dark:text-gray-200">
+              <div className="text-sm text-slate-700 dark:text-neutral-200">
                 Ask your administrator for a temporary password.
               </div>
-              <div className="text-xs text-gray-600 dark:text-gray-300">
+              <div className="text-xs text-slate-600 dark:text-neutral-300">
                 If you are an admin and you’re locked out, run:
               </div>
               <div className="flex items-start gap-2 rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-neutral-700 dark:bg-neutral-900">

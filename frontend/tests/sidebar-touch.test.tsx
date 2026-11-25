@@ -15,7 +15,10 @@ vi.mock("react-router-dom", () => ({
 }));
 vi.mock("../src/context/useLocale", () => ({
   useLocale: () => ({
-    t: (key: Parameters<typeof translate>[1]) => translate("en", key),
+    t: (
+      key: Parameters<typeof translate>[1],
+      params?: Parameters<typeof translate>[2],
+    ) => translate("en", key, params),
   }),
 }));
 vi.mock("../src/context/AuthContext", () => ({

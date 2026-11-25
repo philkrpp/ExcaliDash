@@ -326,7 +326,7 @@ export const DrawingCard = memo(function DrawingCard({
                 data-testid={`drawing-actions-${drawing.id}`}
                 aria-label={`More actions for "${drawing.name}"`}
                 aria-expanded={contextMenu !== null}
-                className="group/actions -my-3 -mr-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-neutral-500"
+                className="group/actions -my-3 -mr-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg"
               >
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg border-2 border-transparent text-slate-500 transition-colors group-hover/actions:border-slate-200 group-hover/actions:bg-slate-50 group-hover/actions:text-slate-800 dark:text-neutral-400 dark:group-hover/actions:border-neutral-700 dark:group-hover/actions:bg-neutral-800 dark:group-hover/actions:text-neutral-100">
                   <Ellipsis size={18} />

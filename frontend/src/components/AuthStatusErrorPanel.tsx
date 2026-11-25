@@ -2,20 +2,18 @@ import React from "react";
 import { Logo } from "./Logo";
 
 type AuthStatusErrorPanelProps = {
+  title?: string;
   message: string;
   onRetry: () => void | Promise<void>;
   fullScreen?: boolean;
 };
 
 export const AuthStatusErrorPanel: React.FC<AuthStatusErrorPanelProps> = ({
+  title,
   message,
   onRetry,
   fullScreen = false,
 }) => {
-  // An optional first line (before "\n") is the panel title.
-  const [first, ...rest] = message.split("\n");
-  const title = rest.length > 0 ? first : null;
-  const body = rest.length > 0 ? rest.join("\n") : message;
   const panel = (
     <div className="auth-panel text-sm" role="alert">
       <div className="text-slate-700 dark:text-neutral-200">
@@ -24,7 +22,7 @@ export const AuthStatusErrorPanel: React.FC<AuthStatusErrorPanelProps> = ({
             {title}
           </div>
         ) : null}
-        {body}
+        {message}
       </div>
       <button
         type="button"

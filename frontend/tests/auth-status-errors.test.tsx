@@ -42,7 +42,8 @@ const httpError = (status: number, headers: Record<string, string> = {}) =>
 const renderers: ReactTestRenderer[] = [];
 
 const Probe = () => {
-  return <span>{useAuth().authStatusError}</span>;
+  const error = useAuth().authStatusError;
+  return <span>{error ? [error.title, error.message].filter(Boolean).join("\n") : null}</span>;
 };
 
 async function loadWith(error: unknown) {
@@ -156,7 +157,8 @@ describe("auth status error panel", () => {
     await act(async () => {
       renderer = create(
         <AuthStatusErrorPanel
-          message={"Too many requests\nTry again in a minute."}
+          title="Too many requests"
+          message="Try again in a minute."
           onRetry={vi.fn()}
         />,
       );

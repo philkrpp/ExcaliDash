@@ -47,7 +47,7 @@ interface AuthContextType {
   loading: boolean;
   authEnabled: boolean | null;
   registrationEnabled: boolean;
-  authStatusError: string | null;
+  authStatusError: AuthStatusError | null;
   authMode: "local" | "hybrid" | "oidc_enforced";
   oidcEnabled: boolean;
   oidcEnforced: boolean;
@@ -84,8 +84,9 @@ const storedIdentity = (value: string | null) => {
   }
 };
 
-/** Returns the panel text; an optional first line before "\n" is its title. */
-const describeAuthStatusError = (error: unknown): string => {
+export type AuthStatusError = { title?: string; message: string };
+
+const describeAuthStatusError = (error: unknown): AuthStatusError => {
   const response = isAxiosError(error) ? error.response : undefined;
   if (response?.status === 429) {
     // shortcut: Retry-After is only readable same-origin (backend CORS does not
@@ -99,16 +100,23 @@ const describeAuthStatusError = (error: unknown): string => {
       Number.isFinite(retryAfter) && retryAfter > 0
         ? `${retryAfter} ${retryAfter === 1 ? "second" : "seconds"}`
         : "a minute";
-    return `Too many requests\nThe server is rate limiting right now. Try again in ${wait}.`;
+    return {
+      title: "Too many requests",
+      message: `The server is rate limiting right now. Try again in ${wait}.`,
+    };
   }
   // A proxy answering 502–504 means it could not reach the backend either.
   const isGatewayError =
     response !== undefined && response.status >= 502 && response.status <= 504;
   if (response && !isGatewayError) {
-    return `The backend answered with HTTP ${response.status} while loading the authentication status. Check the backend logs and your reverse proxy configuration.`;
+    return {
+      message: `The backend answered with HTTP ${response.status} while loading the authentication status. Check the backend logs and your reverse proxy configuration.`,
+    };
   }
   const proxyStatus = isGatewayError ? ` (HTTP ${response.status} from the proxy)` : "";
-  return `Unable to reach the backend API${proxyStatus}. Check BACKEND_URL, FRONTEND_URL, and your reverse proxy configuration.`;
+  return {
+    message: `Unable to reach the backend API${proxyStatus}. Check BACKEND_URL, FRONTEND_URL, and your reverse proxy configuration.`,
+  };
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -121,7 +129,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [authEnabled, setAuthEnabled] = useState<boolean | null>(null);
   const [registrationEnabled, setRegistrationEnabled] = useState(false);
-  const [authStatusError, setAuthStatusError] = useState<string | null>(null);
+  const [authStatusError, setAuthStatusError] = useState<AuthStatusError | null>(null);
   const [authMode, setAuthMode] = useState<
     "local" | "hybrid" | "oidc_enforced"
   >("local");
@@ -296,9 +304,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     } catch (error) {
       if (!isCurrent()) return;
       console.error("Failed to load user:", error);
-      setAuthStatusError(
-        "Unable to initialize authentication state. Check backend/API connectivity and refresh.",
-      );
+      setAuthStatusError({
+        message:
+          "Unable to initialize authentication state. Check backend/API connectivity and refresh.",
+      });
       localStorage.removeItem(USER_KEY);
       applyUser(null);
     } finally {

@@ -243,10 +243,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       ? undefined
                       : (e) => handleItemMenuButton(e, collection.id)
                   }
-                  menuLabel={t("sidebar.itemActions").replace(
-                    "{name}",
-                    collection.name,
-                  )}
+                  menuLabel={t("sidebar.itemActions", {
+                    name: collection.name,
+                  })}
                   isEditing={editingId === collection.id}
                   editValue={editName}
                   onEditChange={setEditName}

@@ -40,7 +40,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     if (authStatusError) {
       return (
         <AuthStatusErrorPanel
-          message={authStatusError}
+          {...authStatusError}
           onRetry={retryAuthStatus}
           fullScreen
         />

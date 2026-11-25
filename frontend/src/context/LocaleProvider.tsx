@@ -20,7 +20,7 @@ export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({
       locale,
       language,
       setLanguage,
-      t: (key) => translate(locale, key),
+      t: (key, params) => translate(locale, key, params),
     }),
     [locale, language, setLanguage],
   );
