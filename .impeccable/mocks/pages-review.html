@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ExcaliDash Seiten-Review</title>
+<style>
+@font-face { font-family: "Excalifont"; src: url("pages-review/Excalifont-Regular.woff2") format("woff2"); font-display: swap; }
+
+:root {
+  color-scheme: light;
+  --bg: #f3f4f6; --paper: #ffffff; --paper-2: #f8fafc; --ink: #0f172a; --ink-2: #334155; --muted: #64748b;
+  --line: #e2e8f0; --line-strong: #1e293b; --brand: #4f46e5; --brand-ink: #3730a3; --brand-soft: #eef2ff;
+  --danger: #e11d48; --danger-soft: #fff1f2; --ok: #059669; --ok-soft: #ecfdf5; --warn: #b45309; --warn-soft: #fffbeb;
+  --hard: 1.5px 1.5px 0 rgba(30,41,59,.9); --hard-3: 3px 3px 0 rgba(30,41,59,.9);
+  --app-bg: #f3f4f6; --app-card: #ffffff; --app-soft: #f8fafc; --app-ink: #1e293b; --app-muted: #64748b; --app-border: #1e293b; --app-line: #e2e8f0;
+  --note: #7c3aed;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0a0a0a; --paper: #171717; --paper-2: #1f1f1f; --ink: #fafafa; --ink-2: #d4d4d4; --muted: #a3a3a3;
+    --line: #2e2e2e; --line-strong: #525252; --brand: #818cf8; --brand-ink: #c7d2fe; --brand-soft: rgba(99,102,241,.14);
+    --danger: #fb7185; --danger-soft: rgba(225,29,72,.14); --ok: #34d399; --ok-soft: rgba(16,185,129,.14); --warn: #fbbf24; --warn-soft: rgba(245,158,11,.12);
+    --hard: 1.5px 1.5px 0 rgba(255,255,255,.18); --hard-3: 3px 3px 0 rgba(255,255,255,.18);
+    --app-bg: #0a0a0a; --app-card: #171717; --app-soft: #262626; --app-ink: #f5f5f5; --app-muted: #a3a3a3; --app-border: #404040; --app-line: #262626;
+    --note: #c4b5fd;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0a0a0a; --paper: #171717; --paper-2: #1f1f1f; --ink: #fafafa; --ink-2: #d4d4d4; --muted: #a3a3a3;
+  --line: #2e2e2e; --line-strong: #525252; --brand: #818cf8; --brand-ink: #c7d2fe; --brand-soft: rgba(99,102,241,.14);
+  --danger: #fb7185; --danger-soft: rgba(225,29,72,.14); --ok: #34d399; --ok-soft: rgba(16,185,129,.14); --warn: #fbbf24; --warn-soft: rgba(245,158,11,.12);
+  --hard: 1.5px 1.5px 0 rgba(255,255,255,.18); --hard-3: 3px 3px 0 rgba(255,255,255,.18);
+  --app-bg: #0a0a0a; --app-card: #171717; --app-soft: #262626; --app-ink: #f5f5f5; --app-muted: #a3a3a3; --app-border: #404040; --app-line: #262626;
+  --note: #c4b5fd;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+::selection { background: color-mix(in srgb, var(--brand) 28%, transparent); }
+a { color: var(--brand); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 2px; border-radius: 6px; }
+code, .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .86em; }
+code { background: var(--paper-2); border: 1px solid var(--line); border-radius: 5px; padding: 0 .3em; overflow-wrap: anywhere; }
+svg.i { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 0 96px; }
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.topbar .wrap { padding-block: 10px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.topbar nav { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
+.topbar nav a { text-decoration: none; color: var(--ink-2); padding: 6px 10px; border-radius: 8px; font-weight: 600; font-size: 13px; }
+.topbar nav a:hover { background: var(--paper); color: var(--brand); }
+@media (max-width: 640px) {
+  .topbar nav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; flex-basis: 100%; order: 2; }
+  .topbar nav a { white-space: nowrap; }
+}
+section[aria-labelledby], .sugg { scroll-margin-top: 110px; }
+.theme-toggle { display: inline-flex; border: 1px solid var(--line); background: var(--paper); border-radius: 10px; padding: 2px; }
+.theme-toggle button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; padding: 6px 10px; border-radius: 8px; cursor: pointer; min-height: 32px; }
+.theme-toggle button[aria-pressed="true"] { background: var(--brand-soft); color: var(--brand-ink); }
+
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; }
+h1 { font-family: "Excalifont", Inter, sans-serif; font-weight: 400; font-size: clamp(2.2rem, 5vw, 3.4rem); margin: 48px 0 8px; letter-spacing: -0.01em; }
+h2 { font-size: 1.55rem; margin: 72px 0 6px; }
+h3 { font-size: 1.1rem; margin: 0; }
+.lead { color: var(--ink-2); max-width: 72ch; margin: 0 0 12px; }
+p { max-width: 72ch; }
+.meta { color: var(--muted); font-size: 13px; }
+
+.callout { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 20px 0; }
+.callout h3 { margin-bottom: 6px; }
+.callout ul { margin: 6px 0 0; padding-left: 20px; }
+.callout li { margin: 3px 0; }
+
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); margin: 16px 0; }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 14px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--paper-2); position: sticky; top: 0; }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; color: var(--muted); width: 2.5em; }
+tr.top td:first-child { box-shadow: inset 3px 0 0 var(--brand); }
+.pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.high { background: var(--danger-soft); color: var(--danger); }
+.pill.medium { background: var(--warn-soft); color: var(--warn); }
+.pill.low { background: var(--paper-2); color: var(--muted); border: 1px solid var(--line); }
+.pill.eff { background: var(--brand-soft); color: var(--brand-ink); }
+.pill.do { background: var(--ok-soft); color: var(--ok); }
+.pill.later { background: var(--paper-2); color: var(--muted); border: 1px solid var(--line); }
+
+.shots { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin: 18px 0 8px; align-items: start; }
+figure { margin: 0; }
+figure img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); }
+figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+.shots.tall figure:has(img.portrait) { max-width: 340px; }
+
+.sugg { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin: 18px 0; }
+.sugg-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 10px; }
+.sugg-head .id { font-weight: 800; color: var(--brand); font-variant-numeric: tabular-nums; }
+.sugg-head h3 { flex: 1 1 280px; }
+.sugg dl { display: grid; grid-template-columns: 9.5em 1fr; gap: 6px 14px; margin: 0; }
+.sugg dt { color: var(--muted); font-size: 13px; font-weight: 600; padding-top: 1px; }
+.sugg dd { margin: 0; }
+@media (max-width: 640px) { .sugg dl { grid-template-columns: 1fr; } .sugg dt { margin-top: 6px; } }
+.flag { margin-top: 10px; font-size: 13.5px; color: var(--note); }
+
+.mockrow { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 16px; align-items: start; }
+.mock { border: 1px dashed var(--line-strong); border-radius: 14px; padding: 14px; background: var(--app-bg); background-image: radial-gradient(color-mix(in srgb, var(--app-muted) 35%, transparent) 1px, transparent 1px); background-size: 24px 24px; overflow: hidden; }
+.mock-label { font-size: 12px; font-weight: 700; color: var(--muted); margin: 0 0 10px; display: flex; gap: 8px; align-items: center; }
+.mock-label .tag { padding: 1px 7px; border-radius: 999px; font-size: 11px; }
+.tag.before { background: var(--danger-soft); color: var(--danger); }
+.tag.after { background: var(--ok-soft); color: var(--ok); }
+
+/* --- App look (replicated from frontend/src/index.css) --- */
+.a { font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: var(--app-ink); font-size: 14px; }
+.a-card { background: var(--app-card); border: 2px solid var(--app-border); border-radius: 16px; box-shadow: var(--hard); }
+.a-card.sel { border-color: var(--brand); box-shadow: 3px 3px 0 color-mix(in srgb, var(--brand) 90%, transparent); }
+.a-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 2px solid var(--app-border); border-radius: 12px; background: var(--app-card); color: var(--app-ink); font: 700 14px/1 Inter, system-ui, sans-serif; padding: 0 14px; min-height: 44px; box-shadow: var(--hard); }
+.a-btn.primary { background: #4f46e5; color: #fff; border-color: #1e293b; }
+:root[data-theme="dark"] .a-btn.primary { background: #6366f1; border-color: rgba(165,180,252,.4); }
+.a-btn.icon { width: 44px; padding: 0; }
+.a-btn.sm { min-height: 36px; font-size: 12.5px; padding: 0 10px; }
+.a-btn.ghost { box-shadow: none; border-color: transparent; background: transparent; }
+.a-input { border: 2px solid var(--app-line); border-radius: 12px; background: var(--app-card); color: var(--app-ink); font: 16px Inter, system-ui, sans-serif; padding: 10px 12px; width: 100%; min-height: 44px; }
+.a-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--app-muted); margin: 0 0 4px; }
+.a-menu { background: var(--app-card); border: 1px solid var(--app-border); border-radius: 12px; box-shadow: var(--hard); padding: 4px; }
+.a-mi { display: flex; align-items: center; gap: 10px; padding: 0 10px; min-height: 44px; border-radius: 9px; font-weight: 500; color: var(--app-ink); }
+.a-mi.hl { background: var(--brand-soft); color: var(--brand-ink); }
+.a-mi.danger { color: var(--danger); }
+.a-sep { border-top: 2px solid var(--app-line); margin: 4px 0; }
+.a-chip { display: inline-flex; align-items: center; border: 1px solid var(--app-line); background: var(--app-soft); color: var(--app-muted); border-radius: 7px; font-size: 11px; font-weight: 600; padding: 2px 8px; }
+.a-switch { position: relative; width: 52px; height: 30px; border: 2px solid var(--app-border); border-radius: 999px; background: #34d399; flex: none; }
+.a-switch::after { content: ""; position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; border-radius: 999px; border: 2px solid var(--app-border); background: #fff; }
+.a-switch.off { background: var(--app-soft); }
+.a-switch.off::after { right: auto; left: 2px; }
+.a-display { font-family: "Excalifont", Inter, sans-serif; }
+.a-side-item { display: flex; align-items: center; gap: 12px; padding: 0 12px; min-height: 44px; border-radius: 12px; border: 2px solid transparent; font-weight: 600; color: var(--app-muted); }
+.a-side-item.on { background: var(--brand-soft); color: var(--brand-ink); border-color: var(--app-border); box-shadow: var(--hard); }
+.a-side-item .grow { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.a-side-label { font-size: 12px; font-weight: 600; color: var(--app-muted); padding: 0 12px 6px; display: flex; align-items: center; justify-content: space-between; }
+.preview { aspect-ratio: 16/10; border-bottom: 2px solid var(--app-border); border-radius: 14px 14px 0 0; background: var(--app-soft); position: relative; display: grid; place-items: center; }
+.sketch { width: 70%; height: 60%; position: relative; }
+.sketch i { position: absolute; border: 2px solid var(--app-ink); border-radius: 8px; opacity: .8; }
+.annot { position: absolute; border: 2px dashed var(--note); border-radius: 999px; pointer-events: none; }
+.annot-text { font-size: 11.5px; font-weight: 700; color: var(--note); }
+.row { display: flex; gap: 8px; align-items: center; }
+.between { justify-content: space-between; }
+.stack > * + * { margin-top: 8px; }
+.frame { border: 2px solid var(--line-strong); border-radius: 18px; padding: 8px; background: var(--app-bg); }
+.gridbox { display: grid; gap: 6px; }
+.gridbox span { display: block; aspect-ratio: 16/12; border: 2px solid var(--app-border); border-radius: 8px; background: var(--app-card); }
+.gridbox span.cut { opacity: .35; }
+.crop { border-radius: 10px; border: 1px solid var(--line); overflow: hidden; }
+.crop img { display: block; width: 100%; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></symbol>
+  <symbol id="i-square" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  <symbol id="i-move" viewBox="0 0 24 24"><path d="M2 9V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1"/><path d="M2 13h10"/><path d="m9 16 3-3-3-3"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M15.707 21.293a1 1 0 0 1-1.414 0l-1.586-1.586a1 1 0 0 1 0-1.414l5.586-5.586a1 1 0 0 1 1.414 0l1.586 1.586a1 1 0 0 1 0 1.414z"/><path d="m18 13-1.375-6.874a1 1 0 0 0-.746-.776L3.235 2.028a1 1 0 0 0-1.207 1.207L5.35 15.879a1 1 0 0 0 .776.746L13 18"/><path d="m2.3 2.3 7.286 7.286"/><circle cx="11" cy="11" r="2"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-chev-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-chev-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+  <symbol id="i-login" viewBox="0 0 24 24"><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="wrap">
+    <nav aria-label="Abschnitte">
+      <a href="#ranking">Ranking</a><a href="#dashboard">Dashboard</a><a href="#sidebar">Sidebar</a><a href="#settings">Settings</a><a href="#profile">Profile</a><a href="#admin">Admin</a><a href="#auth">Auth-Seiten</a><a href="#method">Methode</a>
+    </nav>
+    <div class="theme-toggle" role="group" aria-label="Farbschema">
+      <button type="button" data-set="light" aria-pressed="false">Hell</button>
+      <button type="button" data-set="system" aria-pressed="true">System</button>
+      <button type="button" data-set="dark" aria-pressed="false">Dunkel</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Seiten-Review: alles außer Editor</h1>
+  <p class="lead">Impeccable-Review (Modus <strong>Operate</strong>, Verfeinerung im bestehenden Stil, kein Redesign) für Dashboard, Collections, Settings, Profile, Admin und die Auth-Seiten. Schwerpunkt iPad mit Touch, dazu Desktop und Phone. Alle Screenshots stammen aus dieser Session (headless Chromium mit Touch-Emulation), alle Belege zeigen auf <code>datei:zeile</code> im Stand <code>509e43b</code>.</p>
+  <p class="meta">Stand 25.11.2026 · Editor (<code>/editor/:id</code>, <code>/shared/:id</code>) bewusst ausgenommen, läuft parallel · Mocks in App-Optik (slate/indigo, 2-px-Rahmen, harte 1,5-px-Schatten wie in <code>index.css:49–92</code>)</p>
+
+  <section aria-labelledby="ranking">
+    <h2 id="ranking">Ranking und Empfehlung</h2>
+    <p class="lead">Die ersten sieben bilden zusammen einen <strong>Touch- und Bugfix-Pass</strong> (≈ 1–2 Tage): Sie machen Funktionen auf dem iPad überhaupt erst erreichbar oder beheben belegte Fehler. Empfehlung: diese sieben umsetzen, 8–15 danach als zweite Runde, den Rest nur bei Gelegenheit.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>ID</th><th>Vorschlag</th><th>Seite</th><th>Impact</th><th>Aufwand</th><th>Empfehlung</th></tr></thead>
+        <tbody>
+          <tr class="top"><td class="num">1</td><td><a href="#D1">D1</a></td><td>Karten-Aktionen über sichtbaren ⋯-Button statt nur Rechtsklick/Doppelklick</td><td>Dashboard</td><td><span class="pill high">hoch</span></td><td><span class="pill eff">M</span></td><td><span class="pill do">machen</span></td></tr>
+          <tr class="top"><td class="num">2</td><td><a href="#S1">S1</a></td><td>Collections auf Touch verwalten: ⋯ an jeder Collection, „+“ auf 44 px</td><td>Sidebar</td><td><span class="pill high">hoch</span></td><td><span class="pill eff">M</span></td><td><span class="pill do">machen</span></td></tr>
+          <tr class="top"><td class="num">3</td><td><a href="#D2">D2</a></td><td>Auswahl-Kreis auf Touch sichtbar und 44 px Trefferfläche</td><td>Dashboard</td><td><span class="pill high">hoch</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">machen</span></td></tr>
+          <tr class="top"><td class="num">4</td><td><a href="#D3">D3</a></td><td>Dichteres Raster: 3 Spalten auf dem iPad statt 2</td><td>Dashboard</td><td><span class="pill high">hoch</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">machen</span></td></tr>
+          <tr class="top"><td class="num">5</td><td><a href="#D4">D4</a></td><td>Kontextmenüs im Viewport halten (Bug: ragt rechts raus)</td><td>Dashboard, Sidebar</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">machen</span></td></tr>
+          <tr class="top"><td class="num">6</td><td><a href="#G1">G1</a></td><td>429 und Netzwerkfehler unterscheiden statt „Check BACKEND_URL“</td><td>global</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">machen</span></td></tr>
+          <tr class="top"><td class="num">7</td><td><a href="#A2">A2</a></td><td>Benutzer-Status als Schalter, Deaktivieren bestätigen, „Impersonate“ für sich selbst sperren</td><td>Admin</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">machen</span></td></tr>
+          <tr class="top"><td class="num">8</td><td><a href="#D5">D5</a></td><td>Phone-Toolbar von 4 auf 2 Zeilen</td><td>Dashboard</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">M</span></td><td><span class="pill do">2. Runde</span></td></tr>
+          <tr class="top"><td class="num">9</td><td><a href="#AU2">AU2</a></td><td>Formularfelder: sichtbare Labels, 16 px Schrift auf Touch</td><td>Login, Register, Reset</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">2. Runde</span></td></tr>
+          <tr class="top"><td class="num">10</td><td><a href="#S2">S2</a></td><td>Trash in die Library-Liste, aktive Seite im Account-Button zeigen</td><td>Sidebar</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">2. Runde</span></td></tr>
+          <tr><td class="num">11</td><td><a href="#P2">P2</a></td><td>Avatar-Initialen lesbar (1,44 : 1 → dunkle Schrift)</td><td>global</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">2. Runde</span></td></tr>
+          <tr><td class="num">12</td><td><a href="#A1">A1</a></td><td>Benutzertabelle auf dem Phone als Kartenliste</td><td>Admin</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">M</span></td><td><span class="pill do">2. Runde</span></td></tr>
+          <tr><td class="num">13</td><td><a href="#ST1">ST1</a></td><td>Settings-Zeile als Ganzes tippbar, Schalter größer auf Touch</td><td>Settings, Admin</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">2. Runde</span></td></tr>
+          <tr><td class="num">14</td><td><a href="#AU1">AU1</a></td><td>Auth-Setup und Fehlerpanel an den Auth-Stil angleichen</td><td>Auth-Setup</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">2. Runde</span></td></tr>
+          <tr><td class="num">15</td><td><a href="#P1">P1</a></td><td>„Change password“ nicht als roter Gefahren-Button</td><td>Profile</td><td><span class="pill medium">mittel</span></td><td><span class="pill eff">S</span></td><td><span class="pill do">2. Runde</span></td></tr>
+          <tr><td class="num">16</td><td><a href="#ST2">ST2</a></td><td>Sprachauswahl zeigt „en-US (editor language)“</td><td>Settings</td><td><span class="pill low">niedrig</span></td><td><span class="pill eff">S</span></td><td><span class="pill later">bei Gelegenheit</span></td></tr>
+          <tr><td class="num">17</td><td><a href="#S3">S3</a></td><td>Sidebar-Zeilen 44 px auf Touch, Resize-Griff auf Touch ausblenden</td><td>Sidebar</td><td><span class="pill low">niedrig</span></td><td><span class="pill eff">S</span></td><td><span class="pill later">bei Gelegenheit</span></td></tr>
+          <tr><td class="num">18</td><td><a href="#S4">S4</a></td><td>Abschnittslabels „Library“/„Collections“ kontrastärmer als erlaubt</td><td>Sidebar</td><td><span class="pill low">niedrig</span></td><td><span class="pill eff">S</span></td><td><span class="pill later">bei Gelegenheit</span></td></tr>
+          <tr><td class="num">19</td><td><a href="#D6">D6</a></td><td>Collection-Chip auf der Karte: 23 px hoch</td><td>Dashboard</td><td><span class="pill low">niedrig</span></td><td><span class="pill eff">S</span></td><td><span class="pill later">mit D1</span></td></tr>
+          <tr><td class="num">20</td><td><a href="#D7">D7</a></td><td>Button-Gruppe 34 px und „⌘K“-Hinweis auf reinen Touch-Geräten</td><td>Dashboard</td><td><span class="pill low">niedrig</span></td><td><span class="pill eff">S</span></td><td><span class="pill later">bei Gelegenheit</span></td></tr>
+          <tr><td class="num">21</td><td><a href="#A3">A3</a></td><td>Zwei „Reset“-Buttons mit verschiedener Bedeutung</td><td>Admin</td><td><span class="pill low">niedrig</span></td><td><span class="pill eff">S</span></td><td><span class="pill later">mit A2</span></td></tr>
+          <tr><td class="num">22</td><td><a href="#AU3">AU3</a></td><td>Reset-Hilfe: Befehl abgeschnitten, kein Kopieren-Button</td><td>Reset-Password</td><td><span class="pill low">niedrig</span></td><td><span class="pill eff">S</span></td><td><span class="pill later">bei Gelegenheit</span></td></tr>
+          <tr><td class="num">23</td><td><a href="#AU4">AU4</a></td><td>Auth-Setup sagt dasselbe zweimal</td><td>Auth-Setup</td><td><span class="pill low">niedrig</span></td><td><span class="pill eff">S</span></td><td><span class="pill later">mit AU1</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <h3>Abgleich mit DECISIONS.md und letzten Commits</h3>
+      <ul>
+        <li>Kein Vorschlag widerspricht einem Eintrag in <code>DECISIONS.md</code> (beide Einträge betreffen Editor-Chrome und Freigabe-Links).</li>
+        <li><strong>D5</strong> berührt die gerade umgebaute Dashboard-Toolbar (<code>1111d7c</code>, <code>3783af7</code>). Die dort entschiedene Ein-Zeilen-Toolbar mit Icon-Buttons von <code>md</code> bis <code>2xl</code> bleibt unangetastet; D5 betrifft nur Breiten unter <code>md</code>, die der Umbau nicht adressiert hat.</li>
+        <li><strong>D7</strong> ergänzt <code>3aedd5e</code>: Dort wurde nur <code>.ui-toolbar-button</code> unter <code>(hover: none)</code> auf 44 px gehoben (<code>index.css:104–108</code>), <code>.ui-button-group-item</code> blieb bei 34 px.</li>
+        <li><strong>S2</strong> ändert das Verhalten der Upstream-Einstellung „Compact sidebar“ (<code>SidebarFooter.tsx:51</code>, Upstream-Commit <code>08a84bc</code>). Keine eigene Entscheidung, aber ein Abweichen vom Upstream-Fork.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section aria-labelledby="dashboard">
+    <h2 id="dashboard">Dashboard <span class="meta">/ und /collections</span></h2>
+    <p class="lead"><code>/collections?id=…</code> rendert dieselbe Komponente (<code>App.tsx</code>, Route <code>/collections</code> → <code>Dashboard</code>); alle Punkte gelten dort genauso. Gemessen: Auf dem iPad quer sind nur <strong>2 Karten vollständig</strong> sichtbar, auf dem Phone beginnt die erste Karte erst bei <strong>y = 369 px</strong> von 844.</p>
+    <div class="shots">
+      <figure><img src="pages-review/dash-ipadL-light.webp" alt="Dashboard auf iPad quer: zwei große Kartenspalten neben der Sidebar" loading="lazy"><figcaption>iPad 11″ quer (1194×834): 2 Spalten, 2 Karten ganz sichtbar</figcaption></figure>
+      <figure><img src="pages-review/dash-ipadP-light.webp" alt="Dashboard auf iPad hoch mit Hamburger-Menü und zwei Spalten" loading="lazy"><figcaption>iPad 11″ hoch (834×1194): Drawer statt Sidebar, 2 Spalten</figcaption></figure>
+      <figure><img src="pages-review/dash-phone-light.webp" alt="Dashboard auf dem Phone, Toolbar über vier Zeilen" loading="lazy"><figcaption>Phone (390×844): Toolbar über 4 Zeilen</figcaption></figure>
+      <figure><img src="pages-review/dash-desk-dark.webp" alt="Dashboard auf Desktop im Dark Mode mit drei Spalten" loading="lazy"><figcaption>Desktop 1440×900, dunkel: 3 Spalten, sauber</figcaption></figure>
+    </div>
+
+    <article class="sugg" id="D1">
+      <div class="sugg-head"><span class="id">D1</span><h3>Karten-Aktionen über einen sichtbaren ⋯-Button</h3><span class="pill high">Impact hoch</span><span class="pill eff">Aufwand M</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Umbenennen, Verschieben, Duplizieren, Export und Löschen einer einzelnen Zeichnung hängen nur an <code>onContextMenu</code> (<code>DrawingCard.tsx:153</code>, Menü in <code>DrawingCardContextMenu.tsx:84–216</code>) und Umbenennen zusätzlich an <code>onDoubleClick</code> (<code>DrawingCard.tsx:266</code>). Einen Touch-Einstieg gibt es im Code nicht: Außerhalb des Editors findet <code>grep</code> keine Long-Press- oder Touch-Handler, der einzige <code>onPointerDown</code> (<code>DrawingCard.tsx:248</code>) stoppt nur die Propagation. Das Untermenü „Move to…“ öffnet nur per <code>onMouseEnter</code> (<code>DrawingCardContextMenu.tsx:109</code>), der Button selbst hat kein <code>onClick</code> (<code>:112</code>).</dd>
+        <dt>Vorschlag</dt><dd>Rechts im Kartenfuß einen ⋯-Button (44 × 44 px Trefferfläche, optisch 32 px) ergänzen, der dasselbe <code>DrawingCardContextMenu</code> öffnet, verankert am Button statt an Mauskoordinaten. „Verschieben nach…“ öffnet die Collection-Liste per Tap im selben Menü (aufklappen statt Hover-Untermenü). Rechtsklick und Doppelklick bleiben für Desktop.</dd>
+        <dt>Impact</dt><dd>Hoch. Auf dem iPad sind fünf Kernaktionen sonst nicht auffindbar. Ob iPadOS-Safari bei Long-Press ein <code>contextmenu</code>-Event schickt, ist auf echtem Gerät <strong>nicht verifiziert</strong>; selbst wenn, ist die Geste unsichtbar.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag after">nachher</span> Karte mit ⋯ und geöffnetem Menü (Touch)</p>
+          <div class="a" style="position:relative;max-width:320px">
+            <div class="a-card">
+              <div class="preview"><div class="sketch"><i style="left:0;top:0;width:45%;height:45%;background:#fecaca55"></i><i style="right:0;top:10%;width:35%;height:40%;border-radius:50%"></i><i style="left:25%;bottom:0;width:50%;height:30%"></i></div></div>
+              <div style="padding:12px 14px">
+                <div style="font-weight:700;font-size:15px">Netzwerk Heimlabor</div>
+                <div class="row between" style="margin-top:8px">
+                  <span style="font-size:11px;color:var(--app-muted);display:flex;gap:6px;align-items:center"><svg class="i"><use href="#i-clock"/></svg>vor 2 Min.</span>
+                  <span class="row" style="gap:6px"><span class="a-chip">Unorganized</span><span class="a-btn icon ghost" style="width:36px;min-height:36px;border-radius:10px;background:var(--brand-soft);color:var(--brand-ink)" aria-hidden="true"><svg class="i" style="font-size:18px"><use href="#i-more"/></svg></span></span>
+                </div>
+              </div>
+            </div>
+            <div class="a-menu" style="position:absolute;right:0;bottom:56px;width:220px">
+              <div class="a-mi"><svg class="i"><use href="#i-pen"/></svg>Umbenennen</div>
+              <div class="a-mi hl" style="justify-content:space-between"><span class="row"><svg class="i"><use href="#i-move"/></svg>Verschieben nach</span><svg class="i"><use href="#i-chev-up"/></svg></div>
+              <div style="padding-left:30px">
+                <div class="a-mi" style="min-height:40px">Kundenprojekte</div>
+                <div class="a-mi" style="min-height:40px">Workshops</div>
+              </div>
+              <div class="a-sep"></div>
+              <div class="a-mi"><svg class="i"><use href="#i-copy"/></svg>Duplizieren</div>
+              <div class="a-mi"><svg class="i"><use href="#i-download"/></svg>Exportieren</div>
+              <div class="a-sep"></div>
+              <div class="a-mi danger"><svg class="i"><use href="#i-trash"/></svg>Löschen</div>
+            </div>
+            <div style="height:250px"></div>
+          </div>
+        </div>
+        <div class="mock">
+          <p class="mock-label"><span class="tag before">vorher</span> Rechtsklick-Menü am Desktop, kein Einstieg per Touch</p>
+          <div class="crop"><img src="pages-review/ctx-desk.webp" alt="Desktop-Kontextmenü einer Zeichnungskarte, rechts abgeschnitten" loading="lazy"></div>
+          <p class="annot-text" style="margin:8px 0 0">Menüeinträge 36 px hoch (<code>ui-menu-item</code> py-2, <code>index.css:171</code>). Im Mock 44 px.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="D2">
+      <div class="sugg-head"><span class="id">D2</span><h3>Auswahl-Kreis auf Touch sichtbar, 44 px Trefferfläche</h3><span class="pill high">Impact hoch</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Der Auswahl-Kreis ist bis zum Hover unsichtbar: <code>opacity-0 group-hover:opacity-100</code> (<code>DrawingCard.tsx:182</code>), gemessen <code>opacity: 0</code> auf allen Größen. Er ist 24 × 24 px (<code>DrawingCard.tsx:194</code>). Auf dem iPad gibt es kein Hover; der Kreis lässt sich nur durch Tippen auf eine unsichtbare Stelle treffen (im Test: Tap traf, „1 selected“ erschien). Mehrfachauswahl per Ziehen arbeitet nur mit <code>mousedown/mousemove</code> (<code>useDashboardSelection.ts:77–80</code>), Shift/⌘ fehlen auf Touch.</dd>
+        <dt>Vorschlag</dt><dd>Unter <code>@media (hover: none)</code> den Kreis immer zeigen (halbtransparent, wenn nicht ausgewählt) und die Trefferfläche per Padding auf 44 × 44 px vergrößern, optisch 28 px. Sobald etwas ausgewählt ist, wechselt Tippen auf Karten bereits in Auswahl (<code>useDashboardSelection.ts:172–179</code>), das bleibt.</dd>
+        <dt>Impact</dt><dd>Hoch: Bulk-Aktionen (Verschieben, Duplizieren, Papierkorb) sind auf dem iPad praktisch unauffindbar.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag after">nachher</span> Touch: Kreis immer sichtbar, Trefferfläche gestrichelt</p>
+          <div class="a row" style="gap:14px;align-items:flex-start">
+            <div class="a-card" style="flex:1;max-width:220px">
+              <div class="preview">
+                <span style="position:absolute;top:4px;right:4px;width:44px;height:44px;display:grid;place-items:center"><span style="width:28px;height:28px;border-radius:999px;border:2px solid #94a3b8;background:color-mix(in srgb,var(--app-card) 85%,transparent)"></span></span>
+                <span class="annot" style="top:4px;right:4px;width:44px;height:44px;border-radius:12px"></span>
+                <div class="sketch"><i style="left:0;top:0;width:45%;height:45%"></i><i style="right:0;top:10%;width:35%;height:40%;border-radius:50%"></i></div>
+              </div>
+              <div style="padding:10px 12px;font-weight:700">Skizze</div>
+            </div>
+            <div class="a-card sel" style="flex:1;max-width:220px">
+              <div class="preview" style="border-color:var(--brand)">
+                <span style="position:absolute;top:4px;right:4px;width:44px;height:44px;display:grid;place-items:center"><span style="width:28px;height:28px;border-radius:999px;border:2px solid #1e293b;background:#4f46e5;color:#fff;display:grid;place-items:center"><svg class="i" style="font-size:15px;stroke-width:3"><use href="#i-check"/></svg></span></span>
+                <div class="sketch"><i style="left:0;top:0;width:45%;height:45%"></i><i style="right:0;top:10%;width:35%;height:40%;border-radius:50%"></i></div>
+              </div>
+              <div style="padding:10px 12px;font-weight:700">Netzwerk Heimlabor</div>
+            </div>
+          </div>
+          <p class="annot-text" style="margin:10px 0 0">44 × 44 px Treffer, 28 px Kreis; nur unter <code>(hover: none)</code>, Desktop bleibt wie heute.</p>
+        </div>
+        <div class="mock">
+          <p class="mock-label"><span class="tag before">vorher</span> iPad quer nach Tap auf die unsichtbare Stelle</p>
+          <div class="crop"><img src="pages-review/select-ipadL.webp" alt="iPad: eine Karte ausgewählt, Kreis erst nach Auswahl sichtbar" loading="lazy"></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="D3">
+      <div class="sugg-head"><span class="id">D3</span><h3>Dichteres Raster: 3 Spalten auf dem iPad</h3><span class="pill high">Impact hoch</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd><code>gridTemplateColumns: repeat(auto-fill, minmax(280px, 1fr))</code> (<code>DashboardPanels.tsx:165</code>) plus <code>lg:p-8</code> im Inhaltsbereich (<code>Layout.tsx:222</code>) ergibt gemessen: iPad quer 2 Spalten à 402 px, 2 Karten vollständig sichtbar; iPad hoch 2 Spalten à 368 px; Desktop 1440 3 Spalten; Phone 1. Auf dem iPad sieht man pro Bildschirm weniger Zeichnungen als auf einem Phone im Querformat.</dd>
+        <dt>Vorschlag</dt><dd>Ab <code>md</code> <code>minmax(220px, 1fr)</code> und Seitenpadding <code>md:p-6</code>. Rechnung mit den gemessenen Breiten: iPad quer 886 − 48 = 838 px → 3 Spalten à ≈ 268 px; iPad hoch 802 − 48 = 754 px → 3 Spalten à ≈ 240 px; Desktop 1132 − 48 = 1084 px → 4 Spalten. Phone bleibt bei 1 Spalte (minmax 280 unter <code>md</code>). Vorschau-SVGs skalieren bereits (<code>DrawingCard.tsx:226–228</code>).</dd>
+        <dt>Impact</dt><dd>Hoch für die Übersicht: 50 % mehr Zeichnungen pro Blick auf dem iPad, ohne neues Layout.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag before">vorher</span> iPad quer, Inhaltsbereich maßstäblich</p>
+          <div class="frame"><div class="gridbox" style="grid-template-columns:repeat(2,1fr)"><span></span><span></span><span class="cut"></span><span class="cut"></span></div></div>
+          <p class="annot-text" style="margin:8px 0 0">2 Spalten · 2 ganze Karten im Viewport</p>
+        </div>
+        <div class="mock">
+          <p class="mock-label"><span class="tag after">nachher</span> iPad quer, minmax(220px) + md:p-6</p>
+          <div class="frame"><div class="gridbox" style="grid-template-columns:repeat(3,1fr)"><span></span><span></span><span></span><span></span><span></span><span></span><span class="cut"></span><span class="cut"></span><span class="cut"></span></div></div>
+          <p class="annot-text" style="margin:8px 0 0">3 Spalten · 6 ganze Karten (Kartenhöhe ≈ 260 px statt 338 px)</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="D4">
+      <div class="sugg-head"><span class="id">D4</span><h3>Kontextmenüs im Viewport halten</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Das Menü wird ungeklemmt an der Mausposition platziert: <code>style={{ top: position.y, left: position.x }}</code> (<code>DrawingCardContextMenu.tsx:95</code>), das Untermenü immer rechts (<code>left-full</code>, <code>:127</code>). Gemessen bei Rechtsklick auf die rechte Karte (Desktop 1440 px): Menü endet bei x = 1562, Untermenü bei x = 1755, beides abgeschnitten (Screenshot oben bei D1). Dasselbe Muster in <code>SidebarContextMenu.tsx:41</code>.</dd>
+        <dt>Vorschlag</dt><dd>Nach dem Rendern die Größe messen und in den Viewport klemmen (links/oben verschieben); Untermenü nach links öffnen, wenn rechts kein Platz ist. Mit D1 entfällt das Untermenü auf Touch ohnehin.</dd>
+        <dt>Impact</dt><dd>Mittel: Belegter Bug, auf jeder Bildschirmgröße bei Karten am rechten Rand.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag after">nachher</span> Menü öffnet links vom Zeiger, Untermenü nach links</p>
+          <div class="a" style="position:relative;height:210px;border-right:3px solid var(--note)">
+            <span class="annot-text" style="position:absolute;right:6px;top:0">Viewport-Rand</span>
+            <div class="a-menu" style="position:absolute;right:14px;top:24px;width:180px">
+              <div class="a-mi"><svg class="i"><use href="#i-pen"/></svg>Rename</div>
+              <div class="a-mi hl" style="justify-content:space-between"><span class="row"><svg class="i"><use href="#i-move"/></svg>Move to…</span></div>
+              <div class="a-mi"><svg class="i"><use href="#i-copy"/></svg>Duplicate</div>
+              <div class="a-mi danger"><svg class="i"><use href="#i-trash"/></svg>Delete</div>
+            </div>
+            <div class="a-menu" style="position:absolute;right:202px;top:64px;width:160px">
+              <div class="a-mi">Unorganized</div><div class="a-mi">Workshops</div><div class="a-mi">Kundenprojekte</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="D5">
+      <div class="sugg-head"><span class="id">D5</span><h3>Phone-Toolbar von 4 auf 2 Zeilen</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand M</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Unter <code>sm</code> stapelt die Toolbar Suche, Sortierung, Auswahlgruppe und Import/New in vier Zeilen (<code>DashboardToolbar.tsx:91–306</code>, <code>flex-col</code>, <code>w-full</code>-Gruppen). Zusammen mit 64 px Kopfzeile (<code>Layout.tsx:127</code>) und Seitentitel beginnt die erste Karte bei y = 369 von 844 px (gemessen). Die Auswahlgruppe steht dauerhaft mit drei deaktivierten Icons da.</dd>
+        <dt>Vorschlag</dt><dd>Nur unter <code>md</code>: Zeile 1 Suche; Zeile 2 Sortierung (flex-1), Richtung, Import als Icon, „+ Neu“ als primärer Icon-Button. Die Auswahlgruppe erscheint erst bei <code>hasSelection</code> als eigene Zeile mit Zähler. Der Seitentitel darf auf dem Phone kleiner werden (<code>text-3xl</code> → <code>text-2xl</code>, <code>Dashboard.tsx:249</code>).</dd>
+        <dt>Impact</dt><dd>Mittel: erste Karte rückt um ≈ 110 px nach oben, primäre Aktion bleibt im Daumenbereich der Toolbar.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock" style="max-width:380px">
+          <p class="mock-label"><span class="tag after">nachher</span> Phone 390 px, nichts ausgewählt</p>
+          <div class="a stack">
+            <div style="position:relative"><input class="a-input" style="padding-left:38px;border-color:var(--app-border);box-shadow:var(--hard)" placeholder="Search drawings…" aria-label="Mock: Suche"><svg class="i" style="position:absolute;left:12px;top:14px;color:var(--app-muted);font-size:17px"><use href="#i-search"/></svg></div>
+            <div class="row">
+              <span class="a-btn" style="flex:1;justify-content:space-between"><span class="row"><svg class="i" style="color:var(--brand)"><use href="#i-clock"/></svg>Date Modified</span><svg class="i"><use href="#i-chev-down"/></svg></span>
+              <span class="a-btn icon" style="color:var(--brand)"><svg class="i"><use href="#i-down"/></svg></span>
+              <span class="a-btn icon" style="color:var(--brand)"><svg class="i"><use href="#i-upload"/></svg></span>
+              <span class="a-btn icon primary"><svg class="i"><use href="#i-plus"/></svg></span>
+            </div>
+          </div>
+          <p class="annot-text" style="margin:10px 0 0">Bei Auswahl schiebt sich eine Zeile „3 ausgewählt · Papierkorb · Duplizieren · Verschieben · ✕“ darunter.</p>
+        </div>
+        <div class="mock" style="max-width:300px">
+          <p class="mock-label"><span class="tag before">vorher</span> Phone 390 px</p>
+          <div class="crop"><img src="pages-review/dash-phone-light.webp" alt="Phone-Dashboard mit vierzeiliger Toolbar" loading="lazy"></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="D6">
+      <div class="sugg-head"><span class="id">D6</span><h3>Collection-Chip auf der Karte ist ein 23-px-Ziel</h3><span class="pill low">Impact niedrig</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Der Chip „Unorganized“ öffnet ein Verschieben-Menü, ist aber gemessen 87 × 23 px (<code>py-0.5 text-[11px]</code>, <code>CollectionPicker.tsx:51</code>) und sieht aus wie ein Label.</dd>
+        <dt>Vorschlag</dt><dd>Mit D1 als reine Anzeige behandeln oder unter <code>(hover: none)</code> die Trefferfläche per Pseudo-Element auf 44 px Höhe erweitern. Verschieben läuft dann über das ⋯-Menü.</dd>
+      </dl>
+    </article>
+
+    <article class="sugg" id="D7">
+      <div class="sugg-head"><span class="id">D7</span><h3>Button-Gruppe 34 px und „⌘K“ auf reinen Touch-Geräten</h3><span class="pill low">Impact niedrig</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd><code>.ui-button-group-item</code> ist 34 × 34 px (<code>index.css:91</code>, gemessen), die Touch-Regel in <code>index.css:104–108</code> erfasst nur <code>.ui-toolbar-button</code>. Der Hinweis <code>⌘K</code> erscheint ab <code>sm</code> auch auf dem iPad ohne Tastatur (<code>DashboardToolbar.tsx:120</code>).</dd>
+        <dt>Vorschlag</dt><dd>In denselben <code>@media (hover: none)</code>-Block <code>.ui-button-group-item { h-10 w-10 }</code> aufnehmen (Gruppe dann 44 px hoch, passt zur 42-px-Zeile) und den <code>kbd</code> dort ausblenden.</dd>
+      </dl>
+    </article>
+  </section>
+
+  <!-- SIDEBAR -->
+  <section aria-labelledby="sidebar">
+    <h2 id="sidebar">Sidebar und Layout <span class="meta">gilt für alle Seiten mit Layout</span></h2>
+    <p class="lead">Unter 1024 px wird die Sidebar zum Drawer (<code>Layout.tsx:106</code>): iPad hoch hat Drawer, iPad quer die feste Sidebar.</p>
+    <div class="shots">
+      <figure><img src="pages-review/drawer-ipadP.webp" alt="Geöffneter Sidebar-Drawer auf iPad hoch" loading="lazy"><figcaption>iPad hoch: Drawer geöffnet</figcaption></figure>
+      <figure><img src="pages-review/account-ipadL.webp" alt="Account-Menü geöffnet mit Trash, Profile, Admin, Settings" loading="lazy"><figcaption>iPad quer: Trash, Profile, Admin, Settings stecken im Account-Menü</figcaption></figure>
+    </div>
+
+    <article class="sugg" id="S1">
+      <div class="sugg-head"><span class="id">S1</span><h3>Collections auf Touch verwalten</h3><span class="pill high">Impact hoch</span><span class="pill eff">Aufwand M</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Teilen, Umbenennen und Löschen einer Collection gibt es nur per Rechtsklick (<code>Sidebar.tsx:219</code> → <code>SidebarContextMenu.tsx:44–77</code>), Umbenennen zusätzlich per Doppelklick (<code>Sidebar.tsx:215</code>). Der „+“-Button für eine neue Collection ist 28 × 28 px mit <code>opacity-70</code> (<code>Sidebar.tsx:163</code>, gemessen 28 px).</dd>
+        <dt>Vorschlag</dt><dd>In <code>SidebarItem</code> einen trailing ⋯-Button (44 px Treffer), auf Touch immer sichtbar, auf Desktop bei Hover/Fokus. Er öffnet das vorhandene Menü, am Button verankert. „+“ auf 44 px unter <code>(hover: none)</code>, volle Deckkraft.</dd>
+        <dt>Impact</dt><dd>Hoch: Auf dem iPad lassen sich Collections heute anlegen, aber nicht umbenennen, teilen oder löschen.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock" style="max-width:340px">
+          <p class="mock-label"><span class="tag after">nachher</span> Sidebar-Abschnitt Collections (Touch)</p>
+          <div class="a a-card" style="padding:12px 8px">
+            <div class="a-side-label">Collections <span class="a-btn icon ghost" style="color:var(--app-muted)"><svg class="i"><use href="#i-plus"/></svg></span></div>
+            <div class="a-side-item"><svg class="i" style="font-size:18px"><use href="#i-folder"/></svg><span class="grow">Privat – Garten &amp; Haus</span><span class="a-btn icon ghost" style="color:var(--app-muted)"><svg class="i"><use href="#i-more"/></svg></span></div>
+            <div class="a-side-item on"><svg class="i" style="font-size:18px"><use href="#i-folder"/></svg><span class="grow">Workshops</span><span class="a-chip" style="color:var(--ok);border-color:color-mix(in srgb,var(--ok) 35%,transparent);background:var(--ok-soft)">Shared</span><span class="a-btn icon ghost"><svg class="i"><use href="#i-more"/></svg></span></div>
+            <div class="a-side-item"><svg class="i" style="font-size:18px"><use href="#i-folder"/></svg><span class="grow">Kundenprojekte</span><span class="a-btn icon ghost" style="color:var(--app-muted)"><svg class="i"><use href="#i-more"/></svg></span></div>
+          </div>
+          <p class="annot-text" style="margin:10px 0 0">Zeilen 44 px (heute 40 px), ⋯ und + mit 44 px Treffer.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="S2">
+      <div class="sugg-head"><span class="id">S2</span><h3>Trash in die Library, aktive Seite sichtbar</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Mit „Compact sidebar“ (Standard <code>true</code>, <code>SidebarFooter.tsx:51</code>) liegt Trash im zugeklappten Account-Menü (<code>SidebarFooter.tsx:104–136</code>); als Drop-Ziel taucht es nur auf, weil das Menü bei <code>dragenter</code> aufgeht (<code>:90</code>), was auf Touch nicht greift. Auf Settings/Profile/Admin ist in der Sidebar nichts aktiv markiert: Die Seiten setzen <code>selectedCollectionId="SETTINGS"</code> usw. (<code>Settings.tsx:362</code>), der zugehörige Eintrag steckt aber im geschlossenen Menü.</dd>
+        <dt>Vorschlag</dt><dd>Trash als vierte Zeile unter „Unorganized“ in der Library (dauerhaft sichtbares Drop-Ziel). Auf Settings/Profile/Admin den Account-Button aktiv einfärben und den Seitennamen zeigen.</dd>
+        <dt>Impact</dt><dd>Mittel: Wiederherstellen aus dem Papierkorb und Orientierung auf Unterseiten. Hinweis: weicht vom Upstream-Verhalten der Compact-Sidebar ab.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock" style="max-width:340px">
+          <p class="mock-label"><span class="tag after">nachher</span> Library mit Trash; Footer auf /settings</p>
+          <div class="a a-card" style="padding:12px 8px">
+            <div class="a-side-label">Library</div>
+            <div class="a-side-item"><svg class="i" style="font-size:18px"><use href="#i-grid"/></svg><span class="grow">All Drawings</span></div>
+            <div class="a-side-item"><svg class="i" style="font-size:18px"><use href="#i-users"/></svg><span class="grow">Shared with me</span></div>
+            <div class="a-side-item"><svg class="i" style="font-size:18px"><use href="#i-archive"/></svg><span class="grow">Unorganized</span></div>
+            <div class="a-side-item"><svg class="i" style="font-size:18px"><use href="#i-trash"/></svg><span class="grow">Trash</span></div>
+            <div style="border-top:1px solid var(--app-line);margin:14px -8px 0;padding:10px 8px 0">
+              <div class="a-side-item on"><span style="width:28px;height:28px;border-radius:38%;border:2px solid var(--app-border);background:#fcd34d;color:#1e293b;display:grid;place-items:center;font-weight:900;font-size:11px">PR</span><span class="grow">Philipp · <span style="font-weight:500">Settings</span></span><svg class="i"><use href="#i-chev-up"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="S3">
+      <div class="sugg-head"><span class="id">S3</span><h3>Sidebar-Zeilen 44 px, Resize-Griff auf Touch ausblenden</h3><span class="pill low">Impact niedrig</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Sidebar-Zeilen sind gemessen 40 px hoch (<code>py-2</code>, <code>SidebarItem.tsx:77</code>, <code>Sidebar.tsx:118</code>). Der 6-px-Resize-Griff reagiert nur auf <code>onMouseDown</code> (<code>Layout.tsx:189, 215</code>) und ist auf Touch funktionslos; im Drawer (<code>Layout.tsx:187–193</code>) ebenfalls vorhanden.</dd>
+        <dt>Vorschlag</dt><dd><code>(hover: none)</code>: Zeilen auf <code>py-2.5</code> (44 px), Griff ausblenden.</dd>
+      </dl>
+    </article>
+
+    <article class="sugg" id="S4">
+      <div class="sugg-head"><span class="id">S4</span><h3>Abschnittslabels zu kontrastarm</h3><span class="pill low">Impact niedrig</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>„Library“/„Collections“ in <code>text-slate-400</code> bei 12 px (<code>Sidebar.tsx:111, 155</code>): 2,56 : 1 auf Weiß (berechnet), unter 4,5 : 1.</dd>
+        <dt>Vorschlag</dt><dd><code>text-slate-500</code> (4,76 : 1), dunkel <code>neutral-400</code>.</dd>
+      </dl>
+    </article>
+  </section>
+
+  <!-- SETTINGS -->
+  <section aria-labelledby="settings">
+    <h2 id="settings">Settings <span class="meta">/settings</span></h2>
+    <div class="shots">
+      <figure><img src="pages-review/settings-ipadL-light.webp" alt="Settings auf iPad quer, hell" loading="lazy"><figcaption>iPad quer, hell</figcaption></figure>
+      <figure><img src="pages-review/settings-ipadL-dark.webp" alt="Settings auf iPad quer, dunkel" loading="lazy"><figcaption>iPad quer, dunkel</figcaption></figure>
+      <figure style="max-width:300px"><img src="pages-review/settings-phone-light.webp" alt="Settings auf dem Phone" loading="lazy"><figcaption>Phone: Zeilen brechen sauber um</figcaption></figure>
+    </div>
+    <p class="meta">Mit Auth aus fehlt die API-Key-Karte (<code>Settings.tsx:394</code>), der Advanced-Bereich war zugeklappt und wurde nicht geöffnet.</p>
+
+    <article class="sugg" id="ST1">
+      <div class="sugg-head"><span class="id">ST1</span><h3>Ganze Zeile tippbar, Schalter größer auf Touch</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd><code>PlayfulSwitch</code> ist 44 × 24 px (<code>PlayfulSwitch.tsx:24</code>, gemessen) und das einzige Ziel; Titel und Beschreibung der Zeile (<code>SettingsRow.tsx</code>) reagieren nicht. Betrifft Settings (3 Schalter) und Admin (Local sign-up, Rate limiting).</dd>
+        <dt>Vorschlag</dt><dd>Bei Zeilen mit genau einem Schalter die Zeile als <code>&lt;label&gt;</code> bzw. klickbar machen (Hover-Hintergrund wie Menüeinträge); unter <code>(hover: none)</code> den Schalter auf 52 × 30 px.</dd>
+        <dt>Impact</dt><dd>Mittel: häufigste Interaktion der Seite, auf dem iPad heute ein 24-px-Ziel am rechten Rand.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag after">nachher</span> Zeile als Ganzes gedrückt (Touch)</p>
+          <div class="a a-card" style="overflow:hidden">
+            <div class="row" style="gap:12px;padding:14px 16px;background:var(--brand-soft)">
+              <span style="width:40px;height:40px;border-radius:12px;border:2px solid #000;background:#a78bfa;display:grid;place-items:center;color:#000;flex:none"><svg class="i" style="font-size:20px"><use href="#i-grid"/></svg></span>
+              <span style="flex:1"><b>Compact sidebar</b><br><span style="font-size:12px;color:var(--app-muted)">Keep account actions in the avatar menu</span></span>
+              <span class="a-switch"></span>
+            </div>
+            <div class="row" style="gap:12px;padding:14px 16px;border-top:1px solid var(--app-line)">
+              <span style="width:40px;height:40px;border-radius:12px;border:2px solid #000;background:#fb7185;display:grid;place-items:center;color:#000;flex:none"><svg class="i" style="font-size:20px"><use href="#i-copy"/></svg></span>
+              <span style="flex:1"><b>Append dropped drawings</b><br><span style="font-size:12px;color:var(--app-muted)">Add to the open drawing instead of replacing it.</span></span>
+              <span class="a-switch off"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="ST2">
+      <div class="sugg-head"><span class="id">ST2</span><h3>Sprachauswahl zeigt „en-US (editor language)“</h3><span class="pill low">Impact niedrig</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Standardwert ist <code>navigator.language</code> (<code>LocaleProvider.tsx:9–11</code>); passt er nicht zu „en“/„zh-CN“, erscheint ein Zusatzeintrag <code>`${language} (editor language)`</code> (<code>SettingsMainGrid.tsx:87–89</code>). Im Test: „en-US (editor language)“; in einem deutschen Safari entsprechend „de-DE (editor language)“, während die Oberfläche Englisch bleibt (abgeleitet aus dem Code, nicht mit deutschem Browser getestet).</dd>
+        <dt>Vorschlag</dt><dd>Zwei getrennte Aussagen: Oberfläche (English/简体中文) und eine Hinweiszeile „Editor folgt der Browsersprache: Deutsch“. Oder den Eintrag mit Sprachnamen statt Code beschriften.</dd>
+      </dl>
+    </article>
+  </section>
+
+  <!-- PROFILE -->
+  <section aria-labelledby="profile">
+    <h2 id="profile">Profile <span class="meta">/profile, mit Auth an</span></h2>
+    <div class="shots">
+      <figure><img src="pages-review/auth-profile-ipadL.webp" alt="Profilseite auf iPad quer" loading="lazy"><figcaption>iPad quer, eingeloggt als Admin (lokaler Test-Container)</figcaption></figure>
+    </div>
+
+    <article class="sugg" id="P2">
+      <div class="sugg-head"><span class="id">P2</span><h3>Avatar-Initialen lesbar machen</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd><code>.playful-avatar</code> setzt <code>text-white</code> auf <code>bg-amber-300</code> (<code>index.css:148</code>): 1,44 : 1 (berechnet). Sichtbar im Profil-Kopf und in jedem Sidebar-Footer.</dd>
+        <dt>Vorschlag</dt><dd><code>text-slate-900</code> auf Amber (≈ 11 : 1), im Dark Mode identisch, da der Hintergrund gleich bleibt.</dd>
+        <dt>Impact</dt><dd>Mittel: WCAG-AA-Verstoß an einem überall sichtbaren Element, Einzeiler.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag before">vorher</span> / <span class="tag after">nachher</span></p>
+          <div class="a row" style="gap:18px">
+            <span style="width:72px;height:72px;border-radius:38%;border:2px solid #1e293b;background:#fcd34d;color:#fff;display:grid;place-items:center;font-weight:900;font-size:26px;box-shadow:2px 2px 0 rgba(30,41,59,.9)">PR</span>
+            <span style="width:72px;height:72px;border-radius:38%;border:2px solid #1e293b;background:#fcd34d;color:#1e293b;display:grid;place-items:center;font-weight:900;font-size:26px;box-shadow:2px 2px 0 rgba(30,41,59,.9)">PR</span>
+            <span class="annot-text">1,44 : 1 → ≈ 11 : 1</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="P1">
+      <div class="sugg-head"><span class="id">P1</span><h3>„Change password“ nicht als Gefahren-Button</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Der Button, der nur das Formular aufklappt, nutzt <code>ui-button-danger</code> (<code>PasswordCard.tsx:18, 107–111</code>). Rot ist sonst Löschen vorbehalten (Bulk-Delete, Delete-Collection). Die Seite wirkt dadurch alarmierend, obwohl nichts Destruktives passiert.</dd>
+        <dt>Vorschlag</dt><dd><code>ui-button-secondary</code>; den Hinweis „You will be signed out afterwards“ behalten und erst im Formular den Bestätigungs-Button primär machen.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag after">nachher</span></p>
+          <div class="a a-card row between" style="padding:14px 16px;gap:12px;flex-wrap:wrap">
+            <span><b>Change password</b><br><span style="font-size:12px;color:var(--app-muted)">You will be signed out afterwards</span></span>
+            <span class="a-btn">Change password</span>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ADMIN -->
+  <section aria-labelledby="admin">
+    <h2 id="admin">Admin <span class="meta">/admin, mit Auth an</span></h2>
+    <div class="shots">
+      <figure><img src="pages-review/auth-admin-ipadL.webp" alt="Admin-Seite auf iPad quer mit Access control, Rate limiting und Users" loading="lazy"><figcaption>iPad quer</figcaption></figure>
+      <figure style="max-width:300px"><img src="pages-review/auth-admin-phone-1.webp" alt="Admin auf dem Phone, Benutzertabelle rechts abgeschnitten" loading="lazy"><figcaption>Phone: Tabelle zeigt nur User + Role</figcaption></figure>
+    </div>
+    <p class="meta">Mit Auth aus zeigt <code>/admin</code> nur Kopfzeile und „Review this single-user deployment“ (<code>AdminShell.tsx:27–29</code>); bewertet wurde die Variante mit Auth.</p>
+
+    <article class="sugg" id="A2">
+      <div class="sugg-head"><span class="id">A2</span><h3>Status als Schalter, Deaktivieren bestätigen, Impersonate für sich selbst sperren</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>„Active“ und „No“ sind Buttons, die ihren Zustand anzeigen und beim Tippen sofort umschalten, ohne Rückfrage (<code>UsersTable.tsx:109–127</code>). Ein Tap auf „Active“ sperrt einen Benutzer aus. „Impersonate“ ist für das eigene Konto aktiv (<code>UsersTable.tsx:131–137</code>, im Test <code>isDisabled() === false</code>), „Reset“ dagegen korrekt gesperrt (<code>:140–143</code>). Spaltenkopf „Reset?“ ist unklar.</dd>
+        <dt>Vorschlag</dt><dd>„Active“ als <code>PlayfulSwitch</code> mit Text „Aktiv“/„Gesperrt“, Deaktivieren über das vorhandene <code>ConfirmModal</code>. „Reset?“ → Spalte „Passwortwechsel erzwingen“ als Schalter. „Impersonate“ für <code>currentUserId</code> deaktivieren wie „Reset“.</dd>
+        <dt>Impact</dt><dd>Mittel: Fehlbedienung mit Folgen (ausgesperrte Benutzer) bei einem Tap.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag after">nachher</span> Zeile eines anderen Benutzers</p>
+          <div class="a a-card" style="padding:12px 16px">
+            <div class="row" style="gap:16px;flex-wrap:wrap">
+              <span style="flex:1 1 160px"><b>Anna Beispiel</b><br><span style="color:var(--app-muted);font-size:13px">anna@example.test</span></span>
+              <span class="a-btn sm"><svg class="i"><use href="#i-user"/></svg>USER<svg class="i"><use href="#i-chev-down"/></svg></span>
+              <span class="row" style="gap:8px;font-size:13px;font-weight:600"><span class="a-switch"></span>Aktiv</span>
+              <span class="row" style="gap:8px;font-size:13px;font-weight:600"><span class="a-switch off"></span>Passwortwechsel</span>
+            </div>
+            <div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap">
+              <span class="a-btn sm"><svg class="i"><use href="#i-login"/></svg>Als Anna ansehen</span>
+              <span class="a-btn sm">Temporäres Passwort</span>
+            </div>
+          </div>
+          <div class="a a-card" style="padding:14px 16px;margin-top:12px;max-width:360px">
+            <b>Anna Beispiel sperren?</b>
+            <p style="margin:6px 0 12px;font-size:13px;color:var(--app-muted)">Anna kann sich danach nicht mehr anmelden. Zeichnungen bleiben erhalten.</p>
+            <div class="row" style="justify-content:flex-end"><span class="a-btn sm">Abbrechen</span><span class="a-btn sm" style="background:#f43f5e;color:#fff">Sperren</span></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="A1">
+      <div class="sugg-head"><span class="id">A1</span><h3>Benutzertabelle auf dem Phone als Kartenliste</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand M</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Die Tabelle scrollt horizontal (<code>overflow-x-auto</code>, <code>UsersTable.tsx:44</code>; gemessen 672 px Inhalt in 336 px), Active/Reset/Actions liegen außerhalb, ohne Scroll-Hinweis (Screenshot oben).</dd>
+        <dt>Vorschlag</dt><dd>Unter <code>md</code> jede Zeile als Karte im Layout des A2-Mocks (Name/E-Mail, darunter Rolle und Schalter, darunter Aktionen). Ab <code>md</code> bleibt die Tabelle.</dd>
+        <dt>Impact</dt><dd>Mittel: Admin-Aufgaben auf dem Phone heute nur mit Querwischen erreichbar. Der A2-Mock zeigt die Kartenform.</dd>
+      </dl>
+    </article>
+
+    <article class="sugg" id="A3">
+      <div class="sugg-head"><span class="id">A3</span><h3>Zwei „Reset“-Buttons mit verschiedener Bedeutung</h3><span class="pill low">Impact niedrig</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>„Reset“ hebt im Rate-Limit-Block eine Sperre auf (<code>LoginRateLimitCard.tsx:135</code>), in der Tabelle erzeugt „Reset“ ein temporäres Passwort (<code>UsersTable.tsx:152–154</code>).</dd>
+        <dt>Vorschlag</dt><dd>„Sperre aufheben“ bzw. „Temporäres Passwort“ (siehe A2-Mock).</dd>
+      </dl>
+    </article>
+  </section>
+
+  <!-- AUTH -->
+  <section aria-labelledby="auth">
+    <h2 id="auth">Auth-Seiten <span class="meta">/login, /register, /reset-password, /reset-password-confirm, /auth-setup</span></h2>
+    <p class="lead">Gerendert gegen einen eigenen Backend-Container mit <code>AUTH_MODE=local</code>. Login, Register, Reset und Reset-Confirm teilen <code>.auth-page/.auth-heading/.auth-panel</code> (<code>index.css:126–141</code>) und wirken stimmig; Auth-Setup und das Fehlerpanel nicht.</p>
+    <div class="shots">
+      <figure><img src="pages-review/login-error-ipadL.webp" alt="Login mit Fehlermeldung auf iPad" loading="lazy"><figcaption>Login nach falschem Passwort (iPad quer)</figcaption></figure>
+      <figure style="max-width:300px"><img src="pages-review/register-phone.webp" alt="Admin-Ersteinrichtung auf dem Phone" loading="lazy"><figcaption>Register (Bootstrap-Admin), Phone</figcaption></figure>
+      <figure style="max-width:300px"><img src="pages-review/reset-phone.webp" alt="Passworthilfe auf dem Phone mit abgeschnittenem Befehl" loading="lazy"><figcaption>Reset-Password, Phone</figcaption></figure>
+      <figure><img src="pages-review/authsetup-ipadL-dark.webp" alt="Auth-Setup im Dark Mode mit bläulichem Hintergrund" loading="lazy"><figcaption>Auth-Setup, dunkel: bläuliches gray-900 statt neutral-950</figcaption></figure>
+      <figure><img src="pages-review/error429-ipadL-dark.webp" alt="Fehlerpanel Unable to reach the backend API" loading="lazy"><figcaption>Fehlerpanel bei simuliertem 429 auf /auth/status</figcaption></figure>
+    </div>
+
+    <article class="sugg" id="G1">
+      <div class="sugg-head"><span class="id">G1</span><h3>429 und Netzwerkfehler unterscheiden</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Jeder Fehler beim Laden des Auth-Status endet in „Unable to reach the backend API. Check BACKEND_URL, FRONTEND_URL, and your reverse proxy configuration.“ (<code>AuthContext.tsx:228</code>, im <code>catch</code> ohne Statusprüfung). In dieser Session tatsächlich passiert: Das geteilte Dev-Backend antwortete mit <code>429</code> (allgemeines Rate-Limit 1000 Anfragen/15 Min., <code>backend/src/config.ts:355–356</code>), die App zeigte den Konfigurationsfehler. Auf einem iPad mit vielen Vorschau-Requests ist das kein exotischer Fall. Das Panel nutzt zudem <code>bg-gray-900</code> und <code>rounded-md</code> abseits des App-Stils (<code>AuthStatusErrorPanel.tsx:15, 32</code>).</dd>
+        <dt>Vorschlag</dt><dd>Status auswerten: 429 → „Zu viele Anfragen. Bitte in einer Minute erneut versuchen.“ (ggf. <code>Retry-After</code> lesen), ohne Antwort → bisheriger Hinweis für Betreiber. Panel auf <code>ui-card</code> und <code>.auth-page</code>-Hintergrund umstellen.</dd>
+        <dt>Impact</dt><dd>Mittel: falsche Diagnose lenkt Betreiber auf die Konfiguration statt aufs Warten.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag after">nachher</span> 429</p>
+          <div class="a a-card" style="padding:18px;max-width:420px;margin:0 auto">
+            <div class="row" style="gap:10px;align-items:flex-start"><svg class="i" style="font-size:20px;color:var(--warn);margin-top:2px"><use href="#i-alert"/></svg><div><b>Zu viele Anfragen</b><p style="margin:4px 0 12px;font-size:13px;color:var(--app-muted)">Der Server bremst gerade. Versuch es in etwa einer Minute erneut.</p><span class="a-btn sm">Erneut versuchen</span></div></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="AU2">
+      <div class="sugg-head"><span class="id">AU2</span><h3>Sichtbare Labels und 16 px Schrift auf Touch</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Login und Register haben nur Platzhalter als Beschriftung, die Labels sind <code>sr-only</code> (<code>Login.tsx:225–235, 241–253</code>; <code>Register.tsx:221–288</code>). Nach dem Tippen ist nicht mehr zu sehen, welches Feld was ist. Alle <code>.ui-input</code> haben 14 px (<code>index.css:111</code>, gemessen <code>14px</code>, Höhe 40 px). iOS-Safari zoomt beim Fokus in Felder unter 16 px; das ist bekanntes Verhalten auf dem iPhone, auf Gerät hier <strong>nicht verifiziert</strong>. Platzhalter in <code>slate-400</code>: 2,56 : 1.</dd>
+        <dt>Vorschlag</dt><dd>Sichtbare <code>.ui-field-label</code> über jedem Feld (Klasse existiert, <code>index.css:114</code>); unter <code>(hover: none)</code> <code>.ui-input</code> auf <code>text-base</code> und 44 px Höhe. Gilt automatisch auch für Settings, Profile und Admin.</dd>
+        <dt>Impact</dt><dd>Mittel: Zugänglichkeit und kein Zoom-Sprung beim Login auf dem iPhone.</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag after">nachher</span> Login-Panel</p>
+          <div class="a a-card" style="padding:20px;max-width:380px;margin:0 auto">
+            <label class="a-label" for="mk-email">E-Mail</label>
+            <input id="mk-email" class="a-input" value="admin@example.test" readonly>
+            <label class="a-label" for="mk-pw" style="margin-top:12px">Passwort</label>
+            <input id="mk-pw" class="a-input" type="password" value="xxxxxxxxxx" readonly>
+            <div style="text-align:right;margin:10px 0 14px"><a href="#AU2" style="font-weight:600;font-size:14px">Passwort vergessen?</a></div>
+            <span class="a-btn primary" style="width:100%">Anmelden</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="AU1">
+      <div class="sugg-head"><span class="id">AU1</span><h3>Auth-Setup an den Auth-Stil angleichen</h3><span class="pill medium">Impact mittel</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd><code>AuthSetupChoice</code> nutzt eigenen Hintergrund <code>bg-gray-50 dark:bg-gray-900</code> (bläulich, <code>AuthSetupChoice.tsx:101, 108</code>) statt <code>.auth-page</code> mit Punktraster, und eine fette Sans-Überschrift (<code>:112</code>) statt <code>.auth-heading</code> in Excalifont. Es ist der erste Bildschirm einer neuen Installation und sieht aus wie eine andere App.</dd>
+        <dt>Vorschlag</dt><dd><code>.auth-page</code>/<code>.auth-wrap</code>/<code>.auth-heading</code>/<code>.auth-panel</code> verwenden, Ladezustand ebenso (<code>:101</code>).</dd>
+      </dl>
+      <div class="mockrow">
+        <div class="mock">
+          <p class="mock-label"><span class="tag after">nachher</span></p>
+          <div class="a" style="text-align:center;padding:10px 0">
+            <div class="a-display" style="font-size:34px;line-height:1.1">Authentifizierung wählen</div>
+            <p style="color:var(--app-muted);margin:8px auto 16px;font-size:14px">Neue Installation erkannt.</p>
+            <div class="a-card" style="padding:18px;max-width:460px;margin:0 auto;text-align:left">
+              <p style="margin:0 0 14px;font-size:14px">Admin-Konto anlegen und Zugriff beschränken.</p>
+              <div class="row" style="flex-wrap:wrap"><span class="a-btn primary" style="flex:1 1 180px"><svg class="i"><use href="#i-shield"/></svg>Enable Authentication</span><span class="a-btn" style="flex:1 1 160px">Keep Disabled</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="sugg" id="AU3">
+      <div class="sugg-head"><span class="id">AU3</span><h3>Reset-Hilfe: Befehl abgeschnitten, kein Kopieren</h3><span class="pill low">Impact niedrig</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>Der Wiederherstellungsbefehl steht in einem horizontal scrollenden <code>&lt;pre&gt;</code> (<code>PasswordResetRequest.tsx:102–103</code>) und ist auf dem Phone abgeschnitten; Register hat für seinen Befehl bereits einen Kopieren-Button (<code>Register.tsx:176–190</code>).</dd>
+        <dt>Vorschlag</dt><dd>Dasselbe Muster wie in Register: umbrechen (<code>whitespace-pre-wrap break-words</code>) plus Kopieren-Button (dort 28 px, hier 44 px auf Touch).</dd>
+      </dl>
+    </article>
+
+    <article class="sugg" id="AU4">
+      <div class="sugg-head"><span class="id">AU4</span><h3>Auth-Setup sagt dasselbe zweimal</h3><span class="pill low">Impact niedrig</span><span class="pill eff">Aufwand S</span></div>
+      <dl>
+        <dt>Problem</dt><dd>„Secure this workspace.“ (<code>AuthSetupChoice.tsx:118–122</code>) und direkt darunter der Kasten „Secure ExcaliDash – Create an admin account and restrict access.“ (<code>:135–140</code>).</dd>
+        <dt>Vorschlag</dt><dd>Kasten streichen, Satz unter die Überschrift (siehe AU1-Mock).</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section aria-labelledby="method">
+    <h2 id="method">Methode und Grenzen</h2>
+    <div class="callout">
+      <h3>Wie geprüft wurde</h3>
+      <ul>
+        <li><strong>Einzelkontext statt zwei getrennter Bewertungen:</strong> Der Impeccable-Critique-Ablauf sieht Design-Review und Detector in getrennten Subagents vor. Hier lief beides in einem Kontext, weil der Auftrag Subagents untersagt.</li>
+        <li><strong>Screenshots:</strong> headless Chromium (playwright-core), <code>isMobile + hasTouch</code> für iPad 1194×834 / 834×1194 und Phone 390×844, Desktop 1440×900; hell und dunkel. Chromium ist nicht Safari: Long-Press, Auto-Zoom und Drag&amp;Drop auf iPadOS sind <strong>nicht auf Gerät verifiziert</strong>.</li>
+        <li><strong>Daten:</strong> Eigene Backend-Container (Auth aus, Rate-Limit hochgesetzt; Auth lokal) mit 3 Collections und 8 Zeichnungen. Der Dark Mode wurde durch Abfangen der Präferenz-Antwort im Browser erzwungen, ohne gespeicherte Präferenzen zu ändern.</li>
+        <li><strong>Detector</strong> (<code>impeccable detect</code>, 9 Treffer): 4 × Resize-Griff in <code>Layout.tsx:188/214</code> und 3 × Kartenränder (<code>DrawingCard.tsx:217</code>, <code>ShareCollectionModal.tsx:294</code>, <code>StorageManageModal.tsx:409</code>) sind Fehlalarme. Echt, aber klein: farbiger <code>border-l-4</code> in <code>ApiKeysCard.tsx:193</code> und <code>HistoryPanel.tsx:241</code> (Seitenstreifen-Muster); nicht ins Ranking aufgenommen.</li>
+        <li><strong>Nicht gerendert:</strong> API-Key-Karte in Settings mit Daten, „Advanced“-Bereich geöffnet, OIDC-Varianten von Login, Impersonation-Banner, Update-Banner, Share-Collection-Dialog.</li>
+      </ul>
+    </div>
+    <div class="callout">
+      <h3>Heuristik-Bewertung (Nielsen, 0–4)</h3>
+      <div class="table-scroll" style="margin:8px 0 0">
+        <table style="min-width:560px">
+          <thead><tr><th>Heuristik</th><th>Wert</th><th>Hauptbefund</th></tr></thead>
+          <tbody>
+            <tr><td>Sichtbarkeit des Systemstatus</td><td>3</td><td>Kein aktiver Zustand auf Unterseiten (S2)</td></tr>
+            <tr><td>Bezug zur realen Welt</td><td>3</td><td>„Reset?“, „editor language“ (A2, ST2)</td></tr>
+            <tr><td>Kontrolle und Freiheit</td><td>3</td><td>Papierkorb versteckt (S2)</td></tr>
+            <tr><td>Konsistenz</td><td>2</td><td>Auth-Setup und Fehlerpanel im Fremdstil, Rot für Nicht-Destruktives (AU1, P1)</td></tr>
+            <tr><td>Fehlervermeidung</td><td>2</td><td>Ein Tap sperrt Benutzer, Impersonate für sich selbst (A2)</td></tr>
+            <tr><td>Wiedererkennen statt Erinnern</td><td>2</td><td>Aktionen nur per Rechtsklick/Doppelklick (D1, S1)</td></tr>
+            <tr><td>Flexibilität und Effizienz</td><td>3</td><td>Gute Desktop-Kürzel (⌘K, ⌘A, Shift-Auswahl, Ziehen), auf Touch fehlen Pendants</td></tr>
+            <tr><td>Ästhetik und Reduktion</td><td>3</td><td>Starker, eigener Stil; Phone-Toolbar überladen (D5)</td></tr>
+            <tr><td>Fehler erkennen und beheben</td><td>2</td><td>429 als Konfigurationsfehler (G1)</td></tr>
+            <tr><td>Hilfe und Dokumentation</td><td>3</td><td>Passworthilfe und Bootstrap-Hinweis vorhanden</td></tr>
+            <tr><td><strong>Summe</strong></td><td><strong>26/40</strong></td><td>solide; Schwächen fast nur auf Touch</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="meta">Was gut ist und bleiben soll: der eigenständige Excalidraw-nahe Stil (Excalifont-Titel, 2-px-Rahmen, harte Schatten) zieht sich konsistent durch Dashboard, Settings und Login; Settings brechen auf dem Phone sauber um; die Dark-Mode-Paletten sind vollständig; Ladeplatzhalter und Leerzustände existieren.</p>
+  </section>
+</main>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var buttons = document.querySelectorAll(".theme-toggle button");
+  function apply(mode) {
+    if (mode === "light" || mode === "dark") root.setAttribute("data-theme", mode);
+    else root.removeAttribute("data-theme");
+    buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.set === mode)); });
+  }
+  var saved = null;
+  try { saved = localStorage.getItem("pages-review-theme"); } catch (e) {}
+  apply(saved || "system");
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      apply(b.dataset.set);
+      try { localStorage.setItem("pages-review-theme", b.dataset.set); } catch (e) {}
+    });
+  });
+})();
+</script>
+</body>
+</html>

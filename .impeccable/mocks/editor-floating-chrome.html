@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor-Inseln – Mocks</title>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --page: #f4f4f7; --ink: #1b1b1f; --muted: #5b5b66;
+    --canvas: #ffffff; --island: #ffffff; --island-shadow: 0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.07);
+    --btn: #ececf4; --icon: #1b1b1f; --sel: #e0dfff; --sel-ink: #030064; --sep: #e2e2ea;
+    --stroke: #1e1e1e; --frame: #d6d6de; --new: #4f46e5;
+    --avatar: #facc15; --avatar-ink: #422006;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --page: #111114; --ink: #ececf1; --muted: #a0a0ad;
+    --canvas: #121212; --island: #232329; --island-shadow: 0 1px 2px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.35);
+    --btn: #2e2d39; --icon: #e3e3e8; --sel: #403e6a; --sel-ink: #e0dfff; --sep: #3a3a44;
+    --stroke: #dcdcdc; --frame: #2c2c33; --new: #a5b4fc;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.5 ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif; padding: 24px clamp(16px, 4vw, 48px) 64px; }
+  header.page { display: flex; flex-wrap: wrap; gap: 16px; align-items: baseline; justify-content: space-between; max-width: 1180px; }
+  h1 { font-size: 1.5rem; margin: 0; letter-spacing: -0.01em; }
+  .lead { color: var(--muted); max-width: 70ch; margin: 6px 0 0; }
+  .toggle { font: inherit; border: 1px solid var(--frame); background: var(--island); color: var(--ink); border-radius: 10px; padding: 8px 14px; cursor: pointer; }
+  section.variant { margin-top: 40px; max-width: 1180px; }
+  section.variant h2 { font-size: 1.2rem; margin: 0 0 4px; }
+  section.variant h2 .rec { font-size: .8rem; font-weight: 600; color: var(--new); margin-left: 8px; }
+  section.variant p { margin: 0 0 6px; color: var(--muted); max-width: 80ch; }
+  .facts { display: flex; flex-wrap: wrap; gap: 6px 24px; margin: 8px 0 16px; padding: 0; list-style: none; font-size: .9rem; }
+  .facts li::before { content: "– "; color: var(--muted); }
+  .frames { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  figure { margin: 0; }
+  figcaption { font-size: .85rem; color: var(--muted); margin-top: 6px; }
+  .scaler { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--frame); box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+  .device { position: absolute; top: 0; left: 0; transform-origin: 0 0; background: var(--canvas); overflow: hidden; font-family: ui-sans-serif, -apple-system, system-ui, sans-serif; color: var(--icon); }
+  .device svg.lucide { width: 20px; height: 20px; stroke-width: 1.75; }
+  .abs { position: absolute; }
+  .isl { background: var(--island); box-shadow: var(--island-shadow); border-radius: 8px; display: flex; align-items: center; }
+  .btn { width: 36px; height: 36px; border-radius: 8px; background: var(--btn); display: grid; place-items: center; }
+  .tool { width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; position: relative; }
+  .tool.sel { background: var(--sel); color: var(--sel-ink); }
+  .tool small { position: absolute; right: 2px; bottom: 0; font-size: 9px; opacity: .45; }
+  .vsep { width: 1px; height: 24px; background: var(--sep); margin: 0 4px; flex: none; }
+  .hsep { height: 1px; width: 24px; background: var(--sep); margin: 4px 0; flex: none; }
+  .t44 { width: 44px; height: 44px; border-radius: 8px; display: grid; place-items: center; flex: none; }
+  .title { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 12px 0 4px; }
+  .av { width: 32px; height: 32px; border-radius: 38%; background: var(--avatar); color: var(--avatar-ink); font-weight: 700; font-size: 12px; display: grid; place-items: center; border: 2px solid var(--island); }
+  .av.p2 { background: #a7f3d0; color: #064e3b; }
+  .av.p3 { background: #c7d2fe; color: #1e1b4b; }
+  .stack { display: flex; padding: 0 6px; }
+  .stack .av + .av { margin-left: -10px; }
+  .new { outline: 2px dashed var(--new); outline-offset: 3px; }
+  .menu { background: var(--island); box-shadow: 0 8px 28px rgba(0,0,0,.16); border-radius: 10px; padding: 6px; width: 240px; font-size: 14px; }
+  .menu .row { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 10px; border-radius: 8px; }
+  .menu .row.head { font-weight: 600; border-bottom: 1px solid var(--sep); border-radius: 0; margin-bottom: 4px; }
+  .badge { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: #fef3c7; color: #78350f; white-space: nowrap; margin: 0 4px; }
+  :root[data-theme="dark"] .badge { background: rgba(120,53,15,.35); color: #fde68a; }
+  .legend { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--muted); }
+  .legend i { display: inline-block; width: 18px; height: 12px; outline: 2px dashed var(--new); outline-offset: 0; border-radius: 3px; }
+</style>
+</head>
+<body>
+<header class="page">
+  <div>
+    <h1>Editor ohne Kopfleiste: drei Varianten</h1>
+    <p class="lead">Maßstab 1:2, echte iPad-Maße (11″: 1194×834 quer, 834×1194 hoch; mini: 744×1133). Gestrichelt umrandet = neu. Alles andere ist Excalidraw wie heute; „Bibliothek“ ist in allen Varianten nur noch ein Icon, damit es auf dem iPad mini nicht mehr abgeschnitten wird.</p>
+    <p class="legend"><i></i> neue Insel</p>
+  </div>
+  <button class="toggle" id="theme">Dunkel anzeigen</button>
+</header>
+<main id="root"></main>
+
+<script>
+const TITLE = "Projektplanung Q1 – Workshop Notizen";
+const I = (n) => `<i data-lucide="${n}"></i>`;
+const tools = ["lock-open","|","hand","mouse-pointer-2","square","diamond","circle","arrow-right","minus","pencil","type","image","eraser","|","shapes"];
+const toolRow = (w) => {
+  const width = 550, left = (w - width) / 2;
+  let n = 0;
+  const inner = tools.map(t => t === "|" ? `<div class="vsep"></div>` :
+    `<div class="tool ${t === "mouse-pointer-2" ? "sel" : ""}">${I(t)}${t !== "lock-open" && t !== "shapes" ? `<small>${(++n) % 10}</small>` : ""}</div>`).join("");
+  return `<div class="abs isl" style="left:${left}px;top:16px;height:44px;width:${width}px;padding:4px;gap:0;justify-content:space-between">${inner}</div>`;
+};
+const base = (w, h) => `
+  <div class="abs btn" style="left:16px;top:16px">${I("menu")}</div>
+  ${toolRow(w)}
+  <div class="abs btn" style="right:16px;top:16px" title="Bibliothek">${I("book-open")}</div>
+  <div class="abs isl" style="left:16px;bottom:16px;height:36px;background:var(--btn);box-shadow:none;gap:22px;padding:0 10px">${I("minus")}<span style="font-size:13px">100%</span>${I("plus")}</div>
+  <div class="abs isl" style="left:158px;bottom:16px;height:36px;background:var(--btn);box-shadow:none;gap:14px;padding:0 12px;opacity:.6">${I("undo-2")}${I("redo-2")}</div>
+  <div class="abs btn" style="right:16px;bottom:16px">${I("circle-help")}</div>
+  ${drawing(w, h)}`;
+function drawing(w, h) {
+  const cx = w / 2, cy = h / 2 + 20;
+  const box = (x, y, label, fill) => `<rect x="${x}" y="${y}" width="170" height="80" rx="10" fill="${fill}" stroke="var(--stroke)" stroke-width="2"/><text x="${x + 85}" y="${y + 46}" text-anchor="middle" font-family="Comic Sans MS, Segoe Print, cursive" font-size="20" fill="var(--stroke)">${label}</text>`;
+  return `<svg class="abs" style="left:0;top:0" width="${w}" height="${h}">
+    <defs><marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10" fill="none" stroke="var(--stroke)" stroke-width="2"/></marker></defs>
+    ${box(cx - 300, cy - 150, "Ideen", "#ffec99")}
+    ${box(cx - 85, cy - 150, "Priorisieren", "#b2f2bb")}
+    ${box(cx + 130, cy - 150, "Umsetzen", "#a5d8ff")}
+    <path d="M${cx - 128} ${cy - 110} L${cx - 92} ${cy - 110}" stroke="var(--stroke)" stroke-width="2" marker-end="url(#ah)"/>
+    <path d="M${cx + 87} ${cy - 110} L${cx + 123} ${cy - 110}" stroke="var(--stroke)" stroke-width="2" marker-end="url(#ah)"/>
+    ${box(cx - 85, cy + 20, "Review", "#ffc9c9")}
+    <path d="M${cx + 215} ${cy - 68} C ${cx + 215} ${cy + 60}, ${cx + 150} ${cy + 60}, ${cx + 92} ${cy + 60}" fill="none" stroke="var(--stroke)" stroke-width="2" marker-end="url(#ah)"/>
+  </svg>`;
+}
+const actions = (dir = "row") => {
+  const sep = dir === "row" ? `<div class="vsep"></div>` : `<div class="hsep"></div>`;
+  return `<div class="t44">${I("history")}</div><div class="t44">${I("share-2")}</div>${sep}<div class="t44">${I("download")}</div>${sep}`;
+};
+const people = (dir = "row") => dir === "row"
+  ? `<div class="stack"><div class="av">PK</div><div class="av p2">AM</div></div>`
+  : `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0"><div class="av">PK</div><div class="av p2">AM</div></div>`;
+
+// ---------- Variants ----------
+const V = {
+  a: {
+    name: "A · Eine Zeile oben, faltet bei Platzmangel",
+    rec: true,
+    text: "Zurück + Titel links neben ☰, Aktionen rechts neben der Bibliothek, wie bei Freeform/Notes. Wird es zu eng (Hochformat), schrumpft links auf „←“ und die Aktionen falten in ein „…“-Menü unten rechts, mit Titel zum Umbenennen ganz oben. Auf dem iPad mini ist links kein Platz: „Zurück“ steht dann ebenfalls im Menü.",
+    facts: ["Höhe für die Fläche: +64 px", "Quer: 0 Taps extra", "Hoch: Verlauf/Teilen/Export 2 Taps", "Vertrautes iPad-Muster"],
+    render(w, h) {
+      const wide = w >= 1100;
+      if (wide) return `
+        <div class="abs isl new" style="left:60px;top:16px;height:44px;max-width:${(w - 550) / 2 - 76}px;padding:0 0 0 0">
+          <div class="t44">${I("arrow-left")}</div><div class="vsep"></div><div class="title">${TITLE}</div></div>
+        <div class="abs isl new" style="right:60px;top:16px;height:44px">${actions()}${people()}</div>`;
+      const backFits = (w - 550) / 2 - 60 >= 52;
+      return `
+        ${backFits ? `<div class="abs isl new" style="left:60px;top:16px;height:44px"><div class="t44">${I("arrow-left")}</div></div>` : ""}
+        <div class="abs isl new" style="right:60px;bottom:16px;height:44px">${people()}<div class="vsep"></div><div class="t44">${I("ellipsis")}</div></div>
+        <div class="abs menu" style="right:60px;bottom:70px">
+          <div class="row head">${I("pencil-line")}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${TITLE}</span></div>
+          ${backFits ? "" : `<div class="row">${I("arrow-left")} Zurück zum Dashboard</div>`}
+          <div class="row">${I("history")} Versionsverlauf</div>
+          <div class="row">${I("share-2")} Teilen</div>
+          <div class="row">${I("download")} Exportieren</div>
+        </div>`;
+    },
+  },
+  b: {
+    name: "B · Alles in die untere Leiste",
+    text: "Oben bleibt nur Excalidraw. Eine Insel unten neben Undo/Redo trägt Zurück, Titel, Aktionen und Avatare und passt sich in der Breite an; auf dem iPad mini wird nur der Titel kürzer. Toasts wandern nach oben.",
+    facts: ["Höhe für die Fläche: +64 px", "Alle Größen gleich, 0 Taps extra", "Ungewohnt: „Zurück“ unten", "Nahe am Handballen beim Zeichnen"],
+    render(w, h) {
+      const maxW = w - 240 - 60;
+      return `<div class="abs isl new" style="left:240px;bottom:12px;height:44px;max-width:${maxW}px">
+        <div class="t44">${I("arrow-left")}</div><div class="vsep"></div>
+        <div class="title" style="flex:1 1 auto;min-width:60px">${TITLE}</div>
+        <div class="vsep"></div>${actions()}${people()}</div>`;
+    },
+  },
+  c: {
+    name: "C · Titel oben links, Aktionen als Leiste am rechten Rand",
+    text: "Zurück + Titel links oben, im Hochformat eine Zeile tiefer unter ☰. Aktionen und Avatare stehen senkrecht unter der Bibliothek am rechten Rand, gleich in jeder Größe.",
+    facts: ["Höhe für die Fläche: +64 px", "0 Taps extra", "Rechter Rand: 44 px Spalte belegt", "Hochformat: Titel-Insel kann den Excalidraw-Hinweistext überdecken"],
+    render(w, h) {
+      const wide = w >= 1100;
+      const pill = `<div class="t44">${I("arrow-left")}</div><div class="vsep"></div><div class="title">${TITLE}</div>`;
+      const left = wide
+        ? `<div class="abs isl new" style="left:60px;top:16px;height:44px;max-width:${(w - 550) / 2 - 76}px">${pill}</div>`
+        : `<div class="abs isl new" style="left:16px;top:68px;height:44px;max-width:${Math.min(300, w / 2 - 40)}px">${pill}</div>`;
+      return `${left}
+        <div class="abs isl new" style="right:12px;top:60px;width:44px;flex-direction:column;padding:2px 0">
+          <div class="t44">${I("history")}</div><div class="t44">${I("share-2")}</div><div class="hsep"></div><div class="t44">${I("download")}</div><div class="hsep"></div>${people("col")}</div>`;
+    },
+  },
+};
+
+const sizes = [
+  { label: "iPad 11″ quer · 1194×834", w: 1194, h: 834 },
+  { label: "iPad 11″ hoch · 834×1194", w: 834, h: 1194 },
+  { label: "iPad mini hoch · 744×1133", w: 744, h: 1133 },
+];
+const S = 0.42;
+document.getElementById("root").innerHTML = Object.entries(V).map(([k, v]) => `
+  <section class="variant">
+    <h2>${v.name}${v.rec ? '<span class="rec">Empfehlung</span>' : ""}</h2>
+    <p>${v.text}</p>
+    <ul class="facts">${v.facts.map(f => `<li>${f}</li>`).join("")}</ul>
+    <div class="frames">${sizes.map(s => `
+      <figure>
+        <div class="scaler" style="width:${s.w * S}px;height:${s.h * S}px">
+          <div class="device" style="width:${s.w}px;height:${s.h}px;transform:scale(${S})">${base(s.w, s.h)}${v.render(s.w, s.h)}</div>
+        </div>
+        <figcaption>${s.label}</figcaption>
+      </figure>`).join("")}</div>
+  </section>`).join("");
+lucide.createIcons();
+
+const btn = document.getElementById("theme");
+btn.onclick = () => {
+  const dark = document.documentElement.dataset.theme !== "dark";
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  btn.textContent = dark ? "Hell anzeigen" : "Dunkel anzeigen";
+};
+</script>
+</body>
+</html>

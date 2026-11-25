@@ -143,3 +143,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Impeccable design hook cache
+.impeccable/hook.cache.json
