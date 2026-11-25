@@ -8,6 +8,4 @@ Marker: (ab YYYY-MM-DD) · (wenn: <Bedingung>) · (entscheidet: Philipp) · (pr�
 Regeln: ~/.codex/AGENTS.md, Abschnitt "Repo-Aufgaben und Entscheidungen".
 -->
 
-- [ ] Editor: versteckte Peers hinter „+N“ antippbar machen (Liste mit Folgen), Namen auf Touch sichtbar – Quelle: frontend/src/pages/editor/editorChromeRules.ts (entscheidet: Philipp)
-- [ ] Editor: Titel im Wide-Layout per Tastatur umbenennbar machen (war schon in der alten Kopfleiste nicht möglich) – Quelle: frontend/src/pages/editor/EditorChrome.tsx (EditorTitleIsland)
-- [ ] Dashboard: „Select All“ direkt nach einer Sucheingabe wird zurückgesetzt, sobald die verzögerte Such-Antwort kommt (`onRefreshSuccess: resetSelection`); vorbestehend, im e2e-Helper umgangen – Quelle: frontend/src/pages/Dashboard.tsx:106 (entscheidet: Philipp)
+- [ ] Dashboard: Eine Sammelaktion innerhalb von ~200 ms nach einer Sucheingabe lädt danach die alte Ansicht neu (nur automatisiert erreichbar; der e2e-Helper wartet deshalb auf die Such-Antwort) – Quelle: frontend/src/pages/dashboard/useDashboardDrawingActions.ts:318 (prüfen)
