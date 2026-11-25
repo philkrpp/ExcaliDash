@@ -12,6 +12,12 @@ Quelle: <Spec-/Plan-Pfad oder "Chat YYYY-MM-DD">
 Ersetzt: YYYY-MM-DD – <Titel>   (nur bei Revision)
 -->
 
+## 2026-11-25 – Editor-Personenliste und Dashboard-Auswahl beim Refresh
+
+Entscheidung: „+N“ im Editor öffnet eine Liste aller Personen (Name, Folgen-Knopf). Auf Touch öffnet auch ein Tipp auf einen Avatar diese Liste statt sofort zu folgen; auf dem Desktop folgt ein Klick auf einen Avatar weiter direkt. Der Editortitel im Wide-Layout ist per Tastatur umbenennbar (Enter). Im Dashboard setzt ein Neuladen der Liste die Auswahl nicht mehr zurück; nur Zeichnungen, die nicht mehr in der Liste sind, fallen heraus.
+Grund: Auf Touch gibt es keinen Tooltip, ein Tipp folgte bisher einer namenlosen Person; versteckte Peers waren nicht erreichbar. „Select All“ direkt nach dem Tippen ging durch die verzögerte Such-Antwort verloren.
+Quelle: Chat 2026-11-25, `docs/superpowers/specs/2026-11-25-open-items-design.md`
+
 ## 2026-11-25 – Admin-Nutzerliste: Karten bis xl
 
 Entscheidung: Die Nutzerliste im Admin zeigt Karten bis unter `xl` (1280 px), die Tabelle erst ab `xl` (Spec A1 sagte „unter `md`“). Eine Sprache mit derselben Basissprache wie die UI (z. B. `en-US`) erscheint als „English“ ohne Zusatzeintrag.
