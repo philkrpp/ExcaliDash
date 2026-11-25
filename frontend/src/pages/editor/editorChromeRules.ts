@@ -5,7 +5,6 @@ export const canShowHistory = (p: Pick<EditorChromeProps, "canEdit" | "id">) =>
 export const canShare = (p: Pick<EditorChromeProps, "accessLevel" | "id">) =>
   p.accessLevel === "owner" && Boolean(p.id);
 
-// shortcut: hidden peers can't be followed from the chrome; add a peer list popover if larger sessions become common.
 export const MAX_VISIBLE_PEERS = 2;
 
 /** 44px slots the wide right island needs, so the layout can fall back to the menu when they don't fit. */

@@ -11,6 +11,7 @@ import {
   Share2,
 } from "lucide-react";
 import { InlineEditInput } from "../../components/InlineEditInput";
+import { useMenuKeyboard } from "../../hooks/useMenuKeyboard";
 import { UserAvatar as ProfileAvatar } from "../../components/UserAvatar";
 import type { UserIdentity } from "../../utils/identity";
 import type { Peer } from "./useEditorCollaboration";
@@ -55,16 +56,20 @@ const CollaboratorAvatar = ({
   inactive = false,
   followed = false,
   onClick,
+  actionLabel,
 }: {
   user: UserIdentity;
   label: string;
   inactive?: boolean;
   followed?: boolean;
   onClick?: () => void;
+  /** Replaces the follow label when the click does something else. */
+  actionLabel?: string;
 }) => {
-  const title = onClick
-    ? `${followed ? "Stop following" : "Follow"} ${label}`
-    : label;
+  const follows = Boolean(onClick) && !actionLabel;
+  const title =
+    actionLabel ??
+    (onClick ? `${followed ? "Stop following" : "Follow"} ${label}` : label);
   const avatar = (
     <ProfileAvatar
       name={user.name}
@@ -84,7 +89,7 @@ const CollaboratorAvatar = ({
         <button
           type="button"
           onClick={onClick}
-          aria-pressed={followed}
+          aria-pressed={follows ? followed : undefined}
           aria-label={title}
           className={clsx(
             "grid h-full w-full place-items-center rounded-[38%]",
@@ -101,7 +106,90 @@ const CollaboratorAvatar = ({
   );
 };
 
-const Collaborators = (p: EditorChromeProps) => {
+const followLabel = (peer: Peer, followed: boolean) =>
+  `${followed ? "Stop following" : "Follow"} ${peer.name}`;
+
+const PeopleList = ({
+  me,
+  peers,
+  followedUserId,
+  opensUp,
+  onToggleFollow,
+  onClose,
+}: Pick<
+  EditorChromeProps,
+  "me" | "peers" | "followedUserId" | "onToggleFollow"
+> & { opensUp: boolean; onClose: () => void }) => {
+  const listRef = useRef<HTMLDivElement>(null);
+  useMenuKeyboard(listRef, onClose);
+  const nameClass =
+    "min-w-0 flex-1 truncate text-sm font-medium text-slate-800 dark:text-neutral-100";
+  return (
+    <div
+      ref={listRef}
+      role="dialog"
+      aria-label="People in this drawing"
+      className={clsx(
+        "ui-menu absolute right-0 z-10 max-h-[calc(100dvh-200px)] w-64 overflow-y-auto",
+        opensUp ? "bottom-full mb-2" : "top-full mt-2",
+      )}
+    >
+      <ul>
+        <li className="flex min-h-11 items-center gap-2 px-2 py-1">
+          <ProfileAvatar name={me.name} size="sm" />
+          <span className={nameClass}>{`${me.name} (You)`}</span>
+        </li>
+        {peers.map((peer) => {
+          const followed = peer.id === followedUserId;
+          return (
+            <li
+              key={peer.id}
+              className="flex min-h-11 items-center gap-2 px-2 py-1"
+            >
+              <ProfileAvatar
+                name={peer.name}
+                size="sm"
+                className={clsx(!peer.isActive && "opacity-30 grayscale")}
+              />
+              <span className={nameClass}>{peer.name}</span>
+              <button
+                type="button"
+                aria-pressed={followed}
+                aria-label={followLabel(peer, followed)}
+                onClick={() => {
+                  onToggleFollow(peer);
+                  onClose();
+                }}
+                className={clsx(
+                  followed ? "ui-button-primary" : "ui-button-secondary",
+                  "shrink-0 px-2.5 py-1 text-xs [@media(hover:none)]:min-h-11",
+                )}
+              >
+                {followed ? "Following" : "Follow"}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
+const Collaborators = (p: EditorChromeProps & { opensUp?: boolean }) => {
+  const [listOpen, setListOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!listOpen) return;
+    // Capture phase: Excalidraw's UI sits above the chrome and would otherwise swallow outside taps.
+    const onPointerDown = (event: Event) => {
+      if (!wrapperRef.current?.contains(event.target as Node))
+        setListOpen(false);
+    };
+    window.addEventListener("pointerdown", onPointerDown, true);
+    return () => window.removeEventListener("pointerdown", onPointerDown, true);
+  }, [listOpen]);
+  const toggleList = () => setListOpen((open) => !open);
+
   // The followed peer stays visible so following can always be stopped.
   const ordered = [...p.peers].sort(
     (a, b) =>
@@ -110,7 +198,7 @@ const Collaborators = (p: EditorChromeProps) => {
   const visible = ordered.slice(0, MAX_VISIBLE_PEERS);
   const hidden = ordered.slice(MAX_VISIBLE_PEERS);
   return (
-    <div className="flex shrink-0 items-center">
+    <div ref={wrapperRef} className="relative flex shrink-0 items-center">
       <CollaboratorAvatar user={p.me} label={`${p.me.name} (You)`} />
       {visible.map((peer) => (
         <CollaboratorAvatar
@@ -119,18 +207,37 @@ const Collaborators = (p: EditorChromeProps) => {
           label={peer.name}
           inactive={!peer.isActive}
           followed={peer.id === p.followedUserId}
-          onClick={() => p.onToggleFollow(peer)}
+          // Touch has no tooltip: a tap shows the names before anyone is followed.
+          actionLabel={
+            p.isTouchOnly ? `${peer.name}, show everyone` : undefined
+          }
+          onClick={p.isTouchOnly ? toggleList : () => p.onToggleFollow(peer)}
         />
       ))}
       {hidden.length > 0 ? (
-        <span
-          className="mx-1 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600 dark:bg-neutral-800 dark:text-neutral-300"
+        <button
+          type="button"
+          onClick={toggleList}
+          aria-expanded={listOpen}
+          aria-haspopup="dialog"
+          aria-label={`Show everyone (${hidden.length} more)`}
           title={hidden.map((peer) => peer.name).join(", ")}
-          role="img"
-          aria-label={`${hidden.length} more: ${hidden.map((peer) => peer.name).join(", ")}`}
+          className="grid h-10 min-w-10 place-items-center rounded-lg [@media(hover:none)]:h-11 [@media(hover:none)]:min-w-11"
         >
-          {`+${hidden.length}`}
-        </span>
+          <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600 dark:bg-neutral-800 dark:text-neutral-300">
+            {`+${hidden.length}`}
+          </span>
+        </button>
+      ) : null}
+      {listOpen ? (
+        <PeopleList
+          me={p.me}
+          peers={ordered}
+          followedUserId={p.followedUserId}
+          opensUp={Boolean(p.opensUp)}
+          onToggleFollow={p.onToggleFollow}
+          onClose={() => setListOpen(false)}
+        />
       ) : null}
     </div>
   );
@@ -214,13 +321,27 @@ export const EditorTitleIsland = (
           <div className="w-64 max-w-full px-1">
             <RenameField {...p} />
           </div>
+        ) : p.canEdit ? (
+          <h1 className="min-w-0 font-medium">
+            <button
+              type="button"
+              aria-label={`Rename "${p.drawingName}"`}
+              title={p.drawingName}
+              className="block w-full min-w-0 truncate touch-manipulation cursor-text rounded px-2 py-1 text-left text-gray-900 [@media(hover:none)]:py-2.5 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-800"
+              onDoubleClick={p.onRenameStart}
+              onClick={(event) => {
+                // Enter/Space fire a click with detail 0. Touch has no tooltip or
+                // dblclick, so a tap shows the full (truncated) name in the field.
+                if (event.detail === 0 || p.isTouchOnly) p.onRenameStart();
+              }}
+            >
+              {p.drawingName}
+            </button>
+          </h1>
         ) : (
           <h1
-            className="min-w-0 truncate touch-manipulation cursor-text rounded px-2 py-1 font-medium text-gray-900 [@media(hover:none)]:py-2.5 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-800"
+            className="min-w-0 truncate px-2 py-1 font-medium text-gray-900 dark:text-white"
             title={p.drawingName}
-            onDoubleClick={p.onRenameStart}
-            // Touch screens have no tooltip or dblclick: a tap shows the full (truncated) name in the rename field.
-            onClick={p.isTouchOnly ? p.onRenameStart : undefined}
           >
             {p.drawingName}
           </h1>
@@ -321,7 +442,6 @@ export const EditorOverflowIsland = (
   p: EditorChromeProps & { showBack: boolean },
 ) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const islandRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   // Renaming happens inside the menu, so it stays open until the name is committed or cancelled.
@@ -362,8 +482,14 @@ export const EditorOverflowIsland = (
       if (event.key === "Tab") close(false);
     };
     // Capture phase: Excalidraw's UI sits above this island and would otherwise swallow outside taps.
+    // The people list in the same island counts as outside, so only one popup is open.
     const onPointerDown = (event: Event) => {
-      if (!islandRef.current?.contains(event.target as Node)) close(false);
+      const target = event.target as Node;
+      if (
+        !menuRef.current?.contains(target) &&
+        !triggerRef.current?.contains(target)
+      )
+        close(false);
     };
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("pointerdown", onPointerDown, true);
@@ -374,9 +500,9 @@ export const EditorOverflowIsland = (
   }, [menuOpen]);
 
   return (
-    <div ref={islandRef} className="editor-island relative">
+    <div className="editor-island relative">
       <StatusBadges {...p} compact />
-      <Collaborators {...p} />
+      <Collaborators {...p} opensUp />
       <Divider />
       <button
         ref={triggerRef}

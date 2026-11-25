@@ -144,9 +144,7 @@ describe("editor floating chrome", () => {
     const { element, props } = view();
     const renderer = await render(element);
     expect(byLabel(renderer.root, "Back to dashboard")).toHaveLength(1);
-    expect(renderer.root.findByType("h1").children).toEqual([
-      "Projektplanung Q1",
-    ]);
+    expect(byLabel(renderer.root, 'Rename "Projektplanung Q1"')).toHaveLength(1);
     const slot = await topRight(renderer, false);
     expect(slot).not.toBeNull();
     const history = byLabel(slot!.root, "Version history")[0];
@@ -295,6 +293,106 @@ describe("editor floating chrome", () => {
       "Follow Peer a",
     ]);
     expect(JSON.stringify(slot!.toJSON())).toContain("+2");
+  });
+
+  it("wide: the title renames by keyboard and double-click, not by a single mouse click", async () => {
+    const { element, props } = view();
+    const renderer = await render(element);
+    const title = byLabel(renderer.root, 'Rename "Projektplanung Q1"')[0];
+    expect(title.parent?.type).toBe("h1");
+    expect(title.children).toEqual(["Projektplanung Q1"]);
+    await act(async () => title.props.onClick({ detail: 1 }));
+    expect(props.onRenameStart).not.toHaveBeenCalled();
+    // Enter or Space on a focused button fires a click with detail 0.
+    await act(async () => title.props.onClick({ detail: 0 }));
+    expect(props.onRenameStart).toHaveBeenCalledOnce();
+    await act(async () => title.props.onDoubleClick());
+    expect(props.onRenameStart).toHaveBeenCalledTimes(2);
+  });
+
+  it("wide: a touch tap on the title renames", async () => {
+    const { element, props } = view({ isTouchOnly: true });
+    const renderer = await render(element);
+    const title = byLabel(renderer.root, 'Rename "Projektplanung Q1"')[0];
+    await act(async () => title.props.onClick({ detail: 1 }));
+    expect(props.onRenameStart).toHaveBeenCalledOnce();
+  });
+
+  it("wide: view-only users get a plain title without a rename button", async () => {
+    const renderer = await render(view({ canEdit: false }).element);
+    expect(renderer.root.findByType("h1").children).toEqual([
+      "Projektplanung Q1",
+    ]);
+    expect(byLabel(renderer.root, 'Rename "Projektplanung Q1"')).toHaveLength(0);
+  });
+
+  const peer = (id: string) => ({
+    id,
+    name: `Peer ${id}`,
+    color: "blue",
+    isActive: true,
+  });
+  const peopleList = (root: ReactTestInstance) =>
+    root.findAll(
+      (node) =>
+        node.props.role === "dialog" &&
+        node.props["aria-label"] === "People in this drawing",
+    );
+
+  it("+N opens a list of everyone; following from it closes the list", async () => {
+    const { element, props } = view({
+      peers: [peer("a"), peer("b"), peer("c"), peer("d")],
+    });
+    const renderer = await render(element);
+    const slot = await topRight(renderer, false);
+    const more = byLabel(slot!.root, "Show everyone (2 more)")[0];
+    expect(more.props["aria-expanded"]).toBe(false);
+    expect(more.props.className).toContain("[@media(hover:none)]:h-11");
+    expect(peopleList(slot!.root)).toHaveLength(0);
+    await act(async () => more.props.onClick());
+    const [list] = peopleList(slot!.root);
+    const text = JSON.stringify(slot!.toJSON());
+    for (const name of ["Me (You)", "Peer a", "Peer b", "Peer c", "Peer d"]) {
+      expect(text).toContain(name);
+    }
+    await act(async () => byLabel(list, "Follow Peer c")[0].props.onClick());
+    expect(props.onToggleFollow).toHaveBeenCalledWith(peer("c"));
+    expect(peopleList(slot!.root)).toHaveLength(0);
+  });
+
+  it("closes the people list on an outside tap", async () => {
+    const listeners: Record<string, (event: unknown) => void> = {};
+    vi.stubGlobal("window", {
+      addEventListener: (type: string, fn: (event: unknown) => void) => {
+        listeners[type] = fn;
+      },
+      removeEventListener: vi.fn(),
+    });
+    const renderer = await render(
+      view({ peers: [peer("a"), peer("b"), peer("c")] }).element,
+    );
+    const slot = await topRight(renderer, false);
+    await act(async () =>
+      byLabel(slot!.root, "Show everyone (1 more)")[0].props.onClick(),
+    );
+    expect(peopleList(slot!.root)).toHaveLength(1);
+    await act(async () => listeners.pointerdown({ target: {} }));
+    expect(peopleList(slot!.root)).toHaveLength(0);
+  });
+
+  it("touch: tapping an avatar shows the list with names instead of following", async () => {
+    const { element, props } = view({
+      isTouchOnly: true,
+      peers: [peer("a")],
+    });
+    const renderer = await render(element);
+    const slot = await topRight(renderer, false);
+    const avatar = byLabel(slot!.root, "Peer a, show everyone")[0];
+    expect(avatar.props["aria-pressed"]).toBeUndefined();
+    await act(async () => avatar.props.onClick());
+    expect(props.onToggleFollow).not.toHaveBeenCalled();
+    const [list] = peopleList(slot!.root);
+    expect(byLabel(list, "Follow Peer a")).toHaveLength(1);
   });
 
   it("rename from the menu keeps the menu open with the name field", async () => {
