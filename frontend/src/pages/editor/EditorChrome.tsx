@@ -68,7 +68,7 @@ const CollaboratorAvatar = ({
   const avatar = (
     <ProfileAvatar
       name={user.name}
-      size="toolbar"
+      size="sm"
       className={clsx(
         "transition-all duration-300",
         inactive && "opacity-30 grayscale",
@@ -87,7 +87,7 @@ const CollaboratorAvatar = ({
           aria-pressed={followed}
           aria-label={title}
           className={clsx(
-            "block rounded-[38%]",
+            "grid h-full w-full place-items-center rounded-[38%]",
             followed &&
               "ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-neutral-900",
           )}
@@ -126,6 +126,7 @@ const Collaborators = (p: EditorChromeProps) => {
         <span
           className="mx-1 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600 dark:bg-neutral-800 dark:text-neutral-300"
           title={hidden.map((peer) => peer.name).join(", ")}
+          role="img"
           aria-label={`${hidden.length} more: ${hidden.map((peer) => peer.name).join(", ")}`}
         >
           {`+${hidden.length}`}
@@ -215,7 +216,7 @@ export const EditorTitleIsland = (
           </div>
         ) : (
           <h1
-            className="min-w-0 truncate touch-manipulation cursor-text rounded px-2 py-1 font-medium text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-800"
+            className="min-w-0 truncate touch-manipulation cursor-text rounded px-2 py-1 font-medium text-gray-900 [@media(hover:none)]:py-2.5 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-800"
             title={p.drawingName}
             onDoubleClick={p.onRenameStart}
             // Touch screens have no tooltip or dblclick: a tap shows the full (truncated) name in the rename field.
@@ -284,8 +285,12 @@ const MenuItem = ({
   label,
   onSelect,
   disabled,
+  ariaLabel,
+  emphasis = false,
 }: {
   action: string;
+  ariaLabel?: string;
+  emphasis?: boolean;
   icon: React.ReactNode;
   label: React.ReactNode;
   onSelect: () => void;
@@ -295,9 +300,13 @@ const MenuItem = ({
     type="button"
     role="menuitem"
     data-action={action}
+    aria-label={ariaLabel}
     disabled={disabled}
     onClick={onSelect}
-    className="ui-menu-item min-h-11 disabled:cursor-wait disabled:opacity-60"
+    className={clsx(
+      "ui-menu-item min-h-11 disabled:cursor-wait disabled:opacity-60",
+      emphasis && "font-semibold text-slate-900 dark:text-white",
+    )}
   >
     {icon}
     <span className="min-w-0 truncate">{label}</span>
@@ -332,12 +341,20 @@ export const EditorOverflowIsland = (
       ) ?? [],
     );
 
+  // The rename field unmounts on commit/cancel; hand focus back to the trigger instead of <body>.
+  const wasRenaming = useRef(p.isRenaming);
+  useEffect(() => {
+    if (wasRenaming.current && !p.isRenaming) triggerRef.current?.focus();
+    wasRenaming.current = p.isRenaming;
+  }, [p.isRenaming]);
+
   useEffect(() => {
     if (!menuOpen) return;
     items()[0]?.focus();
     // The rename field handles its own Escape (cancel), which also closes the menu.
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") close(true);
+      if (event.key === "Tab") close(false);
     };
     // Capture phase: Excalidraw's UI sits above this island and would otherwise swallow outside taps.
     const onPointerDown = (event: Event) => {
@@ -372,8 +389,9 @@ export const EditorOverflowIsland = (
           ref={menuRef}
           role="menu"
           aria-label="Drawing actions"
-          // Capped so the menu never runs under Excalidraw's top bar on short (landscape phone) screens.
-          className="ui-menu absolute bottom-full right-0 z-10 mb-2 max-h-[calc(100dvh-200px)] w-64 overflow-y-auto"
+          // Short (landscape phone) screens: beside the island, so all items fit below Excalidraw's top bar;
+          // the height cap is only a fallback for even shorter screens.
+          className="ui-menu absolute bottom-full right-0 z-10 mb-2 max-h-[calc(100dvh-200px)] w-64 overflow-y-auto [@media(max-height:499.98px)]:bottom-0 [@media(max-height:499.98px)]:right-full [@media(max-height:499.98px)]:mb-0 [@media(max-height:499.98px)]:mr-2 [@media(max-height:499.98px)]:max-h-[calc(100dvh-140px)]"
           onKeyDown={(event) => {
             if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
             event.preventDefault();
@@ -394,6 +412,8 @@ export const EditorOverflowIsland = (
               action="rename"
               icon={<PencilLine size={18} className="shrink-0" />}
               label={p.drawingName}
+              ariaLabel={`Rename "${p.drawingName}"`}
+              emphasis
               onSelect={run(p.onRenameStart)}
             />
           ) : (

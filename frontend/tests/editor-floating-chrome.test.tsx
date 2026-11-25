@@ -237,6 +237,9 @@ describe("editor floating chrome", () => {
     // e.g. a tap on Excalidraw's tool row, which sits above the island
     await act(async () => listeners.pointerdown({ target: {} }));
     expect(menus()).toHaveLength(0);
+    await act(async () => more().props.onClick());
+    await act(async () => listeners.keydown({ key: "Tab" }));
+    expect(menus()).toHaveLength(0);
   });
 
   it("keeps the chrome above the history preview while it is shown", async () => {
@@ -302,6 +305,9 @@ describe("editor floating chrome", () => {
     );
     const rename = renderer.root.find(
       (node) => node.props["data-action"] === "rename",
+    );
+    expect(rename.props["aria-label"]).toBe(
+      `Rename "${props.drawingName}"`,
     );
     await act(async () => rename.props.onClick());
     expect(props.onRenameStart).toHaveBeenCalledOnce();
