@@ -105,6 +105,11 @@
     .ui-toolbar-button {
       @apply h-11 w-11;
     }
+
+    /* The bordered pill adds 4px, so the group itself is 44px. */
+    .ui-button-group-item {
+      @apply h-10 w-10;
+    }
   }
 
   .ui-input {
@@ -145,7 +150,7 @@
   }
 
   .playful-avatar {
-    @apply relative isolate flex shrink-0 items-center justify-center rounded-[38%] border-2 border-slate-800 bg-amber-300 font-black text-white shadow-[2px_2px_0px_0px_rgba(30,41,59,0.9)] dark:border-neutral-600 dark:bg-amber-300 dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.18)];
+    @apply relative isolate flex shrink-0 items-center justify-center rounded-[38%] border-2 border-slate-800 bg-amber-300 font-black text-slate-900 shadow-[2px_2px_0px_0px_rgba(30,41,59,0.9)] dark:border-neutral-600 dark:bg-amber-300 dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.18)];
   }
 
   /* Shared secondary-surface language: rounded and playful, without the
@@ -189,6 +194,17 @@
 
   .ui-menu-item-danger {
     @apply text-rose-600 hover:bg-rose-50 hover:text-rose-600 dark:text-rose-400 dark:hover:bg-rose-950/30 dark:hover:text-rose-400;
+  }
+
+  @media (hover: none) {
+    .ui-menu-item {
+      @apply min-h-11;
+    }
+
+    /* 16px stops iOS Safari from zooming into focused fields. */
+    .ui-input {
+      @apply h-11 text-base;
+    }
   }
 
   .ui-menu-separator {
