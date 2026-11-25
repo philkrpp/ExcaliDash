@@ -20,7 +20,8 @@ type UsersTableProps = {
 
 const headerCellClass =
   "px-4 py-2.5 text-xs font-semibold text-slate-500 dark:text-neutral-400 sm:px-6";
-const actionButtonClass = "ui-button-secondary px-2.5 py-1.5 text-xs";
+const actionButtonClass =
+  "ui-button-secondary whitespace-nowrap px-2.5 py-1.5 text-xs";
 
 type UserControlProps = {
   user: AdminUser;
@@ -186,7 +187,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({
       </SettingsSectionHeader>
 
       <div className="overflow-hidden rounded-2xl border-2 border-slate-800 bg-white shadow-[3px_3px_0px_0px_rgba(30,41,59,0.9)] dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.18)]">
-        <ul className="divide-y divide-slate-100 dark:divide-neutral-800 md:hidden">
+        <ul className="divide-y divide-slate-100 dark:divide-neutral-800 xl:hidden">
           {users.map((user) => (
             <li key={user.id} className="space-y-3 px-4 py-3.5 text-sm">
               <div className="min-w-0">
@@ -213,7 +214,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({
           {emptyState ? <li className="px-4 py-6">{emptyState}</li> : null}
         </ul>
 
-        <div className="hidden overflow-x-auto md:block">
+        <div className="hidden overflow-x-auto xl:block">
           <table className="min-w-full text-sm">
             <thead className="bg-slate-50 dark:bg-neutral-800/70">
               <tr className="text-left">

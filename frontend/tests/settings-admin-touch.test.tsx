@@ -140,6 +140,18 @@ describe("SettingsMainGrid", () => {
     });
   });
 
+  it("shows a regional English locale as the English entry without an extra option", async () => {
+    locale.language = "en-US";
+    const r = await render(<SettingsMainGrid {...gridProps} />);
+    const select = r.root.findAll(
+      (n) =>
+        Array.isArray(n.props.options) &&
+        n.props.ariaLabel === "settings.language",
+    )[0];
+    expect(select.props.value).toBe("en");
+    expect(select.props.options).toHaveLength(2);
+  });
+
   it("falls back to the code when Intl.DisplayNames throws", async () => {
     locale.language = "de-DE";
     vi.spyOn(Intl, "DisplayNames").mockImplementation(() => {
@@ -339,18 +351,18 @@ describe("UsersTable", () => {
     expect(props.onToggleMustReset).toHaveBeenCalledTimes(1);
   });
 
-  it("renders a card list below md and the table from md up", async () => {
+  it("renders a card list below xl (tablets too) and the table from xl up", async () => {
     const r = await render(table().element);
     const cards = r.root.findAll(
       (n) =>
         n.type === "ul" &&
-        String(n.props.className).split(" ").includes("md:hidden"),
+        String(n.props.className).split(" ").includes("xl:hidden"),
     );
     expect(cards).toHaveLength(1);
     const tableWrap = r.root.findAll(
       (n) =>
         n.type === "div" &&
-        ["hidden", "md:block"].every((c) =>
+        ["hidden", "xl:block"].every((c) =>
           String(n.props.className).split(" ").includes(c),
         ),
     );

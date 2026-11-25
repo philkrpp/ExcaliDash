@@ -58,6 +58,18 @@ const getEditorLanguageLabel = (language: string) => {
   }
 };
 
+/** Maps a stored locale to the UI language option that already covers it (en-US → en). */
+const getLanguageOption = (language: string) => {
+  try {
+    const base = new Intl.Locale(language).language;
+    if (base === "en") return "en";
+    if (base === "zh") return "zh-CN";
+  } catch {
+    // An invalid tag keeps its own "(editor only)" entry.
+  }
+  return language;
+};
+
 export const SettingsMainGrid = ({
   exportBackup,
   theme,
@@ -79,6 +91,7 @@ export const SettingsMainGrid = ({
   onCheckForUpdates,
 }: SettingsMainGridProps) => {
   const { language, setLanguage, t } = useLocale();
+  const languageOption = getLanguageOption(language);
 
   return (
     <SettingsCard>
@@ -89,14 +102,16 @@ export const SettingsMainGrid = ({
       >
         <PlayfulSelect
           ariaLabel={t("settings.language")}
-          value={language}
+          value={languageOption}
           onChange={setLanguage}
           align="right"
           portal
           options={[
             { value: "en", label: "English" },
             { value: "zh-CN", label: "简体中文" },
-            ...(language !== "en" && language !== "zh-CN"
+            ...(languageOption === language &&
+            language !== "en" &&
+            language !== "zh-CN"
               ? [{ value: language, label: getEditorLanguageLabel(language) }]
               : []),
           ]}

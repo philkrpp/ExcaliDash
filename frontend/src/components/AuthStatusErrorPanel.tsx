@@ -12,9 +12,20 @@ export const AuthStatusErrorPanel: React.FC<AuthStatusErrorPanelProps> = ({
   onRetry,
   fullScreen = false,
 }) => {
+  // An optional first line (before "\n") is the panel title.
+  const [first, ...rest] = message.split("\n");
+  const title = rest.length > 0 ? first : null;
+  const body = rest.length > 0 ? rest.join("\n") : message;
   const panel = (
     <div className="auth-panel text-sm" role="alert">
-      <div className="text-slate-700 dark:text-neutral-200">{message}</div>
+      <div className="text-slate-700 dark:text-neutral-200">
+        {title ? (
+          <div className="mb-1 text-base font-bold text-slate-900 dark:text-neutral-100">
+            {title}
+          </div>
+        ) : null}
+        {body}
+      </div>
       <button
         type="button"
         onClick={() => void onRetry()}

@@ -84,6 +84,7 @@ const storedIdentity = (value: string | null) => {
   }
 };
 
+/** Returns the panel text; an optional first line before "\n" is its title. */
 const describeAuthStatusError = (error: unknown): string => {
   const response = isAxiosError(error) ? error.response : undefined;
   if (response?.status === 429) {
@@ -98,7 +99,7 @@ const describeAuthStatusError = (error: unknown): string => {
       Number.isFinite(retryAfter) && retryAfter > 0
         ? `${retryAfter} ${retryAfter === 1 ? "second" : "seconds"}`
         : "a minute";
-    return `Too many requests. The server is rate limiting right now — try again in ${wait}.`;
+    return `Too many requests\nThe server is rate limiting right now. Try again in ${wait}.`;
   }
   // A proxy answering 502–504 means it could not reach the backend either.
   const isGatewayError =

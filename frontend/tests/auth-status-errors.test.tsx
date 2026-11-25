@@ -86,20 +86,20 @@ afterEach(() => {
 describe("auth status errors", () => {
   it("explains a 429 as rate limiting without a Retry-After header", async () => {
     expect(await loadWith(httpError(429))).toBe(
-      "Too many requests. The server is rate limiting right now — try again in a minute.",
+      "Too many requests\nThe server is rate limiting right now. Try again in a minute.",
     );
   });
 
   it("uses Retry-After seconds for a 429 when the server sends them", async () => {
     expect(await loadWith(httpError(429, { "retry-after": "42" }))).toBe(
-      "Too many requests. The server is rate limiting right now — try again in 42 seconds.",
+      "Too many requests\nThe server is rate limiting right now. Try again in 42 seconds.",
     );
   });
 
   it("ignores an unparsable Retry-After value", async () => {
     expect(
       await loadWith(httpError(429, { "retry-after": "Wed, 21 Oct 2026" })),
-    ).toContain("try again in a minute");
+    ).toContain("Try again in a minute");
   });
 
   it("keeps the operator hint when the server cannot be reached", async () => {
@@ -148,5 +148,26 @@ describe("auth status error panel", () => {
     expect(button.children).toEqual(["Try again"]);
     await act(async () => button.props.onClick());
     expect(onRetry).toHaveBeenCalledOnce();
+  });
+
+  it("renders a first line before a newline as a bold title", async () => {
+    let renderer!: ReactTestRenderer;
+    await act(async () => {
+      renderer = create(
+        <AuthStatusErrorPanel
+          message={"Too many requests\nTry again in a minute."}
+          onRetry={vi.fn()}
+        />,
+      );
+    });
+    renderers.push(renderer);
+    const title = renderer.root.find(
+      (node) =>
+        typeof node.props.className === "string" &&
+        node.props.className.includes("font-bold") &&
+        node.children[0] === "Too many requests",
+    );
+    expect(title).toBeDefined();
+    expect(JSON.stringify(renderer.toJSON())).toContain("Try again in a minute.");
   });
 });

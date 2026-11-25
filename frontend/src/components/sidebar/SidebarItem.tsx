@@ -112,7 +112,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
           type="button"
           aria-label={menuLabel ?? label}
           onClick={onMenuClick}
-          className="ui-icon-button absolute right-3 top-1/2 h-7 w-7 -translate-y-1/2 border-transparent bg-transparent text-slate-500 opacity-0 shadow-none focus-visible:opacity-100 group-hover/item:opacity-100 group-focus-within/item:opacity-100 dark:border-transparent dark:bg-transparent dark:text-neutral-400 dark:shadow-none [@media(hover:none)]:right-2 [@media(hover:none)]:h-11 [@media(hover:none)]:w-11 [@media(hover:none)]:opacity-100"
+          className="ui-icon-button absolute inset-y-0 right-3 my-auto h-7 w-7 border-transparent bg-transparent text-slate-500 opacity-0 shadow-none focus-visible:opacity-100 group-hover/item:opacity-100 group-focus-within/item:opacity-100 dark:border-transparent dark:bg-transparent dark:text-neutral-400 dark:shadow-none [@media(hover:none)]:right-2 [@media(hover:none)]:h-11 [@media(hover:none)]:w-11 [@media(hover:none)]:opacity-100"
         >
           <MoreHorizontal size={16} />
         </button>

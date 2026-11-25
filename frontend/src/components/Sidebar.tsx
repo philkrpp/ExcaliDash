@@ -180,7 +180,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   e.stopPropagation();
                   setIsCreating(true);
                 }}
-                className="ui-icon-button h-7 w-7 border-transparent bg-transparent text-slate-400 shadow-none opacity-70 hover:opacity-100 group-hover/header:opacity-100 dark:border-transparent dark:bg-transparent dark:text-neutral-500 dark:shadow-none [@media(hover:none)]:h-11 [@media(hover:none)]:w-11 [@media(hover:none)]:opacity-100"
+                className="ui-icon-button h-7 w-7 border-transparent bg-transparent text-slate-500 shadow-none opacity-70 hover:opacity-100 group-hover/header:opacity-100 dark:border-transparent dark:bg-transparent dark:text-neutral-400 dark:shadow-none [@media(hover:none)]:h-11 [@media(hover:none)]:w-11 [@media(hover:none)]:opacity-100"
                 aria-label={t("sidebar.newCollection")}
                 title={t("sidebar.newCollection")}
               >
