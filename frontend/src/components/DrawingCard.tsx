@@ -277,7 +277,7 @@ export const DrawingCard = memo(function DrawingCard({
                 />
               </div>
             ) : (
-              <h3
+              <h2
                 className="text-sm sm:text-base font-bold text-slate-800 dark:text-neutral-100 truncate cursor-text select-none group-hover:text-neutral-900 dark:group-hover:text-white transition-colors"
                 title={drawing.name}
                 onDoubleClick={(e) => {
@@ -291,7 +291,7 @@ export const DrawingCard = memo(function DrawingCard({
                 }}
               >
                 {drawing.name}
-              </h3>
+              </h2>
             )}
           </div>
 

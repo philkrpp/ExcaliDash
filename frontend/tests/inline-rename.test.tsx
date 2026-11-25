@@ -231,7 +231,7 @@ describe("drawing card rename", () => {
     );
     await act(async () => {
       renderer.root
-        .findByType("h3")
+        .findByType("h2")
         .props.onDoubleClick({ stopPropagation: vi.fn() });
     });
     return { renderer, onRename };
@@ -282,7 +282,7 @@ describe("drawing card rename", () => {
       field.props.onBlur();
     });
     expect(onRename).not.toHaveBeenCalled();
-    expect(renderer.root.findByType("h3").props.title).toBe("Old name");
+    expect(renderer.root.findByType("h2").props.title).toBe("Old name");
   });
 
   it("keeps editing when the pointer leaves the card", async () => {

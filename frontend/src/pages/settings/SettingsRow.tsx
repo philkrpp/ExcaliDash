@@ -59,6 +59,8 @@ type SettingsRowProps = {
   children?: React.ReactNode;
   /** Rows with exactly one switch: makes the whole row toggle it. */
   onToggle?: () => void;
+  /** Wide controls (inputs, button pairs): own left-aligned line on phones. */
+  stackOnPhone?: boolean;
 };
 
 const INTERACTIVE_SELECTOR = "button, input, select, textarea, a, label";
@@ -70,6 +72,7 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
   description,
   children,
   onToggle,
+  stackOnPhone,
 }) => (
   <div
     className={`flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3.5 sm:px-5 ${
@@ -105,7 +108,13 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
       ) : null}
     </div>
     {children ? (
-      <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+      <div
+        className={`ml-auto flex flex-wrap items-center justify-end gap-2 ${
+          stackOnPhone
+            ? "max-sm:ml-0 max-sm:basis-full max-sm:justify-start"
+            : ""
+        }`}
+      >
         {children}
       </div>
     ) : null}

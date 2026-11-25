@@ -400,6 +400,8 @@ export const Settings: React.FC = () => {
           </div>
         )}
         <div>
+          {/* Keeps the outline h1 → h2 → h3; the row titles below are h3. */}
+          <h2 className="sr-only">Preferences</h2>
           <SettingsMainGrid
             exportBackup={() => void exportBackup()}
             theme={theme}

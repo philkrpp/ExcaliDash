@@ -60,7 +60,7 @@ export const LoginRateLimitCard: React.FC<LoginRateLimitCardProps> = ({
       title="Login rate limiting"
       subtitle="Throttle repeated login attempts"
     >
-      <span className="text-xs font-bold text-slate-400 dark:text-neutral-500">
+      <span className="text-xs font-bold text-slate-500 dark:text-neutral-400">
         {loading
           ? "Loading…"
           : getSaveStatusLabel(saving, autoSaveQueued, dirty)}
@@ -84,7 +84,11 @@ export const LoginRateLimitCard: React.FC<LoginRateLimitCardProps> = ({
         />
       </SettingsRow>
 
-      <SettingsRow title="Attempts" description="Max failed logins per window">
+      <SettingsRow
+        title="Attempts"
+        description="Max failed logins per window"
+        stackOnPhone
+      >
         <input
           type="number"
           min={1}
@@ -93,7 +97,7 @@ export const LoginRateLimitCard: React.FC<LoginRateLimitCardProps> = ({
           onChange={(event) => onMaxAttemptsChange(Number(event.target.value))}
           className={`${settingsSelectClass} w-20`}
         />
-        <span className="text-xs font-bold text-slate-400 dark:text-neutral-500">
+        <span className="text-xs font-bold text-slate-500 dark:text-neutral-400">
           per
         </span>
         <input
@@ -106,7 +110,7 @@ export const LoginRateLimitCard: React.FC<LoginRateLimitCardProps> = ({
           }
           className={`${settingsSelectClass} w-20`}
         />
-        <span className="text-xs font-bold text-slate-400 dark:text-neutral-500">
+        <span className="text-xs font-bold text-slate-500 dark:text-neutral-400">
           min
         </span>
       </SettingsRow>
@@ -114,6 +118,7 @@ export const LoginRateLimitCard: React.FC<LoginRateLimitCardProps> = ({
       <SettingsRow
         title="Reset lockout"
         description="Clear the lockout for one account"
+        stackOnPhone
       >
         <input
           list="admin-user-identifiers"
@@ -121,7 +126,7 @@ export const LoginRateLimitCard: React.FC<LoginRateLimitCardProps> = ({
           value={resetIdentifier}
           onChange={(event) => onResetIdentifierChange(event.target.value)}
           placeholder="user@example.com"
-          className={`${settingsSelectClass} w-48`}
+          className={`${settingsSelectClass} w-48 max-sm:min-w-0 max-sm:flex-1`}
         />
         <datalist id="admin-user-identifiers">
           {userEmails.map((email) => (

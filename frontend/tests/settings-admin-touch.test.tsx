@@ -64,6 +64,27 @@ describe("PlayfulSwitch touch size", () => {
   });
 });
 
+describe("SettingsRow stackOnPhone", () => {
+  const controls = async (stackOnPhone?: boolean) => {
+    const r = await render(
+      <SettingsRow title="Row" stackOnPhone={stackOnPhone}>
+        <input aria-label="field" />
+      </SettingsRow>,
+    );
+    return r.root.findByType("input").parent!.props.className as string;
+  };
+
+  it("puts wide controls on their own left-aligned line below sm", async () => {
+    const className = await controls(true);
+    expect(className).toContain("max-sm:basis-full");
+    expect(className).toContain("max-sm:justify-start");
+  });
+
+  it("keeps controls right-aligned beside the title by default", async () => {
+    expect(await controls()).not.toContain("max-sm:basis-full");
+  });
+});
+
 describe("SettingsRow toggle", () => {
   it("toggles once when the row is clicked", async () => {
     const onToggle = vi.fn();
