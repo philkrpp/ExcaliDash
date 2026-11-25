@@ -10,6 +10,14 @@ import { Sidebar } from "../src/components/Sidebar";
 import { SidebarFooter } from "../src/components/sidebar/SidebarFooter";
 import { translate } from "../src/i18n";
 
+const portalTargets = vi.hoisted(() => [] as unknown[]);
+vi.mock("react-dom", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("react-dom")>()),
+  createPortal: (children: React.ReactNode, target: unknown) => {
+    portalTargets.push(target);
+    return children;
+  },
+}));
 vi.mock("react-router-dom", () => ({
   useNavigate: () => vi.fn(),
 }));
@@ -161,6 +169,8 @@ describe("Sidebar", () => {
     expect(json).toContain("Share Collection");
     expect(json).toContain("Rename Collection");
     expect(json).toContain("Delete Collection");
+    // Portaled so the transformed, overflow-hidden mobile drawer can't clip it.
+    expect(portalTargets.at(-1)).toBe(document.body);
   });
 
   it("does not offer ⋯ for collections shared with me", async () => {

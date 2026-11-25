@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Edit2, Plus, Share2, Trash2 } from "lucide-react";
 import type { Collection } from "../../types";
 import { clampToViewport } from "../../utils/clampToViewport";
@@ -56,67 +57,70 @@ export const SidebarContextMenu: React.FC<SidebarContextMenuProps> = ({
 
   useMenuKeyboard(menuRef, onClose);
 
-  return (
-  <div
-    className="fixed inset-0 z-50"
-    onClick={onClose}
-    onContextMenu={(e) => {
-      e.preventDefault();
-      onClose();
-    }}
-  >
+  // Portaled: the mobile drawer is transformed and overflow-hidden, which would
+  // re-anchor this fixed overlay to the drawer and clip the menu.
+  return createPortal(
     <div
-      ref={menuRef}
-      className="ui-menu absolute w-52 animate-in fade-in zoom-in-95 duration-100"
-      style={{ top: position.y, left: position.x }}
-      onClick={(e) => e.stopPropagation()}
+      className="fixed inset-0 z-50"
+      onClick={onClose}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
     >
-      {contextMenu.type === "item" && contextMenu.id ? (
-        <>
+      <div
+        ref={menuRef}
+        className="ui-menu absolute w-52 animate-in fade-in zoom-in-95 duration-100"
+        style={{ top: position.y, left: position.x }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {contextMenu.type === "item" && contextMenu.id ? (
+          <>
+            <button
+              onClick={() => {
+                onShareCollection(contextMenu.id!);
+                onClose();
+              }}
+              className="ui-menu-item"
+            >
+              <Share2 size={14} /> Share Collection
+            </button>
+            <button
+              onClick={() => {
+                const collection = collections.find(
+                  (c) => c.id === contextMenu.id,
+                );
+                if (collection) onRenameCollection(collection);
+                onClose();
+              }}
+              className="ui-menu-item"
+            >
+              <Edit2 size={14} /> Rename Collection
+            </button>
+            <div className="ui-menu-separator" />
+            <button
+              onClick={() => {
+                onDeleteCollection(contextMenu.id!);
+                onClose();
+              }}
+              className="ui-menu-item ui-menu-item-danger"
+            >
+              <Trash2 size={14} /> Delete Collection
+            </button>
+          </>
+        ) : (
           <button
             onClick={() => {
-              onShareCollection(contextMenu.id!);
+              onCreateCollection();
               onClose();
             }}
             className="ui-menu-item"
           >
-            <Share2 size={14} /> Share Collection
+            <Plus size={14} /> New Collection
           </button>
-          <button
-            onClick={() => {
-              const collection = collections.find(
-                (c) => c.id === contextMenu.id,
-              );
-              if (collection) onRenameCollection(collection);
-              onClose();
-            }}
-            className="ui-menu-item"
-          >
-            <Edit2 size={14} /> Rename Collection
-          </button>
-          <div className="ui-menu-separator" />
-          <button
-            onClick={() => {
-              onDeleteCollection(contextMenu.id!);
-              onClose();
-            }}
-            className="ui-menu-item ui-menu-item-danger"
-          >
-            <Trash2 size={14} /> Delete Collection
-          </button>
-        </>
-      ) : (
-        <button
-          onClick={() => {
-            onCreateCollection();
-            onClose();
-          }}
-          className="ui-menu-item"
-        >
-          <Plus size={14} /> New Collection
-        </button>
-      )}
-    </div>
-  </div>
+        )}
+      </div>
+    </div>,
+    document.body,
   );
 };
