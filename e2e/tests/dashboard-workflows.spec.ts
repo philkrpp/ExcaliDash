@@ -117,7 +117,7 @@ test.describe("Dashboard Workflows", () => {
     await collectionInput.press("Enter");
 
     await expect(
-      page.getByRole("button", { name: collectionName }),
+      page.getByRole("button", { name: collectionName, exact: true }),
     ).toBeVisible();
 
     const collections = await listCollections(request);
@@ -150,13 +150,13 @@ test.describe("Dashboard Workflows", () => {
 
     await page
       .getByRole("navigation")
-      .getByRole("button", { name: collectionName })
+      .getByRole("button", { name: collectionName, exact: true })
       .click();
     await expect(cardLocator).toBeVisible();
 
     await page
       .getByRole("navigation")
-      .getByRole("button", { name: "Unorganized" })
+      .getByRole("button", { name: "Unorganized", exact: true })
       .click();
     await expect(cardLocator).toHaveCount(0);
   });

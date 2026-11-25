@@ -75,7 +75,7 @@ test.describe("Drag and Drop - Collections", () => {
 
     await page
       .getByRole("navigation")
-      .getByRole("button", { name: collection.name })
+      .getByRole("button", { name: collection.name, exact: true })
       .click();
     await page.waitForLoadState("networkidle");
 
@@ -123,7 +123,7 @@ test.describe("Drag and Drop - Collections", () => {
 
     await page
       .getByRole("navigation")
-      .getByRole("button", { name: "Unorganized" })
+      .getByRole("button", { name: "Unorganized", exact: true })
       .click();
     await page.waitForLoadState("networkidle");
 
@@ -182,7 +182,7 @@ test.describe("Drag and Drop - Collections", () => {
 
     await page
       .getByRole("navigation")
-      .getByRole("button", { name: collection.name })
+      .getByRole("button", { name: collection.name, exact: true })
       .click();
     await page.waitForLoadState("networkidle");
 

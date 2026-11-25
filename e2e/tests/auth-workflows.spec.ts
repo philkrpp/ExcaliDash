@@ -242,17 +242,15 @@ test("compact account menu hides email and persists its display preference", asy
     await expect(sidebar.getByText(owner.email, { exact: true })).toHaveCount(
       0,
     );
-    await expect(
-      sidebar.getByRole("button", { name: "Trash", exact: true }),
-    ).toBeHidden();
-    await openAccountMenu(page);
+    // Trash lives in Library in both layouts (DECISIONS.md 2026-11-25, S2).
     await expect(
       sidebar.getByRole("button", { name: "Trash", exact: true }),
     ).toBeVisible();
-    await page.keyboard.press("Escape");
+    await openAccountMenu(page);
     await expect(
-      sidebar.getByRole("button", { name: "Trash", exact: true }),
-    ).toBeHidden();
+      sidebar.getByRole("button", { name: "Settings", exact: true }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
     await toggle.click();
     await expect
       .poll(async () => {

@@ -167,11 +167,13 @@ describe("Sidebar", () => {
     expect(menuButton(renderer)).toBeUndefined();
   });
 
-  it("keeps Enter on the ⋯ button from selecting the row", async () => {
+  it("keeps the ⋯ button outside the row button (no nested interactive)", async () => {
     const renderer = await render(sidebar().element);
-    const stopPropagation = vi.fn();
-    menuButton(renderer).props.onKeyDown({ stopPropagation });
-    expect(stopPropagation).toHaveBeenCalled();
+    let node = menuButton(renderer).parent;
+    while (node) {
+      expect(node.props?.role).not.toBe("button");
+      node = node.parent;
+    }
   });
 
   it("makes the + button a 44px touch target at full opacity", async () => {
