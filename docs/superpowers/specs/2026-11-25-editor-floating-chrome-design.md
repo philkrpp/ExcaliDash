@@ -45,3 +45,12 @@ Give the canvas the full viewport height. On iPad the fixed 64 px header plus Ex
 
 - Fork divergence: larger diff in `EditorView.tsx` raises merge conflicts with upstream ExcaliDash; keep changes contained to editor chrome files.
 - Touch targets ≥ 44 px on `(hover: none)`.
+
+## Implementation notes (from review round 1)
+
+- Wide falls back to the "…" menu layout when the right island's slots (history, share, export, avatars, badges) don't fit beside the tool row (`fitsWideActions` in `useEditorChrome.ts`), so criteria 2/3 hold with many peers or badges.
+- Avatars: at most two peers are shown (the followed one first), the rest as a "+N" chip; following a hidden peer is not possible from the chrome (`shortcut:` in `editorChromeRules.ts`).
+- "Unsaved changes" shows as icon + tooltip below 1366 px and in the menu layout; the label stays available to screen readers.
+- Excalidraw's own collaborator list in the top-right slot is hidden via CSS; our avatars replace it.
+- During the history preview the wide actions island renders in its own raised layer (`z-[25]`), since the preview canvas covers Excalidraw's top-right slot.
+- Outside the chrome files: `ShareModal.tsx` (fallback position without an anchor) and `index.css` (`.editor-island`, the two hide rules).
