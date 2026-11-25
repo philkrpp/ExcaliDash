@@ -75,6 +75,7 @@ export const LoginRateLimitCard: React.FC<LoginRateLimitCardProps> = ({
             ? "Brute-force protection active"
             : "Only disable in trusted environments"
         }
+        onToggle={onToggleEnabled}
       >
         <PlayfulSwitch
           checked={enabled}
@@ -132,7 +133,7 @@ export const LoginRateLimitCard: React.FC<LoginRateLimitCardProps> = ({
           disabled={resetLoading}
           className={settingsButtonClass}
         >
-          {resetLoading ? "Resetting…" : "Reset"}
+          {resetLoading ? "Unlocking…" : "Unlock"}
         </button>
       </SettingsRow>
     </SettingsCard>

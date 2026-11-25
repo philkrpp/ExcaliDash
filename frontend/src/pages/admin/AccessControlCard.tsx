@@ -54,6 +54,11 @@ export const AccessControlCard: React.FC<AccessControlCardProps> = ({
           registrationEnabled,
           localRegistrationAllowed,
         )}
+        onToggle={
+          loading || registrationEnabled === null || !localRegistrationAllowed
+            ? undefined
+            : () => void onToggleRegistration()
+        }
       >
         <PlayfulSwitch
           checked={Boolean(registrationEnabled)}
@@ -72,6 +77,11 @@ export const AccessControlCard: React.FC<AccessControlCardProps> = ({
             oidcJitProvisioningEnabled
               ? "OIDC users get an account on first sign-in"
               : "Only pre-created users can sign in via OIDC"
+          }
+          onToggle={
+            loading || oidcJitProvisioningEnabled === null
+              ? undefined
+              : () => void onToggleOidcJitProvisioning()
           }
         >
           <PlayfulSwitch

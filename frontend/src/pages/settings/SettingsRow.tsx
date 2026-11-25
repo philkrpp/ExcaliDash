@@ -57,7 +57,11 @@ type SettingsRowProps = {
   title: string;
   description?: React.ReactNode;
   children?: React.ReactNode;
+  /** Rows with exactly one switch: makes the whole row toggle it. */
+  onToggle?: () => void;
 };
+
+const INTERACTIVE_SELECTOR = "button, input, select, textarea, a, label";
 
 export const SettingsRow: React.FC<SettingsRowProps> = ({
   icon,
@@ -65,8 +69,24 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
   title,
   description,
   children,
+  onToggle,
 }) => (
-  <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3.5 sm:px-5">
+  <div
+    className={`flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3.5 sm:px-5 ${
+      onToggle
+        ? "cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-neutral-800/60"
+        : ""
+    }`}
+    onClick={
+      onToggle
+        ? (event) => {
+            // Clicks on the switch (or any control in the row) handle themselves.
+            if ((event.target as Element).closest(INTERACTIVE_SELECTOR)) return;
+            onToggle();
+          }
+        : undefined
+    }
+  >
     {icon ? (
       <div
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 ${tileClassName ?? ""}`}

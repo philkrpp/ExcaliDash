@@ -46,6 +46,18 @@ type SettingsMainGridProps = {
   onCheckForUpdates: () => void;
 };
 
+const getEditorLanguageLabel = (language: string) => {
+  try {
+    const base = new Intl.Locale(language).language;
+    const name = new Intl.DisplayNames([language], { type: "language" }).of(
+      base,
+    );
+    return `${name ?? language} (editor only)`;
+  } catch {
+    return `${language} (editor only)`;
+  }
+};
+
 export const SettingsMainGrid = ({
   exportBackup,
   theme,
@@ -85,7 +97,7 @@ export const SettingsMainGrid = ({
             { value: "en", label: "English" },
             { value: "zh-CN", label: "简体中文" },
             ...(language !== "en" && language !== "zh-CN"
-              ? [{ value: language, label: `${language} (editor language)` }]
+              ? [{ value: language, label: getEditorLanguageLabel(language) }]
               : []),
           ]}
           buttonClassName="h-10 min-w-[150px] px-3"
@@ -124,6 +136,7 @@ export const SettingsMainGrid = ({
         tileClassName="border-black bg-violet-400 text-black dark:border-neutral-700 dark:bg-violet-400 dark:text-black"
         title="Compact sidebar"
         description="Keep account actions in the avatar menu"
+        onToggle={() => onCompactSidebarChange(!compactSidebar)}
       >
         <PlayfulSwitch
           checked={compactSidebar}
@@ -137,6 +150,7 @@ export const SettingsMainGrid = ({
         tileClassName="border-black bg-rose-400 text-black dark:border-neutral-700 dark:bg-rose-400 dark:text-black"
         title="Append dropped drawings"
         description="Add to the open drawing instead of replacing it."
+        onToggle={() => onAppendDroppedDrawingsChange(!appendDroppedDrawings)}
       >
         <PlayfulSwitch
           checked={appendDroppedDrawings}
@@ -154,6 +168,7 @@ export const SettingsMainGrid = ({
             ? `Compress images over ${imageCompressionThresholdMb} MB`
             : "Original quality"
         }
+        onToggle={() => toggleImageCompression()}
       >
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-neutral-300">

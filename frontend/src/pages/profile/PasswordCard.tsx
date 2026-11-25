@@ -12,10 +12,9 @@ import {
   SettingsCard,
   SettingsRow,
   settingsButtonClass,
+  settingsPrimaryButtonClass,
   settingsSelectClass,
 } from "../settings/SettingsRow";
-
-const roseButtonClass = "ui-button-danger";
 
 type Props = {
   mustResetPassword: boolean;
@@ -105,7 +104,7 @@ export const PasswordCard: React.FC<Props> = ({
           >
             <button
               onClick={() => setShowPasswordForm(true)}
-              className={roseButtonClass}
+              className={settingsButtonClass}
             >
               Change password
             </button>
@@ -175,7 +174,7 @@ export const PasswordCard: React.FC<Props> = ({
                   !newPassword ||
                   !confirmPassword
                 }
-                className={roseButtonClass}
+                className={settingsPrimaryButtonClass}
               >
                 {loading ? "Changing..." : "Change Password"}
               </button>
