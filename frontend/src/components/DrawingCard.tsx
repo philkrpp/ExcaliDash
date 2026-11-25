@@ -1,11 +1,14 @@
 import React, { memo, useState, useEffect, useCallback } from "react";
-import { PenTool, Check, Clock } from "lucide-react";
+import { PenTool, Check, Clock, Ellipsis } from "lucide-react";
 import type { DrawingSummary, Collection } from "../types";
 import { formatDistanceToNow } from "date-fns";
 import clsx from "clsx";
 import { StorageManageModal } from "./StorageManageModal";
 import { CollectionPicker } from "./drawing-card/CollectionPicker";
-import { DrawingCardContextMenu } from "./drawing-card/DrawingCardContextMenu";
+import {
+  DRAWING_MENU_WIDTH,
+  DrawingCardContextMenu,
+} from "./drawing-card/DrawingCardContextMenu";
 import { hasCachedDrawingPreview } from "./drawing-card/previewCache";
 import { useDrawingPreview } from "./drawing-card/useDrawingPreview";
 import { usePreviewVisibility } from "./drawing-card/usePreviewVisibility";
@@ -141,6 +144,14 @@ export const DrawingCard = memo(function DrawingCard({
     setShowMoveSubmenu(false);
   };
 
+  const handleActionsClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Stop here so the document click listener that closes the menu does not see this click.
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    setContextMenu({ x: rect.right - DRAWING_MENU_WIDTH, y: rect.bottom + 4 });
+    setShowMoveSubmenu(false);
+  };
+
   const preloadDrawing = () => {
     if (isTrash) return;
     void preloadEditor().catch(() => undefined);
@@ -179,7 +190,7 @@ export const DrawingCard = memo(function DrawingCard({
         )}
       >
         <div
-          className="absolute top-2.5 right-2.5 z-20 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200"
+          className="absolute top-2.5 right-2.5 z-20 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-200 [@media(hover:none)]:top-0.5 [@media(hover:none)]:right-0.5 [@media(hover:none)]:opacity-70"
           style={{ opacity: isSelected ? 1 : undefined }}
         >
           <button
@@ -190,14 +201,18 @@ export const DrawingCard = memo(function DrawingCard({
             data-testid={`select-drawing-${drawing.id}`}
             aria-pressed={isSelected}
             aria-label={`${isSelected ? "Deselect" : "Select"} ${drawing.name}`}
-            className={clsx(
-              "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-sm",
-              isSelected
-                ? "bg-indigo-600 dark:bg-indigo-500 border-slate-800 dark:border-indigo-300/60 text-white scale-110"
-                : "bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm border-slate-300 dark:border-neutral-600 hover:border-slate-800 dark:hover:border-neutral-400",
-            )}
+            className="flex h-6 w-6 items-center justify-center [@media(hover:none)]:h-11 [@media(hover:none)]:w-11"
           >
-            {isSelected && <Check size={14} strokeWidth={3} />}
+            <span
+              className={clsx(
+                "flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all duration-200 shadow-sm [@media(hover:none)]:h-7 [@media(hover:none)]:w-7",
+                isSelected
+                  ? "bg-indigo-600 dark:bg-indigo-500 border-slate-800 dark:border-indigo-300/60 text-white scale-110"
+                  : "bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm border-slate-300 dark:border-neutral-600 hover:border-slate-800 dark:hover:border-neutral-400",
+              )}
+            >
+              {isSelected && <Check size={14} strokeWidth={3} />}
+            </span>
           </button>
         </div>
 
@@ -302,6 +317,20 @@ export const DrawingCard = memo(function DrawingCard({
                 onClose={() => setShowCollectionDropdown(false)}
                 onMoveToCollection={onMoveToCollection}
               />
+
+              <button
+                type="button"
+                onClick={handleActionsClick}
+                data-testid={`drawing-actions-${drawing.id}`}
+                aria-label={`More actions for "${drawing.name}"`}
+                aria-haspopup="menu"
+                aria-expanded={contextMenu !== null}
+                className="group/actions -my-3 -mr-3 flex h-11 w-11 shrink-0 items-center justify-center"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg border-2 border-transparent text-slate-500 transition-colors group-hover/actions:border-slate-200 group-hover/actions:bg-slate-50 group-hover/actions:text-slate-800 dark:text-neutral-400 dark:group-hover/actions:border-neutral-700 dark:group-hover/actions:bg-neutral-800 dark:group-hover/actions:text-neutral-100">
+                  <Ellipsis size={18} />
+                </span>
+              </button>
             </div>
           </div>
         </div>

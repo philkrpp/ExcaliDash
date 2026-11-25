@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import clsx from "clsx";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   ArrowRight,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import type { Collection, DrawingSummary } from "../../types";
 import { CollectionMoveOptions } from "./CollectionMoveOptions";
+import { clampToViewport } from "../../utils/clampToViewport";
 
 interface DrawingCardContextMenuProps {
   drawing: DrawingSummary;
@@ -36,6 +38,13 @@ interface DrawingCardContextMenuProps {
 }
 
 const SUBMENU_CLOSE_DELAY_MS = 300;
+export const DRAWING_MENU_WIDTH = 192;
+const SUBMENU_WIDTH = 192;
+const SUBMENU_GAP = 6;
+const VIEWPORT_MARGIN = 8;
+
+// Mouse hover opens the submenu; touch taps (and their emulated hover) must not.
+const isMouse = (event: React.PointerEvent) => event.pointerType === "mouse";
 
 export const DrawingCardContextMenu: React.FC<DrawingCardContextMenuProps> = ({
   drawing,
@@ -58,6 +67,32 @@ export const DrawingCardContextMenu: React.FC<DrawingCardContextMenuProps> = ({
   onExport,
 }) => {
   const closeTimer = useRef<number | null>(null);
+  const lastPointerType = useRef<string>("touch");
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [placement, setPlacement] = useState({
+    x: position.x,
+    y: position.y,
+    submenuLeft: false,
+  });
+
+  // Measure after render and keep the menu (and its hover submenu) inside the viewport.
+  useLayoutEffect(() => {
+    const element = menuRef.current;
+    if (!element) return;
+    const { width, height } = element.getBoundingClientRect();
+    const viewport = { width: window.innerWidth, height: window.innerHeight };
+    const clamped = clampToViewport(
+      position,
+      { width, height },
+      viewport,
+      VIEWPORT_MARGIN,
+    );
+    const submenuRight = clamped.x + width + SUBMENU_GAP + SUBMENU_WIDTH;
+    setPlacement({
+      ...clamped,
+      submenuLeft: submenuRight + VIEWPORT_MARGIN > viewport.width,
+    });
+  }, [position, showMoveSubmenu]);
 
   const openSubmenu = () => {
     if (closeTimer.current !== null) {
@@ -91,8 +126,10 @@ export const DrawingCardContextMenu: React.FC<DrawingCardContextMenuProps> = ({
       }}
     >
       <div
-        className="ui-menu absolute w-48 animate-in fade-in zoom-in-95 duration-100"
-        style={{ top: position.y, left: position.x }}
+        ref={menuRef}
+        data-testid="drawing-card-menu"
+        className="ui-menu absolute w-48 animate-in fade-in zoom-in-95 duration-100 [@media(hover:none)]:max-h-[calc(100dvh-1rem)] [@media(hover:none)]:overflow-y-auto"
+        style={{ top: placement.y, left: placement.x }}
         onClick={(e) => e.stopPropagation()}
       >
         {!isTrash &&
@@ -106,10 +143,22 @@ export const DrawingCardContextMenu: React.FC<DrawingCardContextMenuProps> = ({
         {!isShared ? (
           <div
             className="relative"
-            onMouseEnter={openSubmenu}
-            onMouseLeave={scheduleSubmenuClose}
+            data-testid="drawing-card-move-to"
+            onPointerEnter={(e) => isMouse(e) && openSubmenu()}
+            onPointerLeave={(e) => isMouse(e) && scheduleSubmenuClose()}
           >
-            <button className="ui-menu-item justify-between">
+            <button
+              className="ui-menu-item justify-between"
+              aria-expanded={showMoveSubmenu}
+              onPointerDown={(e) => {
+                lastPointerType.current = e.pointerType;
+              }}
+              onClick={() => {
+                // A mouse already opened it on hover, so a click must not close it again.
+                if (lastPointerType.current === "mouse") openSubmenu();
+                else onShowMoveSubmenu(!showMoveSubmenu);
+              }}
+            >
               <span className="flex items-center gap-2">
                 <FolderInput size={14} /> Move to...
               </span>
@@ -120,13 +169,22 @@ export const DrawingCardContextMenu: React.FC<DrawingCardContextMenuProps> = ({
                 {/* Safe-triangle bridge: invisible hover area connecting the
                     row to its submenu so diagonal mouse moves don't close it. */}
                 <div
-                  className="absolute left-full top-0 z-40 h-full w-3"
-                  onMouseEnter={openSubmenu}
+                  className={clsx(
+                    "absolute top-0 z-40 h-full w-3 [@media(hover:none)]:hidden",
+                    placement.submenuLeft ? "right-full" : "left-full",
+                  )}
+                  onPointerEnter={(e) => isMouse(e) && openSubmenu()}
                 />
                 <div
-                  className="ui-menu absolute left-full -top-1 z-50 ml-1.5 max-h-64 w-48 overflow-y-auto"
-                  onMouseEnter={openSubmenu}
-                  onMouseLeave={scheduleSubmenuClose}
+                  data-testid="drawing-card-move-submenu"
+                  className={clsx(
+                    "ui-menu absolute -top-1 z-50 max-h-64 w-48 overflow-y-auto",
+                    placement.submenuLeft ? "right-full mr-1.5" : "left-full ml-1.5",
+                    // On touch the list expands inside the menu instead of floating beside it.
+                    "[@media(hover:none)]:static [@media(hover:none)]:m-0 [@media(hover:none)]:w-full [@media(hover:none)]:max-h-none [@media(hover:none)]:border-0 [@media(hover:none)]:bg-transparent [@media(hover:none)]:shadow-none",
+                  )}
+                  onPointerEnter={(e) => isMouse(e) && openSubmenu()}
+                  onPointerLeave={(e) => isMouse(e) && scheduleSubmenuClose()}
                 >
                   <CollectionMoveOptions
                     collections={collections}

@@ -87,10 +87,13 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
     !isSharedView &&
     (!isSharedCollection || currentCollection?.sharedRole === "edit");
 
+  // Below md the wrappers use `contents`, so search, sort, import and new flow
+  // into two rows (search; the rest) and the selection group becomes a third
+  // row. From md up the layout is the one-row toolbar.
   return (
-    <div className="mb-6 flex flex-col items-stretch justify-between gap-3 md:flex-row md:items-center lg:mb-8">
-      <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap md:flex-1">
-        <div className="group relative w-full transition-transform duration-200 focus-within:-translate-y-0.5 sm:min-w-0 sm:flex-1 2xl:max-w-md">
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-2 md:flex-nowrap md:gap-3 lg:mb-8">
+      <div className="contents md:flex md:w-full md:min-w-0 md:flex-1 md:flex-nowrap md:items-center md:gap-2">
+        <div className="group relative w-full transition-transform duration-200 focus-within:-translate-y-0.5 md:min-w-0 md:flex-1 2xl:max-w-md">
           <input
             ref={searchInputRef}
             type="text"
@@ -117,12 +120,12 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
               <X size={15} strokeWidth={2.5} />
             </button>
           ) : (
-            <kbd className="pointer-events-none absolute right-3 top-1/2 hidden h-5 -translate-y-1/2 items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-1.5 font-sans text-[10px] font-semibold text-slate-400 sm:inline-flex dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-500">
+            <kbd className="pointer-events-none absolute right-3 top-1/2 hidden h-5 -translate-y-1/2 items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-1.5 font-sans text-[10px] font-semibold text-slate-400 sm:inline-flex [@media(hover:none)]:!hidden dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-500">
               <span className="text-[11px]">⌘</span>K
             </kbd>
           )}
         </div>
-        <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none">
+        <div className="contents md:flex md:min-w-0 md:flex-none md:items-center md:gap-2">
           <PlayfulSelect
             ariaLabel="Sort drawings"
             value={sortConfig.field}
@@ -132,8 +135,8 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
               label: option.label,
               icon: option.icon,
             }))}
-            className="min-w-0 flex-1 sm:flex-none"
-            buttonClassName="h-[42px] w-full sm:w-[184px] md:w-auto 2xl:w-[184px] px-3"
+            className="min-w-0 flex-1 md:flex-none"
+            buttonClassName="h-[42px] w-full md:w-auto 2xl:w-[184px] px-3"
             labelClassName="md:hidden 2xl:inline"
             menuClassName="min-w-[184px]"
           />
@@ -159,8 +162,13 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
           </button>
         </div>
       </div>
-      <div className="flex w-full flex-wrap items-center gap-2 sm:flex-nowrap md:w-auto md:justify-end">
-        <div className="flex items-center gap-2 sm:mr-1">
+      <div className="contents md:flex md:w-auto md:flex-nowrap md:items-center md:justify-end md:gap-2">
+        <div
+          className={clsx(
+            "items-center gap-2 md:mr-1 md:flex",
+            hasSelection ? "flex max-md:order-last max-md:w-full" : "hidden",
+          )}
+        >
           <div className="ui-button-group" role="group" aria-label="Selection">
             <button
               onClick={onSelectAll}
@@ -247,12 +255,12 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
             </div>
           </div>
           {hasSelection && (
-            <span className="whitespace-nowrap rounded-lg bg-indigo-50 px-2 py-1 text-xs font-bold tabular-nums text-indigo-700 animate-in fade-in zoom-in-95 duration-150 dark:bg-indigo-500/15 dark:text-indigo-300">
+            <span className="whitespace-nowrap rounded-lg bg-indigo-50 px-2 py-1 max-md:ml-auto text-xs font-bold tabular-nums text-indigo-700 animate-in fade-in zoom-in-95 duration-150 dark:bg-indigo-500/15 dark:text-indigo-300">
               {selectedCount} selected
             </span>
           )}
         </div>
-        <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
+        <div className="contents md:ml-auto md:flex md:w-auto md:items-center md:gap-2">
           <input
             type="file"
             accept=".excalidash,.excalidraw,.json"
@@ -279,13 +287,12 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
             aria-label="Import drawings"
             title="Import drawings"
             className={clsx(
-              "ui-button-secondary h-[42px] flex-1 whitespace-nowrap px-4 sm:flex-none md:w-[42px] md:px-0 2xl:w-auto 2xl:px-4",
+              "ui-button-secondary h-[42px] w-[42px] shrink-0 whitespace-nowrap px-0 2xl:w-auto 2xl:px-4",
               !(isTrashView || isSharedView) &&
                 "text-indigo-700 dark:text-indigo-300",
             )}
           >
             <Upload size={17} strokeWidth={2.5} />
-            <span className="md:hidden">Import</span>
             <span className="hidden 2xl:inline">Import drawings</span>
           </button>
           <NewDrawingControl

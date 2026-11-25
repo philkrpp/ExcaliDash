@@ -48,13 +48,16 @@ export const CollectionPicker: React.FC<CollectionPickerProps> = ({
             aria-expanded={isOpen}
             disabled={isShared || isSharedCollection}
             className={clsx(
-              "max-w-[140px] truncate rounded-md border px-2 py-0.5 text-[11px] font-semibold transition-colors",
+              // The invisible pseudo-element grows the touch target to 44px; it would be clipped by `truncate`, which lives on the inner span.
+              "relative max-w-[140px] rounded-md border px-2 py-0.5 text-[11px] font-semibold transition-colors [@media(hover:none)]:before:absolute [@media(hover:none)]:before:inset-x-0 [@media(hover:none)]:before:-inset-y-[11px] [@media(hover:none)]:before:content-['']",
               isShared || isSharedCollection
                 ? "bg-slate-50 dark:bg-neutral-800/40 text-slate-400 dark:text-neutral-500 border-neutral-100 dark:border-neutral-800 cursor-not-allowed"
                 : "bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 cursor-pointer border-slate-200 dark:border-neutral-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:hover:border-indigo-500/50 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300",
             )}
           >
-            {isShared ? "Shared" : collectionName}
+            <span className="block truncate">
+              {isShared ? "Shared" : collectionName}
+            </span>
           </button>
 
           {!isShared && isOpen && (

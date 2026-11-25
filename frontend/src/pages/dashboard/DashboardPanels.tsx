@@ -159,10 +159,9 @@ export const DrawingsGrid = memo(function DrawingsGrid({
   return (
     <div
       className={clsx(
-        "grid gap-3 sm:gap-4 pb-16 sm:pb-24 transition-all duration-300",
+        "grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3 sm:gap-4 pb-16 sm:pb-24 transition-all duration-300",
         isDraggingFile && "opacity-20 blur-sm",
       )}
-      style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}
     >
       {drawings.length === 0 ? (
         <div className="col-span-full flex flex-col items-center justify-center py-16 sm:py-32 text-slate-400 dark:text-neutral-500 border-2 border-dashed border-slate-300 dark:border-neutral-700 rounded-3xl bg-white/60 dark:bg-neutral-900/50">
