@@ -159,7 +159,7 @@ test.describe("UI review screenshots", () => {
         path: path.join(outputDir, "08-editor.png"),
       });
 
-      await page.getByTitle("Version History").click();
+      await page.getByRole("button", { name: "Version history" }).click();
       const historyDialog = page.getByRole("dialog", {
         name: "Version history",
       });

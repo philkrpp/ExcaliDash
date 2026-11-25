@@ -19,11 +19,6 @@ import {
  * - Auto-save functionality
  */
 
-const revealEditorHeader = async (page: import("@playwright/test").Page) => {
-  await page.mouse.move(24, 2);
-  await page.waitForTimeout(150);
-};
-
 test.describe("Drawing Creation", () => {
   let createdDrawingIds: string[] = [];
 
@@ -82,30 +77,32 @@ test.describe("Drawing Creation", () => {
     });
   });
 
-  test("should display drawing name in editor header", async ({
+  test("should show the drawing name in the floating chrome", async ({
     page,
     request,
   }) => {
-    const drawingName = `Header_Test_${Date.now()}`;
+    const drawingName = `Chrome_Test_${Date.now()}`;
     const drawing = await createDrawing(request, { name: drawingName });
     createdDrawingIds.push(drawing.id);
 
-    // A saved override from older releases must not re-enable auto-hide.
-    await page.addInitScript((id) => {
-      localStorage.setItem(`excalidash:editor:${id}:autoHideEnabled`, "1");
-    }, drawing.id);
     await page.goto(`/editor/${drawing.id}`);
     await page.waitForSelector("[class*='excalidraw'], canvas", {
       timeout: 15000,
     });
 
-    await expect(page.getByText(drawingName)).toBeVisible();
-    await expect(page.getByTitle("Enable auto-hide")).toBeVisible();
-    // Wait beyond the old three-second initial hide timer without revealing
-    // the header through mouse movement.
-    await page.waitForTimeout(3500);
-    await expect(page.getByText(drawingName)).toBeInViewport();
-    await expect(page.getByTitle("Enable auto-hide")).toBeInViewport();
+    await expect(
+      page.getByRole("heading", { level: 1, name: drawingName }),
+    ).toBeInViewport();
+    await expect(page.locator("header")).toHaveCount(0);
+
+    const viewportHeight = page.viewportSize()!.height;
+    const canvasBox = await page
+      .locator(".excalidraw-container, .excalidraw")
+      .first()
+      .boundingBox();
+    expect(canvasBox).not.toBeNull();
+    expect(canvasBox!.y).toBeLessThanOrEqual(1);
+    expect(canvasBox!.height).toBeGreaterThanOrEqual(viewportHeight - 1);
   });
 
   test("should rename drawing via editor header", async ({ page, request }) => {
@@ -120,15 +117,11 @@ test.describe("Drawing Creation", () => {
       timeout: 15000,
     });
 
-    await revealEditorHeader(page);
-
     const nameElement = page.getByText(originalName);
     await expect(nameElement).toBeInViewport();
     await nameElement.dblclick();
 
-    await page.waitForTimeout(300);
-
-    const nameInput = page.locator("input").filter({ hasText: "" }).first();
+    const nameInput = page.getByLabel("Drawing name");
     await nameInput.clear();
     await nameInput.fill(newName);
     await nameInput.press("Enter");
@@ -153,9 +146,7 @@ test.describe("Drawing Creation", () => {
       timeout: 15000,
     });
 
-    await revealEditorHeader(page);
-
-    const backButton = page.locator("header button").first();
+    const backButton = page.getByRole("button", { name: "Back to dashboard" });
     await expect(backButton).toBeInViewport();
     await backButton.click();
 

@@ -244,11 +244,8 @@ test.describe("Drawing Version History", () => {
       timeout: 15000,
     });
 
-    // Trigger header visibility (may be auto-hidden)
-    await page.mouse.move(640, 10);
-    await page.waitForTimeout(500);
-
-    const historyButton = page.locator('button[title="Version History"]');
-    await expect(historyButton).toBeAttached();
+    await expect(
+      page.getByRole("button", { name: "Version history" }),
+    ).toBeVisible();
   });
 });
