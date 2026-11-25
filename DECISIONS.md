@@ -12,6 +12,12 @@ Quelle: <Spec-/Plan-Pfad oder "Chat YYYY-MM-DD">
 Ersetzt: YYYY-MM-DD – <Titel>   (nur bei Revision)
 -->
 
+## 2026-11-25 – Seiten-Review: alle 23 Punkte umsetzen
+
+Entscheidung: Alle Vorschläge aus `.impeccable/mocks/pages-review.html` werden umgesetzt; die Mocks dort gelten als gewählte Varianten. Neue Texte auf Englisch (Sidebar zusätzlich zh-CN über `i18n.ts`). ST2: Zusatzeintrag mit Sprachnamen statt Locale-Code. D6: Collection-Chip bleibt Picker, auf Touch 44 px Trefferfläche. S2: Trash steht immer in der Library, bewusst abweichend vom Upstream-Verhalten der Compact-Sidebar.
+Grund: Auf dem iPad waren Kernaktionen (Karten, Collections, Auswahl) nur per Rechtsklick/Hover erreichbar; dazu belegte Fehler (Menüs außerhalb des Viewports, 429 als Konfigurationsfehler).
+Quelle: Chat 2026-11-25; `docs/superpowers/specs/2026-11-25-pages-touch-pass-design.md`
+
 ## 2026-11-25 – Editor ohne feste Kopfleiste: schwebende Inseln überall
 
 Entscheidung: Die 64-px-Kopfleiste im Editor entfällt auf allen Geräten. Zurück + Titel und die Aktionen (Verlauf, Teilen, Export, Avatare, Status-Badges) schweben als Inseln in Excalidraws oberer Werkzeugzeile. Auto-Hide (Header-Toggle und Einstellung „Auto-hide editor header“) wird entfernt; das Backend akzeptiert das alte Preference-Feld weiter.
