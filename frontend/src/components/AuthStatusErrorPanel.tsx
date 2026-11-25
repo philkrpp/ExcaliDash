@@ -1,9 +1,8 @@
 import React from "react";
 import { Logo } from "./Logo";
+import type { AuthStatusError } from "../context/AuthContext";
 
-type AuthStatusErrorPanelProps = {
-  title?: string;
-  message: string;
+type AuthStatusErrorPanelProps = AuthStatusError & {
   onRetry: () => void | Promise<void>;
   fullScreen?: boolean;
 };

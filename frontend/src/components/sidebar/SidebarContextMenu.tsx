@@ -4,6 +4,7 @@ import { Edit2, Plus, Share2, Trash2 } from "lucide-react";
 import type { Collection } from "../../types";
 import { clampToViewport } from "../../utils/clampToViewport";
 import { useMenuKeyboard } from "../../hooks/useMenuKeyboard";
+import { useLocale } from "../../context/useLocale";
 
 /** Matches the `w-52` class on the menu; used to right-align it under a button. */
 export const SIDEBAR_MENU_WIDTH = 208;
@@ -34,6 +35,7 @@ export const SidebarContextMenu: React.FC<SidebarContextMenuProps> = ({
   onShareCollection,
   onDeleteCollection,
 }) => {
+  const { t } = useLocale();
   const menuRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({
     x: contextMenu.x,
@@ -83,7 +85,7 @@ export const SidebarContextMenu: React.FC<SidebarContextMenuProps> = ({
               }}
               className="ui-menu-item"
             >
-              <Share2 size={14} /> Share Collection
+              <Share2 size={14} /> {t("sidebar.shareCollection")}
             </button>
             <button
               onClick={() => {
@@ -95,7 +97,7 @@ export const SidebarContextMenu: React.FC<SidebarContextMenuProps> = ({
               }}
               className="ui-menu-item"
             >
-              <Edit2 size={14} /> Rename Collection
+              <Edit2 size={14} /> {t("sidebar.renameCollection")}
             </button>
             <div className="ui-menu-separator" />
             <button
@@ -105,7 +107,7 @@ export const SidebarContextMenu: React.FC<SidebarContextMenuProps> = ({
               }}
               className="ui-menu-item ui-menu-item-danger"
             >
-              <Trash2 size={14} /> Delete Collection
+              <Trash2 size={14} /> {t("sidebar.deleteCollection")}
             </button>
           </>
         ) : (
@@ -116,7 +118,7 @@ export const SidebarContextMenu: React.FC<SidebarContextMenuProps> = ({
             }}
             className="ui-menu-item"
           >
-            <Plus size={14} /> New Collection
+            <Plus size={14} /> {t("sidebar.newCollection")}
           </button>
         )}
       </div>

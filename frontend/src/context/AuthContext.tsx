@@ -41,6 +41,8 @@ export interface User {
   impersonatorId?: string;
 }
 
+export type AuthStatusError = { title?: string; message: string };
+
 interface AuthContextType {
   user: User | null;
   sessionGeneration: number;
@@ -83,8 +85,6 @@ const storedIdentity = (value: string | null) => {
     return identityOf(null);
   }
 };
-
-export type AuthStatusError = { title?: string; message: string };
 
 const describeAuthStatusError = (error: unknown): AuthStatusError => {
   const response = isAxiosError(error) ? error.response : undefined;
