@@ -5,7 +5,10 @@ import { useEditorChrome } from "../src/pages/editor/useEditorChrome";
 
 let touchOnly: boolean | undefined;
 const Probe = () => {
-  const { isTouchOnly } = useEditorChrome({ drawingName: "Drawing" });
+  const { isTouchOnly } = useEditorChrome({
+    drawingName: "Drawing",
+    wideActionSlots: 4,
+  });
   useEffect(() => {
     touchOnly = isTouchOnly;
   }, [isTouchOnly]);
@@ -21,6 +24,9 @@ const stubEnvironment = (hoverNone: boolean) => {
   doc = { title: "" };
   vi.stubGlobal("document", doc);
   vi.stubGlobal("window", {
+    innerWidth: 1440,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
     matchMedia: (query: string) => ({
       get matches() {
         return query === "(hover: none)" && hoverNoneNow;

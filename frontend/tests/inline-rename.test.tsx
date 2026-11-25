@@ -310,6 +310,7 @@ describe("editor header rename", () => {
       historyButtonRef: { current: null },
       shareButtonRef: { current: null },
       isRenaming: true,
+      chromeLayout: "wide",
       isSavingOnLeave: false,
       isSceneLoading: false,
       langCode: "en",

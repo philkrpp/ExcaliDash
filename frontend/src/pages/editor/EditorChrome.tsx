@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import {
   ArrowLeft,
@@ -14,6 +14,11 @@ import { InlineEditInput } from "../../components/InlineEditInput";
 import { UserAvatar as ProfileAvatar } from "../../components/UserAvatar";
 import type { UserIdentity } from "../../utils/identity";
 import type { Peer } from "./useEditorCollaboration";
+import {
+  MAX_VISIBLE_PEERS,
+  canShare,
+  canShowHistory,
+} from "./editorChromeRules";
 
 export type EditorChromeProps = {
   id?: string;
@@ -39,10 +44,6 @@ export type EditorChromeProps = {
   onRenameSubmit: () => void;
   onShareOpen: () => void;
 };
-
-const canShowHistory = (p: EditorChromeProps) => p.canEdit && Boolean(p.id);
-const canShare = (p: EditorChromeProps) =>
-  p.accessLevel === "owner" && Boolean(p.id);
 
 const Divider = () => (
   <div className="mx-0.5 h-6 w-px shrink-0 bg-slate-200 dark:bg-neutral-700" />
@@ -100,21 +101,39 @@ const CollaboratorAvatar = ({
   );
 };
 
-const Collaborators = (p: EditorChromeProps) => (
-  <div className="flex items-center">
-    <CollaboratorAvatar user={p.me} label={`${p.me.name} (You)`} />
-    {p.peers.map((peer) => (
-      <CollaboratorAvatar
-        key={peer.id}
-        user={peer}
-        label={peer.name}
-        inactive={!peer.isActive}
-        followed={peer.id === p.followedUserId}
-        onClick={() => p.onToggleFollow(peer)}
-      />
-    ))}
-  </div>
-);
+const Collaborators = (p: EditorChromeProps) => {
+  // The followed peer stays visible so following can always be stopped.
+  const ordered = [...p.peers].sort(
+    (a, b) =>
+      Number(b.id === p.followedUserId) - Number(a.id === p.followedUserId),
+  );
+  const visible = ordered.slice(0, MAX_VISIBLE_PEERS);
+  const hidden = ordered.slice(MAX_VISIBLE_PEERS);
+  return (
+    <div className="flex shrink-0 items-center">
+      <CollaboratorAvatar user={p.me} label={`${p.me.name} (You)`} />
+      {visible.map((peer) => (
+        <CollaboratorAvatar
+          key={peer.id}
+          user={peer}
+          label={peer.name}
+          inactive={!peer.isActive}
+          followed={peer.id === p.followedUserId}
+          onClick={() => p.onToggleFollow(peer)}
+        />
+      ))}
+      {hidden.length > 0 ? (
+        <span
+          className="mx-1 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600 dark:bg-neutral-800 dark:text-neutral-300"
+          title={hidden.map((peer) => peer.name).join(", ")}
+          aria-label={`${hidden.length} more: ${hidden.map((peer) => peer.name).join(", ")}`}
+        >
+          {`+${hidden.length}`}
+        </span>
+      ) : null}
+    </div>
+  );
+};
 
 const StatusBadges = (p: EditorChromeProps & { compact?: boolean }) => (
   <>
@@ -125,7 +144,14 @@ const StatusBadges = (p: EditorChromeProps & { compact?: boolean }) => (
         role="status"
       >
         <CloudOff size={14} />
-        <span className={clsx(p.compact && "sr-only")}>Unsaved changes</span>
+        <span
+          className={
+            // The wide right island only has room for the label on large screens.
+            p.compact ? "sr-only" : "sr-only min-[1366px]:not-sr-only"
+          }
+        >
+          Unsaved changes
+        </span>
       </span>
     ) : null}
     {!p.canEdit ? (
@@ -136,7 +162,7 @@ const StatusBadges = (p: EditorChromeProps & { compact?: boolean }) => (
   </>
 );
 
-const BackButton = (p: EditorChromeProps) => (
+const BackButton = (p: EditorChromeProps & { showLabel: boolean }) => (
   <button
     type="button"
     onClick={p.onBackClick}
@@ -147,13 +173,15 @@ const BackButton = (p: EditorChromeProps) => (
     title="Back to dashboard"
     className={clsx(
       "ui-toolbar-button disabled:cursor-wait",
-      p.isSavingOnLeave && "w-auto gap-2 px-3",
+      p.isSavingOnLeave && p.showLabel && "w-auto gap-2 px-3",
     )}
   >
     {p.isSavingOnLeave ? (
       <>
         <Loader2 size={20} className="animate-spin" />
-        <span className="text-sm font-medium">Saving changes...</span>
+        <span className={p.showLabel ? "text-sm font-medium" : "sr-only"}>
+          Saving changes...
+        </span>
       </>
     ) : (
       <ArrowLeft size={20} />
@@ -176,8 +204,8 @@ const RenameField = (p: EditorChromeProps) => (
 export const EditorTitleIsland = (
   p: EditorChromeProps & { showTitle: boolean },
 ) => (
-  <div className="editor-island absolute left-[60px] top-4 z-[3] max-w-[calc(50vw-275px-76px)]">
-    <BackButton {...p} />
+  <div className="editor-island max-w-full">
+    <BackButton {...p} showLabel={p.showTitle} />
     {p.showTitle ? (
       <>
         <Divider />
@@ -284,33 +312,55 @@ export const EditorOverflowIsland = (
   p: EditorChromeProps & { showBack: boolean },
 ) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const islandRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   // Renaming happens inside the menu, so it stays open until the name is committed or cancelled.
   const isOpen = menuOpen || p.isRenaming;
-  const run = (action: () => void) => () => {
+  const close = (restoreFocus: boolean) => {
     setMenuOpen(false);
+    if (restoreFocus) triggerRef.current?.focus();
+  };
+  const run = (action: () => void) => () => {
+    close(true);
     action();
   };
+  const items = () =>
+    Array.from(
+      menuRef.current?.querySelectorAll<HTMLButtonElement>(
+        '[role="menuitem"]:not(:disabled)',
+      ) ?? [],
+    );
 
   useEffect(() => {
     if (!menuOpen) return;
+    items()[0]?.focus();
     // The rename field handles its own Escape (cancel), which also closes the menu.
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === "Escape") close(true);
+    };
+    // Capture phase: Excalidraw's UI sits above this island and would otherwise swallow outside taps.
+    const onPointerDown = (event: Event) => {
+      if (!islandRef.current?.contains(event.target as Node)) close(false);
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("pointerdown", onPointerDown, true);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("pointerdown", onPointerDown, true);
+    };
   }, [menuOpen]);
 
   return (
-    <div className="editor-island relative">
+    <div ref={islandRef} className="editor-island relative">
       <StatusBadges {...p} compact />
       <Collaborators {...p} />
       <Divider />
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setMenuOpen((open) => !open)}
-        // Above the outside-click backdrop, so a second tap closes the menu.
-        className="ui-toolbar-button relative z-10"
+        className="ui-toolbar-button"
         aria-label="More actions"
         aria-haspopup="menu"
         aria-expanded={isOpen}
@@ -318,75 +368,80 @@ export const EditorOverflowIsland = (
         <Ellipsis size={20} />
       </button>
       {isOpen ? (
-        <>
-          <div
-            className="fixed inset-0"
-            onClick={() => setMenuOpen(false)}
-            aria-hidden
-          />
-          <div
-            role="menu"
-            aria-label="Drawing actions"
-            className="ui-menu absolute bottom-full right-0 z-10 mb-2 w-64"
-          >
-            {p.isRenaming ? (
-              <div className="p-1">
-                <RenameField {...p} />
-              </div>
-            ) : p.canEdit ? (
-              <MenuItem
-                action="rename"
-                icon={<PencilLine size={18} className="shrink-0" />}
-                label={p.drawingName}
-                onSelect={run(p.onRenameStart)}
-              />
-            ) : (
-              <div className="truncate px-2.5 py-2 text-sm font-semibold text-slate-800 dark:text-neutral-100">
-                {p.drawingName}
-              </div>
-            )}
-            <div className="ui-menu-separator" />
-            {p.showBack ? (
-              <MenuItem
-                action="back"
-                icon={
-                  p.isSavingOnLeave ? (
-                    <Loader2 size={18} className="shrink-0 animate-spin" />
-                  ) : (
-                    <ArrowLeft size={18} className="shrink-0" />
-                  )
-                }
-                label={
-                  p.isSavingOnLeave ? "Saving changes..." : "Back to dashboard"
-                }
-                disabled={p.isSavingOnLeave}
-                onSelect={run(p.onBackClick)}
-              />
-            ) : null}
-            {canShowHistory(p) ? (
-              <MenuItem
-                action="history"
-                icon={<History size={18} className="shrink-0" />}
-                label="Version history"
-                onSelect={run(p.onHistoryOpen)}
-              />
-            ) : null}
-            {canShare(p) ? (
-              <MenuItem
-                action="share"
-                icon={<Share2 size={18} className="shrink-0" />}
-                label="Share"
-                onSelect={run(p.onShareOpen)}
-              />
-            ) : null}
+        <div
+          ref={menuRef}
+          role="menu"
+          aria-label="Drawing actions"
+          // Capped so the menu never runs under Excalidraw's top bar on short (landscape phone) screens.
+          className="ui-menu absolute bottom-full right-0 z-10 mb-2 max-h-[calc(100dvh-200px)] w-64 overflow-y-auto"
+          onKeyDown={(event) => {
+            if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+            event.preventDefault();
+            const list = items();
+            const index = list.indexOf(
+              document.activeElement as HTMLButtonElement,
+            );
+            const step = event.key === "ArrowDown" ? 1 : -1;
+            list[(index + step + list.length) % list.length]?.focus();
+          }}
+        >
+          {p.isRenaming ? (
+            <div className="p-1">
+              <RenameField {...p} />
+            </div>
+          ) : p.canEdit ? (
             <MenuItem
-              action="export"
-              icon={<Download size={18} className="shrink-0" />}
-              label="Export drawing"
-              onSelect={run(p.onExportClick)}
+              action="rename"
+              icon={<PencilLine size={18} className="shrink-0" />}
+              label={p.drawingName}
+              onSelect={run(p.onRenameStart)}
             />
-          </div>
-        </>
+          ) : (
+            <div className="truncate px-2.5 py-2 text-sm font-semibold text-slate-800 dark:text-neutral-100">
+              {p.drawingName}
+            </div>
+          )}
+          <div className="ui-menu-separator" />
+          {p.showBack ? (
+            <MenuItem
+              action="back"
+              icon={
+                p.isSavingOnLeave ? (
+                  <Loader2 size={18} className="shrink-0 animate-spin" />
+                ) : (
+                  <ArrowLeft size={18} className="shrink-0" />
+                )
+              }
+              label={
+                p.isSavingOnLeave ? "Saving changes..." : "Back to dashboard"
+              }
+              disabled={p.isSavingOnLeave}
+              onSelect={run(p.onBackClick)}
+            />
+          ) : null}
+          {canShowHistory(p) ? (
+            <MenuItem
+              action="history"
+              icon={<History size={18} className="shrink-0" />}
+              label="Version history"
+              onSelect={run(p.onHistoryOpen)}
+            />
+          ) : null}
+          {canShare(p) ? (
+            <MenuItem
+              action="share"
+              icon={<Share2 size={18} className="shrink-0" />}
+              label="Share"
+              onSelect={run(p.onShareOpen)}
+            />
+          ) : null}
+          <MenuItem
+            action="export"
+            icon={<Download size={18} className="shrink-0" />}
+            label="Export drawing"
+            onSelect={run(p.onExportClick)}
+          />
+        </div>
       ) : null}
     </div>
   );

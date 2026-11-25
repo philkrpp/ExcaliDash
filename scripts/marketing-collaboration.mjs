@@ -29,19 +29,14 @@ export async function captureCollaboration(
       });
       contexts.push(context);
       await context.addInitScript(
-        ({ person, ids, theme }) => {
+        ({ person, theme }) => {
           localStorage.setItem("excalidash-user-id", JSON.stringify(person));
           localStorage.setItem(
             "excalidash-preferences",
             JSON.stringify({ theme }),
           );
-          for (const id of ids)
-            localStorage.setItem(
-              `excalidash:editor:${id}:autoHideEnabled`,
-              "false",
-            );
         },
-        { person, ids: manifest.map((drawing) => drawing.id), theme },
+        { person, theme },
       );
       pages.push(await context.newPage());
     }

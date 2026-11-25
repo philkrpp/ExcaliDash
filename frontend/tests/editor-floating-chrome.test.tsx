@@ -7,6 +7,7 @@ import {
 } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EditorView } from "../src/pages/editor/EditorView";
+import { wideActionSlots } from "../src/pages/editor/editorChromeRules";
 import {
   useEditorChrome,
   type EditorChromeLayout,
@@ -215,10 +216,10 @@ describe("editor floating chrome", () => {
     expect(props.onBackClick).toHaveBeenCalledOnce();
   });
 
-  it("closes the menu on a second tap of … and on Escape", async () => {
-    const listeners: Record<string, (event: { key: string }) => void> = {};
+  it("closes the menu on a second tap of …, an outside tap and Escape", async () => {
+    const listeners: Record<string, (event: unknown) => void> = {};
     vi.stubGlobal("window", {
-      addEventListener: (type: string, fn: (event: { key: string }) => void) =>
+      addEventListener: (type: string, fn: (event: unknown) => void) =>
         (listeners[type] = fn),
       removeEventListener: vi.fn(),
     });
@@ -227,12 +228,56 @@ describe("editor floating chrome", () => {
     const menus = () => renderer.root.findAll((n) => n.props.role === "menu");
     await act(async () => more().props.onClick());
     expect(menus()).toHaveLength(1);
-    expect(more().props.className).toContain("z-10");
     await act(async () => more().props.onClick());
     expect(menus()).toHaveLength(0);
     await act(async () => more().props.onClick());
     await act(async () => listeners.keydown({ key: "Escape" }));
     expect(menus()).toHaveLength(0);
+    await act(async () => more().props.onClick());
+    // e.g. a tap on Excalidraw's tool row, which sits above the island
+    await act(async () => listeners.pointerdown({ target: {} }));
+    expect(menus()).toHaveLength(0);
+  });
+
+  it("keeps the chrome above the history preview while it is shown", async () => {
+    const preview = { id: "old", elements: [], appState: {}, files: {} };
+    for (const chromeLayout of ["wide", "narrow"] as const) {
+      const renderer = await render(
+        view({ chromeLayout, historyPreview: preview, isHistoryOpen: true })
+          .element,
+      );
+      const raised = renderer.root.findAll(
+        (n) =>
+          n.type === "div" &&
+          typeof n.props.className === "string" &&
+          n.props.className.includes("z-[25]"),
+      );
+      expect(raised.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("caps visible peers and keeps the followed one visible", async () => {
+    const peer = (id: string) => ({
+      id,
+      name: `Peer ${id}`,
+      color: "blue",
+      isActive: true,
+    });
+    const renderer = await render(
+      view({
+        peers: [peer("a"), peer("b"), peer("c"), peer("d")],
+        followedUserId: "d",
+      }).element,
+    );
+    const slot = await topRight(renderer, false);
+    const follows = slot!.root.findAll(
+      (n) => n.type === "button" && n.props["aria-pressed"] !== undefined,
+    );
+    expect(follows.map((n) => n.props["aria-label"])).toEqual([
+      "Stop following Peer d",
+      "Follow Peer a",
+    ]);
+    expect(JSON.stringify(slot!.toJSON())).toContain("+2");
   });
 
   it("rename from the menu keeps the menu open with the name field", async () => {
@@ -286,8 +331,12 @@ describe("editor floating chrome", () => {
 
 describe("useEditorChrome layout", () => {
   let layout: EditorChromeLayout | undefined;
+  let slots = 4;
   const Probe = () => {
-    const { chromeLayout } = useEditorChrome({ drawingName: "D" });
+    const { chromeLayout } = useEditorChrome({
+      drawingName: "D",
+      wideActionSlots: slots,
+    });
     useEffect(() => {
       layout = chromeLayout;
     }, [chromeLayout]);
@@ -297,6 +346,9 @@ describe("useEditorChrome layout", () => {
   const stub = (width: number, height: number) => {
     vi.stubGlobal("document", { title: "" });
     vi.stubGlobal("window", {
+      innerWidth: width,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
       matchMedia: (query: string) => ({
         // Minimal evaluator for the queries the hook uses.
         matches: query.split(",").some((part) =>
@@ -321,8 +373,52 @@ describe("useEditorChrome layout", () => {
     [390, 844, "mobile"],
     [844, 390, "mobile"],
   ])("%ix%i → %s", async (width, height, expected) => {
+    slots = 4;
     stub(width, height);
     await render(<Probe />);
     expect(layout).toBe(expected);
+  });
+
+  it.each([
+    [1194, 5, "wide"],
+    [1194, 6, "narrow"],
+    [1440, 8, "wide"],
+    [1440, 9, "narrow"],
+  ])(
+    "falls back to the menu when the right island would reach the tool row (%ipx, %i slots → %s)",
+    async (width, count, expected) => {
+      slots = count;
+      stub(width, 900);
+      await render(<Probe />);
+      expect(layout).toBe(expected);
+    },
+  );
+});
+
+describe("wideActionSlots", () => {
+  const peer = (id: string) => ({ id, name: id, color: "red", isActive: true });
+  const base = {
+    id: "d",
+    accessLevel: "owner" as const,
+    canEdit: true,
+    autosaveFailing: false,
+    peers: [] as ReturnType<typeof peer>[],
+  };
+  it.each([
+    ["owner alone", base, 4],
+    ["owner + 2 peers", { ...base, peers: [peer("a"), peer("b")] }, 6],
+    [
+      "owner + 4 peers (2 shown, +2 chip)",
+      { ...base, peers: ["a", "b", "c", "d"].map(peer) },
+      7,
+    ],
+    ["owner with unsaved changes", { ...base, autosaveFailing: true }, 5],
+    [
+      "viewer (read-only label)",
+      { ...base, accessLevel: "view" as const, canEdit: false },
+      4,
+    ],
+  ])("%s → %i", (_label, props, expected) => {
+    expect(wideActionSlots(props)).toBe(expected);
   });
 });

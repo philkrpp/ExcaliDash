@@ -382,7 +382,6 @@ export const useEditorCommands = ({
     }
   }, [drawingId, drawingName, refs]);
 
-
   const handleRenameStart = useCallback(() => {
     if (!canEdit) return;
     setNewName(drawingName);

@@ -36,7 +36,11 @@ export const ShareModal: React.FC<Props> = ({
     if (!isOpen) return;
     const updatePosition = () => {
       const rect = anchorRef.current?.getBoundingClientRect();
-      if (!rect) return;
+      if (!rect) {
+        // No visible anchor (narrow editor layout): default top-right spot.
+        setPosition({ right: 12, top: 72 });
+        return;
+      }
       setPosition({
         right: Math.max(
           12,

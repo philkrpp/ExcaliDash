@@ -552,6 +552,7 @@ describe("sharing placement and chrome", () => {
         isRenaming={false}
         isSavingOnLeave={false}
         isSceneLoading={false}
+        chromeLayout="wide"
         langCode="en"
         loadError={null}
         me={{ id: "me", name: "Me", color: "red" }}

@@ -274,3 +274,9 @@ html.dark body {
   .sidebar-trigger__label {
   display: none;
 }
+
+/* The editor chrome shows its own collaborator avatars (with follow); Excalidraw's list would duplicate them. */
+[data-editor-root] .layer-ui__wrapper__top-right .UserList__wrapper,
+[data-editor-root] .layer-ui__wrapper__top-right > .UserList {
+  display: none;
+}

@@ -11,6 +11,7 @@ import { useEditorChrome } from "./editor/useEditorChrome";
 import { useEditorIdentity } from "./editor/useEditorIdentity";
 import { EditorDialogs } from "./editor/EditorDialogs";
 import { EditorView } from "./editor/EditorView";
+import { wideActionSlots } from "./editor/editorChromeRules";
 import { useLibraryImportFromUrl } from "./editor/useLibraryImportFromUrl";
 import { useEditorSnapshotGuards } from "./editor/useEditorSnapshotGuards";
 import { useEditorSceneLoader } from "./editor/useEditorSceneLoader";
@@ -67,7 +68,6 @@ const ExcalidrawEditor: React.FC = () => {
   const shareButtonRef = useRef<HTMLButtonElement>(null);
   const [historyPreview, setHistoryPreview] =
     useState<api.DrawingSnapshotFull | null>(null);
-  const { isTouchOnly, chromeLayout } = useEditorChrome({ drawingName });
   const me: UserIdentity = useEditorIdentity(user);
   const [isReady, setIsReady] = useState(false);
   const { elementVersionMap, hasElementChanged, recordElementVersion } =
@@ -353,6 +353,16 @@ const ExcalidrawEditor: React.FC = () => {
     setIsRenaming,
     setIsSavingOnLeave,
     setNewName,
+  });
+  const { isTouchOnly, chromeLayout } = useEditorChrome({
+    drawingName,
+    wideActionSlots: wideActionSlots({
+      id,
+      accessLevel,
+      canEdit,
+      autosaveFailing,
+      peers,
+    }),
   });
 
   return (

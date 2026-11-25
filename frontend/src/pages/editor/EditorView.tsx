@@ -2,6 +2,7 @@ import React from "react";
 import type { DrawingSnapshotFull } from "../../api";
 import { HistoryPreviewCanvas } from "./HistoryPreviewCanvas";
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
+import clsx from "clsx";
 import { Toaster } from "sonner";
 import { LanguageSelector } from "../../components/LanguageSelector";
 import { GridStepSelector } from "../../components/GridStepSelector";
@@ -16,7 +17,7 @@ import {
 import type { EditorChromeLayout } from "./useEditorChrome";
 
 type EditorViewProps = EditorChromeProps & {
-  chromeLayout?: EditorChromeLayout;
+  chromeLayout: EditorChromeLayout;
   historyButtonRef: React.RefObject<HTMLButtonElement>;
   shareButtonRef: React.RefObject<HTMLButtonElement>;
   editorContainerRef: React.RefObject<HTMLDivElement>;
@@ -54,7 +55,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
     id,
     accessLevel,
     canEdit,
-    chromeLayout = "wide",
+    chromeLayout,
     drawingName,
     editorContainerRef,
     initialData,
@@ -77,6 +78,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
     onCloseShare,
     onToggleTheme,
   } = chrome;
+  // Below Excalidraw's own UI (z 4: sidebars, panels) normally; above the history preview (z-20) while it is shown.
+  const chromeZ = historyPreview ? "z-[25]" : "z-[3]";
 
   return (
     <div
@@ -192,16 +195,28 @@ export const EditorView: React.FC<EditorViewProps> = ({
         ) : null}
         {!loadError &&
         (chromeLayout === "wide" || chromeLayout === "narrow") ? (
-          <EditorTitleIsland {...chrome} showTitle={chromeLayout === "wide"} />
+          <div
+            className={clsx(
+              // Right of Excalidraw's menu button, never into its ~550px centered tool row.
+              "absolute left-[60px] top-4 max-w-[calc(50vw-275px-68px)]",
+              chromeZ,
+            )}
+          >
+            <EditorTitleIsland
+              {...chrome}
+              showTitle={chromeLayout === "wide"}
+            />
+          </div>
         ) : null}
         {!loadError && chromeLayout !== "wide" ? (
           <div
-            className={
+            className={clsx(
               chromeLayout === "mobile"
-                ? // shortcut: clears Excalidraw's ~50px mobile bottom bar; measure it if that bar changes.
-                  "absolute bottom-[72px] right-4 z-[3]"
-                : "absolute bottom-4 right-[60px] z-[3]"
-            }
+                ? // shortcut: clears Excalidraw's ~50px mobile bottom bar and 36px right tool column; measure them if they change.
+                  "absolute bottom-[72px] right-[56px]"
+                : "absolute bottom-4 right-[60px]",
+              chromeZ,
+            )}
           >
             <EditorOverflowIsland
               {...chrome}

@@ -9,7 +9,12 @@ const MOBILE_QUERY =
 // Wide: back + title left of the tool row, actions right of it (iPad 11" landscape and larger).
 const WIDE_QUERY = "(min-width: 1180px)";
 // Narrow: only the back button still fits left of the tool row (iPad 11" portrait); below that it moves into the menu.
-const BACK_FITS_QUERY = "(min-width: 780px)";
+const BACK_FITS_QUERY = "(min-width: 800px)";
+
+// Room right of the tool row up to the library button (36px + gaps), in 44px slots (buttons, avatars, badges).
+const SLOT_PX = 44;
+const fitsWideActions = (viewportWidth: number, slots: number) =>
+  viewportWidth / 2 - 275 - 68 >= slots * SLOT_PX;
 
 export type EditorChromeLayout = "wide" | "narrow" | "compact" | "mobile";
 
@@ -35,18 +40,34 @@ const useMediaQuery = (query: string): boolean => {
   return matches;
 };
 
+const readWidth = () => (typeof window !== "undefined" ? window.innerWidth : 0);
+
 type UseEditorChromeOptions = {
   drawingName: string;
+  /** Slots the wide right island needs; see `wideActionSlots`. */
+  wideActionSlots: number;
 };
 
-export const useEditorChrome = ({ drawingName }: UseEditorChromeOptions) => {
+export const useEditorChrome = ({
+  drawingName,
+  wideActionSlots,
+}: UseEditorChromeOptions) => {
   const isTouchOnly = useMediaQuery(TOUCH_ONLY_QUERY);
   const isMobile = useMediaQuery(MOBILE_QUERY);
   const isWide = useMediaQuery(WIDE_QUERY);
   const backFits = useMediaQuery(BACK_FITS_QUERY);
+  const [viewportWidth, setViewportWidth] = useState(readWidth);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sync = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
+  }, []);
+
   const chromeLayout: EditorChromeLayout = isMobile
     ? "mobile"
-    : isWide
+    : isWide && fitsWideActions(viewportWidth, wideActionSlots)
       ? "wide"
       : backFits
         ? "narrow"
