@@ -9,7 +9,7 @@ export const canShare = (p: Pick<EditorChromeProps, "accessLevel" | "id">) =>
 export const MAX_VISIBLE_PEERS = 2;
 
 /** 44px slots the wide right island needs, so the layout can fall back to the menu when they don't fit. */
-export const wideActionSlots = (
+export const countWideActionSlots = (
   p: Pick<
     EditorChromeProps,
     "id" | "accessLevel" | "canEdit" | "autosaveFailing" | "peers"

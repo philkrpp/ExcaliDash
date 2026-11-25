@@ -25,20 +25,22 @@ type Props = {
   onClose: () => void;
 };
 
+const DEFAULT_POSITION = { right: 12, top: 72 };
+
 export const ShareModal: React.FC<Props> = ({
   drawingId,
   isOpen,
   onClose,
   anchorRef,
 }) => {
-  const [position, setPosition] = useState({ right: 12, top: 72 });
+  const [position, setPosition] = useState(DEFAULT_POSITION);
   useEffect(() => {
     if (!isOpen) return;
     const updatePosition = () => {
       const rect = anchorRef.current?.getBoundingClientRect();
       if (!rect) {
         // No visible anchor (narrow editor layout): default top-right spot.
-        setPosition({ right: 12, top: 72 });
+        setPosition(DEFAULT_POSITION);
         return;
       }
       setPosition({

@@ -11,7 +11,7 @@ import { useEditorChrome } from "./editor/useEditorChrome";
 import { useEditorIdentity } from "./editor/useEditorIdentity";
 import { EditorDialogs } from "./editor/EditorDialogs";
 import { EditorView } from "./editor/EditorView";
-import { wideActionSlots } from "./editor/editorChromeRules";
+import { countWideActionSlots } from "./editor/editorChromeRules";
 import { useLibraryImportFromUrl } from "./editor/useLibraryImportFromUrl";
 import { useEditorSnapshotGuards } from "./editor/useEditorSnapshotGuards";
 import { useEditorSceneLoader } from "./editor/useEditorSceneLoader";
@@ -356,7 +356,7 @@ const ExcalidrawEditor: React.FC = () => {
   });
   const { isTouchOnly, chromeLayout } = useEditorChrome({
     drawingName,
-    wideActionSlots: wideActionSlots({
+    wideActionSlots: countWideActionSlots({
       id,
       accessLevel,
       canEdit,

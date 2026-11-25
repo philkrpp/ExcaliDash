@@ -14,7 +14,11 @@ import {
   EditorTitleIsland,
   type EditorChromeProps,
 } from "./EditorChrome";
-import type { EditorChromeLayout } from "./useEditorChrome";
+import {
+  SIDE_ISLAND_MAX_WIDTH,
+  type EditorChromeLayout,
+} from "./useEditorChrome";
+import { canShare } from "./editorChromeRules";
 
 type EditorViewProps = EditorChromeProps & {
   chromeLayout: EditorChromeLayout;
@@ -53,7 +57,6 @@ export const EditorView: React.FC<EditorViewProps> = ({
 }) => {
   const {
     id,
-    accessLevel,
     canEdit,
     chromeLayout,
     drawingName,
@@ -93,7 +96,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
         }
       }}
     >
-      {accessLevel === "owner" && id ? (
+      {canShare(chrome) && id ? (
         <ShareModal
           drawingId={id}
           drawingName={drawingName}
@@ -198,9 +201,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
           <div
             className={clsx(
               // Right of Excalidraw's menu button, never into its ~550px centered tool row.
-              "absolute left-[60px] top-4 max-w-[calc(50vw-275px-68px)]",
+              "absolute left-[60px] top-4",
               chromeZ,
             )}
+            style={{ maxWidth: SIDE_ISLAND_MAX_WIDTH }}
           >
             <EditorTitleIsland
               {...chrome}

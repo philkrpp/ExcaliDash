@@ -7,7 +7,7 @@ import {
 } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EditorView } from "../src/pages/editor/EditorView";
-import { wideActionSlots } from "../src/pages/editor/editorChromeRules";
+import { countWideActionSlots } from "../src/pages/editor/editorChromeRules";
 import {
   useEditorChrome,
   type EditorChromeLayout,
@@ -395,7 +395,7 @@ describe("useEditorChrome layout", () => {
   );
 });
 
-describe("wideActionSlots", () => {
+describe("countWideActionSlots", () => {
   const peer = (id: string) => ({ id, name: id, color: "red", isActive: true });
   const base = {
     id: "d",
@@ -419,6 +419,6 @@ describe("wideActionSlots", () => {
       4,
     ],
   ])("%s → %i", (_label, props, expected) => {
-    expect(wideActionSlots(props)).toBe(expected);
+    expect(countWideActionSlots(props)).toBe(expected);
   });
 });

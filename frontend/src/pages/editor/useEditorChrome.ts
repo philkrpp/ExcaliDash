@@ -13,8 +13,13 @@ const BACK_FITS_QUERY = "(min-width: 800px)";
 
 // Room right of the tool row up to the library button (36px + gaps), in 44px slots (buttons, avatars, badges).
 const SLOT_PX = 44;
+const TOOL_ROW_HALF_PX = 275;
+// Room each side keeps clear: Excalidraw's 36px corner button plus gaps.
+const SIDE_RESERVE_PX = 68;
 const fitsWideActions = (viewportWidth: number, slots: number) =>
-  viewportWidth / 2 - 275 - 68 >= slots * SLOT_PX;
+  viewportWidth / 2 - TOOL_ROW_HALF_PX - SIDE_RESERVE_PX >= slots * SLOT_PX;
+/** Max width of an island beside the tool row (the title island on the left). */
+export const SIDE_ISLAND_MAX_WIDTH = `calc(50vw - ${TOOL_ROW_HALF_PX}px - ${SIDE_RESERVE_PX}px)`;
 
 export type EditorChromeLayout = "wide" | "narrow" | "compact" | "mobile";
 
@@ -44,7 +49,7 @@ const readWidth = () => (typeof window !== "undefined" ? window.innerWidth : 0);
 
 type UseEditorChromeOptions = {
   drawingName: string;
-  /** Slots the wide right island needs; see `wideActionSlots`. */
+  /** Slots the wide right island needs; see `countWideActionSlots`. */
   wideActionSlots: number;
 };
 
