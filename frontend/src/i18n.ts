@@ -60,6 +60,6 @@ export const translate = (
 ): string =>
   Object.entries(params ?? {}).reduce(
     // A replacer function keeps `$&`-style patterns in values literal.
-    (text, [name, value]) => text.replace(`{${name}}`, () => value),
+    (text, [name, value]) => text.replaceAll(`{${name}}`, () => value),
     (messages[locale][key] ?? messages.en[key]) as string,
   );
