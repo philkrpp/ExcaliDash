@@ -103,7 +103,7 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
             aria-label="Search drawings"
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
-            className="h-[42px] w-full rounded-xl border-2 border-slate-800 bg-white pl-10 pr-12 text-sm text-slate-900 shadow-[1.5px_1.5px_0px_0px_rgba(30,41,59,0.9)] outline-none transition-shadow placeholder:text-slate-400 focus:shadow-[3px_3px_0px_0px_rgba(79,70,229,0.9)] focus-visible:outline-none dark:border-neutral-600 dark:bg-neutral-900 dark:text-white dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.18)] dark:placeholder:text-neutral-500 dark:focus:shadow-[3px_3px_0px_0px_rgba(129,140,248,0.6)]"
+            className="h-[42px] w-full rounded-xl border-2 border-slate-800 bg-white pl-10 pr-12 text-sm text-slate-900 shadow-[1.5px_1.5px_0px_0px_rgba(30,41,59,0.9)] outline-none transition-shadow placeholder:text-slate-500 focus:shadow-[3px_3px_0px_0px_rgba(79,70,229,0.9)] focus-visible:outline-none dark:border-neutral-600 dark:bg-neutral-900 dark:text-white dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.18)] dark:placeholder:text-neutral-400 dark:focus:shadow-[3px_3px_0px_0px_rgba(129,140,248,0.6)]"
           />
           <Search
             className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-indigo-500 dark:text-neutral-500 dark:group-focus-within:text-indigo-300"
@@ -122,7 +122,7 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
               <X size={15} strokeWidth={2.5} />
             </button>
           ) : (
-            <kbd className="pointer-events-none absolute right-3 top-1/2 hidden h-5 -translate-y-1/2 items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-1.5 font-sans text-[10px] font-semibold text-slate-400 sm:inline-flex [@media(hover:none)]:!hidden dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-500">
+            <kbd className="pointer-events-none absolute right-3 top-1/2 hidden h-5 -translate-y-1/2 items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 px-1.5 font-sans text-[11px] font-semibold text-slate-500 sm:inline-flex [@media(hover:none)]:!hidden dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
               <span className="text-[11px]">⌘</span>K
             </kbd>
           )}
