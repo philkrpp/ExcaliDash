@@ -13,6 +13,8 @@ interface SidebarItemProps {
   onContextMenu?: (e: React.MouseEvent) => void;
   /** Opens the item menu from a visible button (touch has no right-click). */
   onMenuClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  /** Accessible name of the ⋯ button (translated by the caller). */
+  menuLabel?: string;
   extraAction?: React.ReactNode;
   isEditing?: boolean;
   editValue?: string;
@@ -31,6 +33,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   onDoubleClick,
   onContextMenu,
   onMenuClick,
+  menuLabel,
   extraAction,
   isEditing,
   editValue,
@@ -107,8 +110,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
       {!isEditing && onMenuClick && (
         <button
           type="button"
-          aria-label={`Actions for ${label}`}
-          aria-haspopup="menu"
+          aria-label={menuLabel ?? label}
           onClick={onMenuClick}
           className="ui-icon-button absolute right-3 top-1/2 h-7 w-7 -translate-y-1/2 border-transparent bg-transparent text-slate-500 opacity-0 shadow-none focus-visible:opacity-100 group-hover/item:opacity-100 group-focus-within/item:opacity-100 dark:border-transparent dark:bg-transparent dark:text-neutral-400 dark:shadow-none [@media(hover:none)]:right-2 [@media(hover:none)]:h-11 [@media(hover:none)]:w-11 [@media(hover:none)]:opacity-100"
         >

@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import { Edit2, Plus, Share2, Trash2 } from "lucide-react";
 import type { Collection } from "../../types";
 import { clampToViewport } from "../../utils/clampToViewport";
+import { useMenuKeyboard } from "../../hooks/useMenuKeyboard";
 
 /** Matches the `w-52` class on the menu; used to right-align it under a button. */
 export const SIDEBAR_MENU_WIDTH = 208;
@@ -40,17 +41,20 @@ export const SidebarContextMenu: React.FC<SidebarContextMenuProps> = ({
 
   useLayoutEffect(() => {
     const requested = { x: contextMenu.x, y: contextMenu.y };
-    const rect = menuRef.current?.getBoundingClientRect();
+    // offset* ignores the zoom-in animation's transform, unlike getBoundingClientRect.
+    const menu = menuRef.current;
     setPosition(
-      rect
+      menu
         ? clampToViewport(
             requested,
-            { width: rect.width, height: rect.height },
+            { width: menu.offsetWidth, height: menu.offsetHeight },
             { width: window.innerWidth, height: window.innerHeight },
           )
         : requested,
     );
   }, [contextMenu.x, contextMenu.y, contextMenu.type, contextMenu.id]);
+
+  useMenuKeyboard(menuRef, onClose);
 
   return (
   <div

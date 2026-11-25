@@ -182,7 +182,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   setIsCreating(true);
                 }}
                 className="ui-icon-button h-7 w-7 border-transparent bg-transparent text-slate-400 shadow-none opacity-70 hover:opacity-100 group-hover/header:opacity-100 dark:border-transparent dark:bg-transparent dark:text-neutral-500 dark:shadow-none [@media(hover:none)]:h-11 [@media(hover:none)]:w-11 [@media(hover:none)]:opacity-100"
-                aria-label="New collection"
+                aria-label={t("sidebar.newCollection")}
                 title={t("sidebar.newCollection")}
               >
                 <Plus size={14} strokeWidth={2.5} />
@@ -244,6 +244,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       ? undefined
                       : (e) => handleItemMenuButton(e, collection.id)
                   }
+                  menuLabel={t("sidebar.itemActions").replace(
+                    "{name}",
+                    collection.name,
+                  )}
                   isEditing={editingId === collection.id}
                   editValue={editName}
                   onEditChange={setEditName}

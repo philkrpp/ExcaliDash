@@ -15,6 +15,7 @@ import {
 import type { Collection, DrawingSummary } from "../../types";
 import { CollectionMoveOptions } from "./CollectionMoveOptions";
 import { clampToViewport } from "../../utils/clampToViewport";
+import { useMenuKeyboard } from "../../hooks/useMenuKeyboard";
 
 interface DrawingCardContextMenuProps {
   drawing: DrawingSummary;
@@ -40,6 +41,8 @@ interface DrawingCardContextMenuProps {
 const SUBMENU_CLOSE_DELAY_MS = 300;
 export const DRAWING_MENU_WIDTH = 192;
 const SUBMENU_WIDTH = 192;
+/** Matches the submenu's `max-h-64`. */
+const SUBMENU_MAX_HEIGHT = 256;
 const SUBMENU_GAP = 6;
 const VIEWPORT_MARGIN = 8;
 
@@ -69,17 +72,22 @@ export const DrawingCardContextMenu: React.FC<DrawingCardContextMenuProps> = ({
   const closeTimer = useRef<number | null>(null);
   const lastPointerType = useRef<string>("touch");
   const menuRef = useRef<HTMLDivElement>(null);
+  const moveRowRef = useRef<HTMLDivElement>(null);
   const [placement, setPlacement] = useState({
     x: position.x,
     y: position.y,
     submenuLeft: false,
+    submenuUp: false,
   });
+  useMenuKeyboard(menuRef, onClose);
 
   // Measure after render and keep the menu (and its hover submenu) inside the viewport.
   useLayoutEffect(() => {
     const element = menuRef.current;
     if (!element) return;
-    const { width, height } = element.getBoundingClientRect();
+    // offset* ignores the zoom-in animation's transform, unlike getBoundingClientRect.
+    const width = element.offsetWidth;
+    const height = element.offsetHeight;
     const viewport = { width: window.innerWidth, height: window.innerHeight };
     const clamped = clampToViewport(
       position,
@@ -88,9 +96,11 @@ export const DrawingCardContextMenu: React.FC<DrawingCardContextMenuProps> = ({
       VIEWPORT_MARGIN,
     );
     const submenuRight = clamped.x + width + SUBMENU_GAP + SUBMENU_WIDTH;
+    const rowTop = clamped.y + (moveRowRef.current?.offsetTop ?? 0);
     setPlacement({
       ...clamped,
       submenuLeft: submenuRight + VIEWPORT_MARGIN > viewport.width,
+      submenuUp: rowTop + SUBMENU_MAX_HEIGHT + VIEWPORT_MARGIN > viewport.height,
     });
   }, [position, showMoveSubmenu]);
 
@@ -142,6 +152,7 @@ export const DrawingCardContextMenu: React.FC<DrawingCardContextMenuProps> = ({
         ) : null}
         {!isShared ? (
           <div
+            ref={moveRowRef}
             className="relative"
             data-testid="drawing-card-move-to"
             onPointerEnter={(e) => isMouse(e) && openSubmenu()}
@@ -178,7 +189,8 @@ export const DrawingCardContextMenu: React.FC<DrawingCardContextMenuProps> = ({
                 <div
                   data-testid="drawing-card-move-submenu"
                   className={clsx(
-                    "ui-menu absolute -top-1 z-50 max-h-64 w-48 overflow-y-auto",
+                    "ui-menu absolute z-50 max-h-64 w-48 overflow-y-auto",
+                    placement.submenuUp ? "-bottom-1" : "-top-1",
                     placement.submenuLeft ? "right-full mr-1.5" : "left-full ml-1.5",
                     // On touch the list expands inside the menu instead of floating beside it.
                     "[@media(hover:none)]:static [@media(hover:none)]:m-0 [@media(hover:none)]:w-full [@media(hover:none)]:max-h-none [@media(hover:none)]:border-0 [@media(hover:none)]:bg-transparent [@media(hover:none)]:shadow-none",

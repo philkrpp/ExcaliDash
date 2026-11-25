@@ -87,6 +87,9 @@ const storedIdentity = (value: string | null) => {
 const describeAuthStatusError = (error: unknown): string => {
   const response = isAxiosError(error) ? error.response : undefined;
   if (response?.status === 429) {
+    // shortcut: Retry-After is only readable same-origin (backend CORS does not
+    // expose it), so split-origin deployments fall back to "in a minute";
+    // add it to exposedHeaders in backend/src/index.ts if that setup matters.
     const retryAfter = Number.parseInt(
       String(response.headers?.["retry-after"] ?? ""),
       10,

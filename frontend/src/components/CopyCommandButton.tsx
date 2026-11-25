@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
 
 const copyText = async (value: string) => {
@@ -13,8 +13,9 @@ const copyText = async (value: string) => {
   textarea.style.left = "-9999px";
   document.body.appendChild(textarea);
   textarea.select();
-  document.execCommand("copy");
+  const copied = document.execCommand("copy");
   document.body.removeChild(textarea);
+  if (!copied) throw new Error("Copy command was rejected");
 };
 
 export const CopyCommandButton: React.FC<{
@@ -22,12 +23,21 @@ export const CopyCommandButton: React.FC<{
   label?: string;
 }> = ({ command, label = "Copy command" }) => {
   const [copied, setCopied] = useState(false);
+  const resetTimer = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (resetTimer.current !== null) window.clearTimeout(resetTimer.current);
+    },
+    [],
+  );
 
   const copy = async () => {
     try {
       await copyText(command);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
+      if (resetTimer.current !== null) window.clearTimeout(resetTimer.current);
+      resetTimer.current = window.setTimeout(() => setCopied(false), 1500);
     } catch {
       // Clipboard access can be denied by the browser; the command remains visible.
     }

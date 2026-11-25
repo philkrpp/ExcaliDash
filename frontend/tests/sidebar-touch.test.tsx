@@ -180,7 +180,7 @@ describe("Sidebar", () => {
     const renderer = await render(sidebar().element);
     const plus = renderer.root.findAll(
       (node) =>
-        node.type === "button" && node.props["aria-label"] === "New collection",
+        node.type === "button" && node.props["aria-label"] === "New Collection",
     )[0];
     expect(plus.props.className).toContain("[@media(hover:none)]:h-11");
     expect(plus.props.className).toContain("[@media(hover:none)]:w-11");

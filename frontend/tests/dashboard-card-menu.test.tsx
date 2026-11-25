@@ -23,7 +23,11 @@ const collections = [
 let renderer: ReactTestRenderer | undefined;
 const render = async (
   position: { x: number; y: number },
-  extra: { showMoveSubmenu?: boolean; onShowMoveSubmenu?: () => void } = {},
+  extra: {
+    showMoveSubmenu?: boolean;
+    onShowMoveSubmenu?: () => void;
+    onClose?: () => void;
+  } = {},
 ) => {
   await act(async () => {
     renderer = create(
@@ -38,7 +42,7 @@ const render = async (
         exportError={null}
         showMoveSubmenu={extra.showMoveSubmenu ?? false}
         onShowMoveSubmenu={extra.onShowMoveSubmenu ?? vi.fn()}
-        onClose={vi.fn()}
+        onClose={extra.onClose ?? vi.fn()}
         onRename={vi.fn()}
         onMoveToCollection={vi.fn()}
         onDuplicate={vi.fn()}
@@ -49,8 +53,16 @@ const render = async (
       {
         createNodeMock: (element) =>
           element.props["data-testid"] === "drawing-card-menu"
-            ? { getBoundingClientRect: () => ({ width: 192, height: 200 }) }
-            : null,
+            ? {
+                offsetWidth: 192,
+                offsetHeight: 200,
+                querySelector: () => firstItem,
+                querySelectorAll: () => [firstItem],
+                contains: () => false,
+              }
+            : element.props["data-testid"] === "drawing-card-move-to"
+              ? { offsetTop: 44 }
+              : null,
       },
     );
   });
@@ -62,8 +74,20 @@ const menu = () =>
 const moveRow = () =>
   renderer!.root.findByProps({ "data-testid": "drawing-card-move-to" });
 
+const firstItem = { focus: vi.fn() };
+let keyListener: ((event: Partial<KeyboardEvent>) => void) | undefined;
+
 beforeEach(() => {
-  vi.stubGlobal("document", { body: {} });
+  firstItem.focus.mockClear();
+  keyListener = undefined;
+  vi.stubGlobal("document", {
+    body: {},
+    activeElement: null,
+    addEventListener: (type: string, listener: typeof keyListener) => {
+      if (type === "keydown") keyListener = listener;
+    },
+    removeEventListener: vi.fn(),
+  });
   vi.stubGlobal("window", {
     innerWidth: 1440,
     innerHeight: 900,
@@ -107,6 +131,44 @@ describe("drawing card menu placement", () => {
     });
     expect(submenu.props.className).toContain("right-full");
     expect(submenu.props.className).not.toContain("left-full");
+  });
+});
+
+describe("drawing card menu submenu height", () => {
+  const submenuClass = async (y: number) => {
+    await render({ x: 100, y }, { showMoveSubmenu: true });
+    return renderer!.root.findByProps({
+      "data-testid": "drawing-card-move-submenu",
+    }).props.className as string;
+  };
+
+  it("drops the submenu down while it fits below", async () => {
+    expect(await submenuClass(100)).toContain("-top-1");
+  });
+
+  it("opens the submenu upwards near the bottom edge", async () => {
+    // Menu clamped to y=692, move row at 692+44: 256px of submenu would not fit.
+    const className = await submenuClass(880);
+    expect(className).toContain("-bottom-1");
+    expect(className).not.toContain("-top-1");
+  });
+});
+
+describe("drawing card menu keyboard", () => {
+  it("focuses the first item when it opens", async () => {
+    await render({ x: 100, y: 100 });
+    expect(firstItem.focus).toHaveBeenCalled();
+  });
+
+  it("closes on Escape", async () => {
+    const onClose = vi.fn();
+    await render({ x: 100, y: 100 }, { onClose });
+    keyListener?.({
+      key: "Escape",
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+    });
+    expect(onClose).toHaveBeenCalled();
   });
 });
 

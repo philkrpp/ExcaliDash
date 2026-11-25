@@ -51,7 +51,10 @@ const LabeledSwitch: React.FC<{
   disabled?: boolean;
   onChange: () => void;
 }> = ({ label, ariaLabel, checked, disabled, onChange }) => (
-  <span className="inline-flex items-center gap-2">
+  // A <label> forwards taps on the caption to the switch button inside it.
+  <label
+    className={`inline-flex items-center gap-2 ${disabled ? "" : "cursor-pointer"}`}
+  >
     <PlayfulSwitch
       checked={checked}
       disabled={disabled}
@@ -61,7 +64,7 @@ const LabeledSwitch: React.FC<{
     <span className="text-xs font-semibold text-slate-600 dark:text-neutral-300">
       {label}
     </span>
-  </span>
+  </label>
 );
 
 const UserActions: React.FC<
