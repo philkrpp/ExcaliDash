@@ -54,3 +54,5 @@ Give the canvas the full viewport height. On iPad the fixed 64 px header plus Ex
 - Excalidraw's own collaborator list in the top-right slot is hidden via CSS; our avatars replace it.
 - During the history preview the wide actions island renders in its own raised layer (`z-[25]`), since the preview canvas covers Excalidraw's top-right slot.
 - Outside the chrome files: `ShareModal.tsx` (fallback position without an anchor) and `index.css` (`.editor-island`, the two hide rules).
+- "…" menu: opens beside its island on screens under 500 px high (`.editor-overflow-menu` in `index.css`); arrow keys move between items, Escape closes and refocuses "…", Tab and outside taps close it. After renaming inside the menu, focus returns to "…" unless the rename was committed by tapping elsewhere.
+- While the history preview is shown, all chrome layers (title, actions, overflow) sit at `z-[25]` above the preview canvas (`z-20`); otherwise `z-[3]`, below Excalidraw's own panels.
