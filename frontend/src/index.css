@@ -167,6 +167,18 @@
     @apply rounded-xl border border-slate-800 bg-white p-1 shadow-[1.5px_1.5px_0px_0px_rgba(30,41,59,0.9)] dark:border-neutral-600 dark:bg-neutral-900 dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.18)];
   }
 
+  /* Editor "…" menu: above its island; on short (landscape phone) screens beside it, so every item
+     fits below Excalidraw's top bar. The height caps are only a fallback for even shorter screens. */
+  .editor-overflow-menu {
+    @apply absolute bottom-full right-0 z-10 mb-2 max-h-[calc(100dvh-200px)] w-64 overflow-y-auto;
+  }
+
+  @media (max-height: 499.98px) {
+    .editor-overflow-menu {
+      @apply bottom-0 right-full mb-0 mr-2 max-h-[calc(100dvh-140px)];
+    }
+  }
+
   .ui-menu-item {
     @apply flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-indigo-400;
   }

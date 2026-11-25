@@ -89,7 +89,7 @@ const CollaboratorAvatar = ({
           className={clsx(
             "grid h-full w-full place-items-center rounded-[38%]",
             followed &&
-              "ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-neutral-900",
+              "ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-[#232329]",
           )}
         >
           {avatar}
@@ -344,7 +344,12 @@ export const EditorOverflowIsland = (
   // The rename field unmounts on commit/cancel; hand focus back to the trigger instead of <body>.
   const wasRenaming = useRef(p.isRenaming);
   useEffect(() => {
-    if (wasRenaming.current && !p.isRenaming) triggerRef.current?.focus();
+    // Only when focus was lost (Enter/Escape); a tap elsewhere that commits via blur keeps its own focus.
+    const active =
+      typeof document === "undefined" ? null : document.activeElement;
+    const focusLost = !active || active === document.body;
+    if (wasRenaming.current && !p.isRenaming && focusLost)
+      triggerRef.current?.focus();
     wasRenaming.current = p.isRenaming;
   }, [p.isRenaming]);
 
@@ -389,9 +394,7 @@ export const EditorOverflowIsland = (
           ref={menuRef}
           role="menu"
           aria-label="Drawing actions"
-          // Short (landscape phone) screens: beside the island, so all items fit below Excalidraw's top bar;
-          // the height cap is only a fallback for even shorter screens.
-          className="ui-menu absolute bottom-full right-0 z-10 mb-2 max-h-[calc(100dvh-200px)] w-64 overflow-y-auto [@media(max-height:499.98px)]:bottom-0 [@media(max-height:499.98px)]:right-full [@media(max-height:499.98px)]:mb-0 [@media(max-height:499.98px)]:mr-2 [@media(max-height:499.98px)]:max-h-[calc(100dvh-140px)]"
+          className="ui-menu editor-overflow-menu"
           onKeyDown={(event) => {
             if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
             event.preventDefault();
