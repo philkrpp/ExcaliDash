@@ -59,6 +59,7 @@ export const translate = (
   params?: Record<string, string>,
 ): string =>
   Object.entries(params ?? {}).reduce(
-    (text, [name, value]) => text.replace(`{${name}}`, value),
+    // A replacer function keeps `$&`-style patterns in values literal.
+    (text, [name, value]) => text.replace(`{${name}}`, () => value),
     (messages[locale][key] ?? messages.en[key]) as string,
   );
