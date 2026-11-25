@@ -115,6 +115,9 @@ const byLabel = (root: ReactTestInstance, label: string) =>
     (node) => node.type === "button" && node.props["aria-label"] === label,
   );
 
+const titleButton = (root: ReactTestInstance) =>
+  root.findByType("h1").findByType("button");
+
 // Renders what Excalidraw would place in its top-right slot.
 async function topRight(renderer: ReactTestRenderer, isMobile: boolean) {
   const canvas = renderer.root.findByType("mock-canvas" as React.ElementType);
@@ -144,7 +147,7 @@ describe("editor floating chrome", () => {
     const { element, props } = view();
     const renderer = await render(element);
     expect(byLabel(renderer.root, "Back to dashboard")).toHaveLength(1);
-    expect(byLabel(renderer.root, 'Rename "Projektplanung Q1"')).toHaveLength(1);
+    expect(titleButton(renderer.root).children).toEqual(["Projektplanung Q1"]);
     const slot = await topRight(renderer, false);
     expect(slot).not.toBeNull();
     const history = byLabel(slot!.root, "Version history")[0];
@@ -298,9 +301,15 @@ describe("editor floating chrome", () => {
   it("wide: the title renames by keyboard and double-click, not by a single mouse click", async () => {
     const { element, props } = view();
     const renderer = await render(element);
-    const title = byLabel(renderer.root, 'Rename "Projektplanung Q1"')[0];
-    expect(title.parent?.type).toBe("h1");
+    const title = titleButton(renderer.root);
+    // The heading reads as the name; the rename hint is a description.
+    expect(title.props["aria-label"]).toBeUndefined();
     expect(title.children).toEqual(["Projektplanung Q1"]);
+    const hint = renderer.root.find(
+      (node) => node.props.id === title.props["aria-describedby"],
+    );
+    expect(hint.children).toEqual(["Press Enter to rename"]);
+    expect(hint.parent?.type).not.toBe("h1");
     await act(async () => title.props.onClick({ detail: 1 }));
     expect(props.onRenameStart).not.toHaveBeenCalled();
     // Enter or Space on a focused button fires a click with detail 0.
@@ -313,7 +322,7 @@ describe("editor floating chrome", () => {
   it("wide: a touch tap on the title renames", async () => {
     const { element, props } = view({ isTouchOnly: true });
     const renderer = await render(element);
-    const title = byLabel(renderer.root, 'Rename "Projektplanung Q1"')[0];
+    const title = titleButton(renderer.root);
     await act(async () => title.props.onClick({ detail: 1 }));
     expect(props.onRenameStart).toHaveBeenCalledOnce();
   });
@@ -323,7 +332,9 @@ describe("editor floating chrome", () => {
     expect(renderer.root.findByType("h1").children).toEqual([
       "Projektplanung Q1",
     ]);
-    expect(byLabel(renderer.root, 'Rename "Projektplanung Q1"')).toHaveLength(0);
+    expect(
+      renderer.root.findByType("h1").findAllByType("button"),
+    ).toHaveLength(0);
   });
 
   const peer = (id: string) => ({
@@ -360,7 +371,7 @@ describe("editor floating chrome", () => {
     expect(peopleList(slot!.root)).toHaveLength(0);
   });
 
-  it("closes the people list on an outside tap", async () => {
+  it("closes the people list on an outside tap and on Tab", async () => {
     const listeners: Record<string, (event: unknown) => void> = {};
     vi.stubGlobal("window", {
       addEventListener: (type: string, fn: (event: unknown) => void) => {
@@ -378,6 +389,11 @@ describe("editor floating chrome", () => {
     expect(peopleList(slot!.root)).toHaveLength(1);
     await act(async () => listeners.pointerdown({ target: {} }));
     expect(peopleList(slot!.root)).toHaveLength(0);
+    await act(async () =>
+      byLabel(slot!.root, "Show everyone (1 more)")[0].props.onClick(),
+    );
+    await act(async () => listeners.keydown({ key: "Tab" }));
+    expect(peopleList(slot!.root)).toHaveLength(0);
   });
 
   it("touch: tapping an avatar shows the list with names instead of following", async () => {
@@ -389,7 +405,12 @@ describe("editor floating chrome", () => {
     const slot = await topRight(renderer, false);
     const avatar = byLabel(slot!.root, "Peer a, show everyone")[0];
     expect(avatar.props["aria-pressed"]).toBeUndefined();
+    expect(avatar.props["aria-haspopup"]).toBe("dialog");
+    expect(avatar.props["aria-expanded"]).toBe(false);
     await act(async () => avatar.props.onClick());
+    expect(
+      byLabel(slot!.root, "Peer a, show everyone")[0].props["aria-expanded"],
+    ).toBe(true);
     expect(props.onToggleFollow).not.toHaveBeenCalled();
     const [list] = peopleList(slot!.root);
     expect(byLabel(list, "Follow Peer a")).toHaveLength(1);

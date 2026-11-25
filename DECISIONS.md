@@ -12,6 +12,13 @@ Quelle: <Spec-/Plan-Pfad oder "Chat YYYY-MM-DD">
 Ersetzt: YYYY-MM-DD – <Titel>   (nur bei Revision)
 -->
 
+## 2026-11-25 – Dashboard-Auswahl beim Refresh: ganz oder gar nicht
+
+Entscheidung: Ein Neuladen der Liste behält die Auswahl nur, wenn alle gewählten Zeichnungen noch in der Liste stehen; sonst wird sie wie früher komplett geleert (nicht einzeln gekürzt). Solange die Liste noch lädt (Platzhalter), bleibt sie unverändert.
+Grund: Ein Refresh lädt nur die erste Seite (24); einzelnes Kürzen ließ eine Auswahl über mehrere Seiten still schrumpfen, und die nächste Sammelaktion traf weniger Zeichnungen als gewählt (Code-Review). Der „Select All“-Fix nach einer Suche bleibt erhalten.
+Quelle: Review-Runde 1, `docs/superpowers/specs/2026-11-25-open-items-design.md`
+Ersetzt: 2026-11-25 – Editor-Personenliste und Dashboard-Auswahl beim Refresh (nur der Satz zur Auswahl)
+
 ## 2026-11-25 – Editor-Personenliste und Dashboard-Auswahl beim Refresh
 
 Entscheidung: „+N“ im Editor öffnet eine Liste aller Personen (Name, Folgen-Knopf). Auf Touch öffnet auch ein Tipp auf einen Avatar diese Liste statt sofort zu folgen; auf dem Desktop folgt ein Klick auf einen Avatar weiter direkt. Der Editortitel im Wide-Layout ist per Tastatur umbenennbar (Enter). Im Dashboard setzt ein Neuladen der Liste die Auswahl nicht mehr zurück; nur Zeichnungen, die nicht mehr in der Liste sind, fallen heraus.

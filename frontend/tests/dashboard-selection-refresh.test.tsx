@@ -65,7 +65,7 @@ describe("dashboard selection across list refreshes", () => {
     expect([...probe.latest].sort()).toEqual(["a", "b"]);
   });
 
-  it("drops only ids that are no longer listed", async () => {
+  it("clears the selection once a selected drawing is no longer listed", async () => {
     await act(async () => {
       renderer = create(<Harness drawings={[drawing("a"), drawing("b")]} />);
     });
@@ -73,7 +73,7 @@ describe("dashboard selection across list refreshes", () => {
     await act(async () =>
       renderer!.update(<Harness drawings={[drawing("b"), drawing("c")]} />),
     );
-    expect([...probe.latest]).toEqual(["b"]);
+    expect([...probe.latest]).toEqual([]);
   });
 
   it("waits for the list to load before dropping anything", async () => {
@@ -87,8 +87,12 @@ describe("dashboard selection across list refreshes", () => {
     );
     expect([...probe.latest].sort()).toEqual(["a", "b"]);
     await act(async () =>
+      renderer!.update(<Harness drawings={[drawing("a"), drawing("b")]} />),
+    );
+    expect([...probe.latest].sort()).toEqual(["a", "b"]);
+    await act(async () =>
       renderer!.update(<Harness drawings={[drawing("a")]} />),
     );
-    expect([...probe.latest]).toEqual(["a"]);
+    expect([...probe.latest]).toEqual([]);
   });
 });

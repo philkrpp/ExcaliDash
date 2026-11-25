@@ -50,26 +50,32 @@ const Divider = () => (
   <div className="mx-0.5 h-6 w-px shrink-0 bg-slate-200 dark:bg-neutral-700" />
 );
 
+const followLabel = (name: string, followed: boolean) =>
+  `${followed ? "Stop following" : "Follow"} ${name}`;
+
 const CollaboratorAvatar = ({
   user,
   label,
   inactive = false,
   followed = false,
   onClick,
-  actionLabel,
+  listOpen,
 }: {
   user: UserIdentity;
   label: string;
   inactive?: boolean;
   followed?: boolean;
   onClick?: () => void;
-  /** Replaces the follow label when the click does something else. */
-  actionLabel?: string;
+  /** Set when the click opens the people list instead of following. */
+  listOpen?: boolean;
 }) => {
-  const follows = Boolean(onClick) && !actionLabel;
-  const title =
-    actionLabel ??
-    (onClick ? `${followed ? "Stop following" : "Follow"} ${label}` : label);
+  const opensList = listOpen !== undefined;
+  const follows = Boolean(onClick) && !opensList;
+  const title = opensList
+    ? `${label}${followed ? " (following)" : ""}, show everyone`
+    : onClick
+      ? followLabel(label, followed)
+      : label;
   const avatar = (
     <ProfileAvatar
       name={user.name}
@@ -90,6 +96,8 @@ const CollaboratorAvatar = ({
           type="button"
           onClick={onClick}
           aria-pressed={follows ? followed : undefined}
+          aria-haspopup={opensList ? "dialog" : undefined}
+          aria-expanded={opensList ? listOpen : undefined}
           aria-label={title}
           className={clsx(
             "grid h-full w-full place-items-center rounded-[38%]",
@@ -106,9 +114,6 @@ const CollaboratorAvatar = ({
   );
 };
 
-const followLabel = (peer: Peer, followed: boolean) =>
-  `${followed ? "Stop following" : "Follow"} ${peer.name}`;
-
 const PeopleList = ({
   me,
   peers,
@@ -122,8 +127,9 @@ const PeopleList = ({
 > & { opensUp: boolean; onClose: () => void }) => {
   const listRef = useRef<HTMLDivElement>(null);
   useMenuKeyboard(listRef, onClose);
-  const nameClass =
-    "min-w-0 flex-1 truncate text-sm font-medium text-slate-800 dark:text-neutral-100";
+  const rowClass = "ui-menu-item min-h-11";
+  const statusClass =
+    "shrink-0 text-xs font-semibold text-slate-500 dark:text-neutral-400";
   return (
     <div
       ref={listRef}
@@ -134,43 +140,44 @@ const PeopleList = ({
         opensUp ? "bottom-full mb-2" : "top-full mt-2",
       )}
     >
-      <ul>
-        <li className="flex min-h-11 items-center gap-2 px-2 py-1">
-          <ProfileAvatar name={me.name} size="sm" />
-          <span className={nameClass}>{`${me.name} (You)`}</span>
-        </li>
-        {peers.map((peer) => {
-          const followed = peer.id === followedUserId;
-          return (
-            <li
-              key={peer.id}
-              className="flex min-h-11 items-center gap-2 px-2 py-1"
-            >
-              <ProfileAvatar
-                name={peer.name}
-                size="sm"
-                className={clsx(!peer.isActive && "opacity-30 grayscale")}
-              />
-              <span className={nameClass}>{peer.name}</span>
-              <button
-                type="button"
-                aria-pressed={followed}
-                aria-label={followLabel(peer, followed)}
-                onClick={() => {
-                  onToggleFollow(peer);
-                  onClose();
-                }}
-                className={clsx(
-                  followed ? "ui-button-primary" : "ui-button-secondary",
-                  "shrink-0 px-2.5 py-1 text-xs [@media(hover:none)]:min-h-11",
-                )}
-              >
-                {followed ? "Following" : "Follow"}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="flex min-h-11 items-center gap-2 px-2.5 py-2 text-sm font-medium text-slate-600 dark:text-neutral-300">
+        <ProfileAvatar name={me.name} size="sm" />
+        <span className="min-w-0 flex-1 truncate">{me.name}</span>
+        <span className={statusClass}>You</span>
+      </div>
+      {peers.map((peer) => {
+        const followed = peer.id === followedUserId;
+        return (
+          <button
+            key={peer.id}
+            type="button"
+            aria-pressed={followed}
+            aria-label={followLabel(peer.name, followed)}
+            onClick={() => {
+              onToggleFollow(peer);
+              onClose();
+            }}
+            className={clsx(rowClass, followed && "ui-menu-item-selected")}
+          >
+            <ProfileAvatar
+              name={peer.name}
+              size="sm"
+              className={clsx(!peer.isActive && "opacity-30 grayscale")}
+            />
+            <span className="min-w-0 flex-1 truncate">
+              {peer.name}
+              {peer.isActive ? null : (
+                <span className="ml-1.5 text-xs font-medium text-slate-500 dark:text-neutral-400">
+                  away
+                </span>
+              )}
+            </span>
+            <span className={followed ? "shrink-0 text-xs" : statusClass}>
+              {followed ? "Following" : "Follow"}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 };
@@ -185,8 +192,16 @@ const Collaborators = (p: EditorChromeProps & { opensUp?: boolean }) => {
       if (!wrapperRef.current?.contains(event.target as Node))
         setListOpen(false);
     };
+    // Like the … menu: tabbing away closes the list.
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Tab") setListOpen(false);
+    };
     window.addEventListener("pointerdown", onPointerDown, true);
-    return () => window.removeEventListener("pointerdown", onPointerDown, true);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown, true);
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, [listOpen]);
   const toggleList = () => setListOpen((open) => !open);
 
@@ -198,7 +213,8 @@ const Collaborators = (p: EditorChromeProps & { opensUp?: boolean }) => {
   const visible = ordered.slice(0, MAX_VISIBLE_PEERS);
   const hidden = ordered.slice(MAX_VISIBLE_PEERS);
   return (
-    <div ref={wrapperRef} className="relative flex shrink-0 items-center">
+    // No `relative` here: the list anchors to the island's edge, like the … menu.
+    <div ref={wrapperRef} className="flex shrink-0 items-center">
       <CollaboratorAvatar user={p.me} label={`${p.me.name} (You)`} />
       {visible.map((peer) => (
         <CollaboratorAvatar
@@ -208,9 +224,7 @@ const Collaborators = (p: EditorChromeProps & { opensUp?: boolean }) => {
           inactive={!peer.isActive}
           followed={peer.id === p.followedUserId}
           // Touch has no tooltip: a tap shows the names before anyone is followed.
-          actionLabel={
-            p.isTouchOnly ? `${peer.name}, show everyone` : undefined
-          }
+          listOpen={p.isTouchOnly ? listOpen : undefined}
           onClick={p.isTouchOnly ? toggleList : () => p.onToggleFollow(peer)}
         />
       ))}
@@ -308,6 +322,8 @@ const RenameField = (p: EditorChromeProps) => (
   />
 );
 
+const TITLE_HINT_ID = "editor-title-rename-hint";
+
 /** Top-left, next to Excalidraw's menu button: back, and the title when there is room. */
 export const EditorTitleIsland = (
   p: EditorChromeProps & { showTitle: boolean },
@@ -322,22 +338,28 @@ export const EditorTitleIsland = (
             <RenameField {...p} />
           </div>
         ) : p.canEdit ? (
-          <h1 className="min-w-0 font-medium">
-            <button
-              type="button"
-              aria-label={`Rename "${p.drawingName}"`}
-              title={p.drawingName}
-              className="block w-full min-w-0 truncate touch-manipulation cursor-text rounded px-2 py-1 text-left text-gray-900 [@media(hover:none)]:py-2.5 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-800"
-              onDoubleClick={p.onRenameStart}
-              onClick={(event) => {
-                // Enter/Space fire a click with detail 0. Touch has no tooltip or
-                // dblclick, so a tap shows the full (truncated) name in the field.
-                if (event.detail === 0 || p.isTouchOnly) p.onRenameStart();
-              }}
-            >
-              {p.drawingName}
-            </button>
-          </h1>
+          <>
+            {/* Outside the heading, so it reads as the drawing name. */}
+            <span id={TITLE_HINT_ID} className="sr-only">
+              Press Enter to rename
+            </span>
+            <h1 className="min-w-0 font-medium">
+              <button
+                type="button"
+                aria-describedby={TITLE_HINT_ID}
+                title={p.drawingName}
+                className="block w-full min-w-0 truncate touch-manipulation cursor-text rounded px-2 py-1 text-left text-gray-900 [@media(hover:none)]:py-2.5 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-800"
+                onDoubleClick={p.onRenameStart}
+                onClick={(event) => {
+                  // Enter/Space fire a click with detail 0. Touch has no tooltip or
+                  // dblclick, so a tap shows the full (truncated) name in the field.
+                  if (event.detail === 0 || p.isTouchOnly) p.onRenameStart();
+                }}
+              >
+                {p.drawingName}
+              </button>
+            </h1>
+          </>
         ) : (
           <h1
             className="min-w-0 truncate px-2 py-1 font-medium text-gray-900 dark:text-white"
@@ -360,7 +382,7 @@ export const EditorActionsIsland = ({
   historyButtonRef: React.RefObject<HTMLButtonElement>;
   shareButtonRef: React.RefObject<HTMLButtonElement>;
 }) => (
-  <div className="editor-island">
+  <div className="editor-island relative">
     <StatusBadges {...p} />
     {canShowHistory(p) ? (
       <button

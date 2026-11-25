@@ -38,14 +38,17 @@ export const useDashboardSelection = ({
     setSelectedIds(new Set());
   }, [setSelectedIds]);
 
-  // A list refresh keeps the selection; only drawings that left the list drop out.
+  // A list refresh keeps the selection while every selected drawing is still
+  // listed. Otherwise it clears visibly: a refresh only reloads the first page,
+  // so a partial prune would silently shrink a multi-page selection.
   useEffect(() => {
     if (isLoading) return;
     setSelectedIds((previous) => {
       if (previous.size === 0) return previous;
       const listed = new Set(drawings.map((drawing) => drawing.id));
-      const kept = [...previous].filter((id) => listed.has(id));
-      return kept.length === previous.size ? previous : new Set(kept);
+      return [...previous].every((id) => listed.has(id))
+        ? previous
+        : new Set();
     });
   }, [drawings, isLoading, setSelectedIds]);
 
