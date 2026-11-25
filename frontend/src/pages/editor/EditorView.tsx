@@ -4,8 +4,6 @@ import { HistoryPreviewCanvas } from "./HistoryPreviewCanvas";
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
 import {
   ArrowLeft,
-  ChevronDown,
-  ChevronUp,
   CloudOff,
   Download,
   History,
@@ -26,13 +24,11 @@ import type { Peer } from "./useEditorCollaboration";
 type EditorViewProps = {
   id?: string;
   accessLevel: "none" | "view" | "edit" | "owner";
-  autoHideEnabled: boolean;
   autosaveFailing: boolean;
   canEdit: boolean;
   drawingName: string;
   editorContainerRef: React.RefObject<HTMLDivElement>;
   initialData: any;
-  isHeaderVisible: boolean;
   isTouchOnly: boolean;
   isHistoryOpen: boolean;
   historyPreview: DrawingSnapshotFull | null;
@@ -73,7 +69,6 @@ type EditorViewProps = {
   isShareOpen: boolean;
   onCloseShare: () => void;
   onHistoryOpen: () => void;
-  onToggleAutoHide: () => void;
   onToggleTheme: () => void;
 };
 
@@ -132,13 +127,11 @@ const CollaboratorAvatar = ({
 export const EditorView: React.FC<EditorViewProps> = ({
   id,
   accessLevel,
-  autoHideEnabled,
   autosaveFailing,
   canEdit,
   drawingName,
   editorContainerRef,
   initialData,
-  isHeaderVisible,
   isTouchOnly,
   isHistoryOpen,
   historyPreview,
@@ -175,7 +168,6 @@ export const EditorView: React.FC<EditorViewProps> = ({
   isShareOpen,
   onCloseShare,
   onHistoryOpen,
-  onToggleAutoHide,
   onToggleTheme,
 }) => (
   <div
@@ -189,12 +181,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
       }
     }}
   >
-    <header
-      className={clsx(
-        "h-16 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 flex items-center gap-3 px-4 justify-between z-10 fixed top-0 left-0 right-0 transition-all duration-300",
-        isHeaderVisible || isShareOpen ? "translate-y-0" : "-translate-y-full",
-      )}
-    >
+    <header className="h-16 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 flex items-center gap-3 px-4 justify-between z-10 fixed top-0 left-0 right-0">
       <div className="flex min-w-0 flex-1 items-center gap-4">
         <button
           onClick={onBackClick}
@@ -272,17 +259,6 @@ export const EditorView: React.FC<EditorViewProps> = ({
             </button>
           </div>
         ) : null}
-        <button
-          onClick={onToggleAutoHide}
-          className="ui-toolbar-button [@media(hover:none)]:hidden"
-          title={autoHideEnabled ? "Disable auto-hide" : "Enable auto-hide"}
-        >
-          {autoHideEnabled ? (
-            <ChevronUp size={20} />
-          ) : (
-            <ChevronDown size={20} />
-          )}
-        </button>
         <div className="h-6 w-px bg-gray-300 dark:bg-gray-700" />
         <button
           onClick={onExportClick}
@@ -335,8 +311,8 @@ export const EditorView: React.FC<EditorViewProps> = ({
         onCanvasDropCapture(event);
       }}
       style={{
-        height: isHeaderVisible ? "calc(100dvh - 4rem)" : "100dvh",
-        marginTop: isHeaderVisible ? "4rem" : "0",
+        height: "calc(100dvh - 4rem)",
+        marginTop: "4rem",
       }}
     >
       {loadError ? (

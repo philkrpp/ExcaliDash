@@ -8,7 +8,6 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { usePreference } from "../context/PreferencesContext";
 import { useEditorChrome } from "./editor/useEditorChrome";
-import { useEditorAutoHide } from "./editor/useEditorAutoHide";
 import { useEditorIdentity } from "./editor/useEditorIdentity";
 import { EditorDialogs } from "./editor/EditorDialogs";
 import { EditorView } from "./editor/EditorView";
@@ -56,12 +55,7 @@ const ExcalidrawEditor: React.FC = () => {
   const [isSceneLoading, setIsSceneLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isSavingOnLeave, setIsSavingOnLeave] = useState(false);
-  const [editorAutoHide] = usePreference("editorAutoHide", false);
   const [appendDroppedDrawings] = usePreference("appendDroppedDrawings", false);
-  const { autoHideEnabled, setAutoHideEnabled } = useEditorAutoHide(
-    id,
-    editorAutoHide,
-  );
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [langCode, setLangCode] = usePreference(
     "language",
@@ -73,12 +67,7 @@ const ExcalidrawEditor: React.FC = () => {
   const shareButtonRef = useRef<HTMLButtonElement>(null);
   const [historyPreview, setHistoryPreview] =
     useState<api.DrawingSnapshotFull | null>(null);
-  const { isHeaderVisible, setIsHeaderVisible, isTouchOnly } = useEditorChrome({
-    drawingName,
-    autoHideEnabled,
-    isRenaming,
-    isShareOpen,
-  });
+  const { isTouchOnly } = useEditorChrome({ drawingName });
   const me: UserIdentity = useEditorIdentity(user);
   const [isReady, setIsReady] = useState(false);
   const { elementVersionMap, hasElementChanged, recordElementVersion } =
@@ -350,9 +339,7 @@ const ExcalidrawEditor: React.FC = () => {
     handleExportClick,
     handleRenameStart,
     handleRenameSubmit,
-    handleToggleAutoHide,
   } = useEditorCommands({
-    autoHideEnabled,
     canEdit,
     drawingId: id,
     drawingName,
@@ -362,9 +349,7 @@ const ExcalidrawEditor: React.FC = () => {
     newName,
     refs: commandRefs,
     resolveSafeSnapshot,
-    setAutoHideEnabled,
     setDrawingName,
-    setIsHeaderVisible,
     setIsRenaming,
     setIsSavingOnLeave,
     setNewName,
@@ -375,13 +360,11 @@ const ExcalidrawEditor: React.FC = () => {
       <EditorView
         id={id}
         accessLevel={accessLevel}
-        autoHideEnabled={autoHideEnabled}
         autosaveFailing={autosaveFailing}
         canEdit={canEdit}
         drawingName={drawingName}
         editorContainerRef={editorContainerRef}
         initialData={initialData}
-        isHeaderVisible={isHeaderVisible}
         isTouchOnly={isTouchOnly}
         isHistoryOpen={isHistoryOpen}
         historyPreview={isHistoryOpen ? historyPreview : null}
@@ -418,7 +401,6 @@ const ExcalidrawEditor: React.FC = () => {
         isShareOpen={isShareOpen}
         onCloseShare={() => setIsShareOpen(false)}
         onHistoryOpen={() => setIsHistoryOpen(true)}
-        onToggleAutoHide={handleToggleAutoHide}
         onToggleTheme={toggleTheme}
       />
       <EditorDialogs

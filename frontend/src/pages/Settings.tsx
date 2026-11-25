@@ -28,10 +28,6 @@ export const Settings: React.FC = () => {
   const navigate = useNavigate();
   const { theme, themePreference, setThemePreference } = useTheme();
   const { authEnabled, user, authMode } = useAuth();
-  const [editorAutoHide, setEditorAutoHide] = usePreference(
-    "editorAutoHide",
-    false,
-  );
   const [compactSidebar, setCompactSidebar] = usePreference(
     "compactSidebar",
     true,
@@ -413,8 +409,6 @@ export const Settings: React.FC = () => {
             toggleImageCompression={toggleImageCompression}
             imageCompressionThresholdMb={imageCompressionThresholdMb}
             onImageCompressionThresholdChange={updateImageCompressionThreshold}
-            editorAutoHide={editorAutoHide}
-            onEditorAutoHideChange={setEditorAutoHide}
             compactSidebar={compactSidebar}
             onCompactSidebarChange={setCompactSidebar}
             appendDroppedDrawings={appendDroppedDrawings}

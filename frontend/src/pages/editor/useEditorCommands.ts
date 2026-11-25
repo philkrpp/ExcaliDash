@@ -58,7 +58,6 @@ type EditorCommandRefs = {
 };
 
 type UseEditorCommandsParams = {
-  autoHideEnabled: boolean;
   canEdit: boolean;
   drawingId: string | undefined;
   drawingName: string;
@@ -79,16 +78,13 @@ type UseEditorCommandsParams = {
     options?: { suppressErrors?: boolean; onlyIfDirty?: boolean },
   ) => Promise<void>;
   flushBroadcastChanges: () => void;
-  setAutoHideEnabled: (enabled: boolean) => void;
   setDrawingName: (name: string) => void;
-  setIsHeaderVisible: (visible: boolean) => void;
   setIsRenaming: (isRenaming: boolean) => void;
   setIsSavingOnLeave: (isSaving: boolean) => void;
   setNewName: (name: string) => void;
 };
 
 export const useEditorCommands = ({
-  autoHideEnabled,
   canEdit,
   drawingId,
   drawingName,
@@ -98,9 +94,7 @@ export const useEditorCommands = ({
   newName,
   refs,
   resolveSafeSnapshot,
-  setAutoHideEnabled,
   setDrawingName,
-  setIsHeaderVisible,
   setIsRenaming,
   setIsSavingOnLeave,
   setNewName,
@@ -388,10 +382,6 @@ export const useEditorCommands = ({
     }
   }, [drawingId, drawingName, refs]);
 
-  const handleToggleAutoHide = useCallback(() => {
-    setAutoHideEnabled(!autoHideEnabled);
-    setIsHeaderVisible(true);
-  }, [autoHideEnabled, setAutoHideEnabled, setIsHeaderVisible]);
 
   const handleRenameStart = useCallback(() => {
     if (!canEdit) return;
@@ -405,6 +395,5 @@ export const useEditorCommands = ({
     handleExportClick,
     handleRenameStart,
     handleRenameSubmit,
-    handleToggleAutoHide,
   };
 };

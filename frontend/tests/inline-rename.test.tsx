@@ -301,12 +301,10 @@ describe("editor header rename", () => {
       id: "drawing",
       accessLevel: "owner",
       canEdit: true,
-      autoHideEnabled: true,
       autosaveFailing: false,
       drawingName: "Drawing",
       editorContainerRef: { current: null },
       initialData: { elements: [] },
-      isHeaderVisible: true,
       isHistoryOpen: false,
       historyPreview: null,
       historyButtonRef: { current: null },
@@ -339,7 +337,6 @@ describe("editor header rename", () => {
       onShareOpen: vi.fn(),
       onCloseShare: vi.fn(),
       onHistoryOpen: vi.fn(),
-      onToggleAutoHide: vi.fn(),
       onToggleTheme: vi.fn(),
       ...overrides,
     };
@@ -385,7 +382,6 @@ describe("editor rename command", () => {
     let current!: ReturnType<typeof useEditorCommands>;
     function Harness() {
       const next = useEditorCommands({
-        autoHideEnabled: false,
         canEdit: true,
         drawingId: "drawing",
         drawingName,
@@ -395,9 +391,7 @@ describe("editor rename command", () => {
         enqueueSceneSave: vi.fn() as never,
         flushBroadcastChanges: vi.fn(),
         resolveSafeSnapshot: vi.fn() as never,
-        setAutoHideEnabled: vi.fn(),
         setDrawingName,
-        setIsHeaderVisible: vi.fn(),
         setIsRenaming,
         setIsSavingOnLeave: vi.fn(),
         setNewName: vi.fn(),

@@ -54,7 +54,6 @@ Open the account menu and select **Settings** to adjust preferences for your acc
 
 - **Language:** switch between `English`, `简体中文`, or an Excalidraw editor language.
 - **Appearance:** choose `Light`, `Dark`, or `System` to follow your operating system color scheme automatically.
-- **Auto-hide editor header:** collapse the top bar automatically when opening a drawing.
 - **Compact sidebar:** keep account actions tucked into the avatar menu.
 - **Append dropped drawings:** when enabled, dragging one or more `.excalidraw` files onto an open canvas appends their elements to the current drawing (laid out cleanly without overlapping) instead of replacing the canvas.
 - **Optimized images:** compress uploaded images above a configurable MB threshold, or turn off to preserve original quality.

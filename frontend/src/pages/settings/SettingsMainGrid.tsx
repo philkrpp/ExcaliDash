@@ -2,8 +2,6 @@ import {
   Archive,
   CopyPlus,
   PanelLeft,
-  Eye,
-  EyeOff,
   Languages,
   Monitor,
   Moon,
@@ -36,8 +34,6 @@ type SettingsMainGridProps = {
   toggleImageCompression: () => void;
   imageCompressionThresholdMb: number;
   onImageCompressionThresholdChange: (value: number) => void;
-  editorAutoHide: boolean;
-  onEditorAutoHideChange: (enabled: boolean) => void;
   compactSidebar: boolean;
   onCompactSidebarChange: (enabled: boolean) => void;
   appendDroppedDrawings: boolean;
@@ -59,8 +55,6 @@ export const SettingsMainGrid = ({
   toggleImageCompression,
   imageCompressionThresholdMb,
   onImageCompressionThresholdChange,
-  editorAutoHide,
-  onEditorAutoHideChange,
   compactSidebar,
   onCompactSidebarChange,
   appendDroppedDrawings,
@@ -122,19 +116,6 @@ export const SettingsMainGrid = ({
             { value: "dark", label: "Dark", icon: <Moon size={14} /> },
             { value: "system", label: "System", icon: <Monitor size={14} /> },
           ]}
-        />
-      </SettingsRow>
-
-      <SettingsRow
-        icon={editorAutoHide ? <EyeOff size={20} /> : <Eye size={20} />}
-        tileClassName="border-black bg-cyan-400 text-black dark:border-neutral-700 dark:bg-cyan-400 dark:text-black"
-        title="Auto-hide editor header"
-        description={`${editorAutoHide ? "Hide by default" : "Keep visible by default"} (mouse only)`}
-      >
-        <PlayfulSwitch
-          checked={editorAutoHide}
-          onChange={onEditorAutoHideChange}
-          ariaLabel="Toggle editor header auto-hide default"
         />
       </SettingsRow>
 

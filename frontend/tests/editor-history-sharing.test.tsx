@@ -4,7 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EditorDialogs } from "../src/pages/editor/EditorDialogs";
 import { EditorView } from "../src/pages/editor/EditorView";
 import { HistoryPreviewCanvas } from "../src/pages/editor/HistoryPreviewCanvas";
-import { useEditorChrome } from "../src/pages/editor/useEditorChrome";
 import { useEditorPersistence } from "../src/pages/editor/useEditorPersistence";
 import { useEditorCommands } from "../src/pages/editor/useEditorCommands";
 import { ShareModal } from "../src/components/ShareModal";
@@ -185,7 +184,6 @@ function persistenceHarness() {
       resolveSafeSnapshot,
     });
     const nextCommands = useEditorCommands({
-      autoHideEnabled: false,
       canEdit: true,
       drawingId: "drawing",
       drawingName: "Drawing",
@@ -200,9 +198,7 @@ function persistenceHarness() {
       enqueueSceneSave: nextPersistence.enqueueSceneSave,
       flushBroadcastChanges: vi.fn(),
       resolveSafeSnapshot,
-      setAutoHideEnabled: vi.fn(),
       setDrawingName: vi.fn(),
-      setIsHeaderVisible: vi.fn(),
       setIsRenaming: vi.fn(),
       setIsSavingOnLeave: vi.fn(),
       setNewName: vi.fn(),
@@ -537,30 +533,6 @@ describe("sharing placement and chrome", () => {
     expect(close).toHaveBeenCalledOnce();
   });
 
-  it("cancels pending auto-hide timers while sharing is open and resumes after close", async () => {
-    let visible = true;
-    function Chrome({ open }: { open: boolean }) {
-      const chrome = useEditorChrome({
-        drawingName: "Drawing",
-        autoHideEnabled: true,
-        isRenaming: false,
-        isShareOpen: open,
-      });
-      useLayoutEffect(() => {
-        visible = chrome.isHeaderVisible;
-      });
-      return null;
-    }
-    const renderer = await render(<Chrome open={false} />);
-    await advance(2000);
-    await act(async () => renderer.update(<Chrome open />));
-    await advance(5000);
-    expect(visible).toBe(true);
-    await act(async () => renderer.update(<Chrome open={false} />));
-    await advance(3000);
-    expect(visible).toBe(false);
-  });
-
   it("keeps the live canvas mounted and blocks drops from reaching live import handlers during history", async () => {
     const drop = vi.fn();
     const shareAnchor = ref(null);
@@ -569,12 +541,10 @@ describe("sharing placement and chrome", () => {
         id="drawing"
         accessLevel="owner"
         canEdit
-        autoHideEnabled
         autosaveFailing={false}
         drawingName="Drawing"
         editorContainerRef={ref(null)}
         initialData={{ elements: liveElements }}
-        isHeaderVisible={false}
         isHistoryOpen
         historyPreview={historicalSnapshot}
         historyButtonRef={ref(null)}
@@ -608,7 +578,6 @@ describe("sharing placement and chrome", () => {
         isShareOpen
         onCloseShare={vi.fn()}
         onHistoryOpen={vi.fn()}
-        onToggleAutoHide={vi.fn()}
         onToggleTheme={vi.fn()}
       />,
     );
@@ -623,9 +592,6 @@ describe("sharing placement and chrome", () => {
     const share = renderer.root.findByType(ShareModal);
     expect(share.props.anchorRef).toBe(shareAnchor);
     expect(share.parent?.type).not.toBe("header");
-    expect(renderer.root.findByType("header").props.className).toContain(
-      "translate-y-0",
-    );
     const event = { preventDefault: vi.fn(), stopPropagation: vi.fn() };
     renderer.root
       .findAll((node) => node.type === "div" && node.props.onDropCapture)[0]

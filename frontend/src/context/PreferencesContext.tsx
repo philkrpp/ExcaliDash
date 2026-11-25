@@ -24,7 +24,6 @@ const KNOWN_KEYS: PreferenceKey[] = [
   "dashboardSortDirection",
   "language",
   "gridStep",
-  "editorAutoHide",
   "compactSidebar",
   "appendDroppedDrawings",
 ];

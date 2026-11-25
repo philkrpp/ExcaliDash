@@ -76,7 +76,6 @@ const mountEditor = async () => {
       resolveSafeSnapshot,
     });
     const nextCommands = useEditorCommands({
-      autoHideEnabled: false,
       canEdit: true,
       drawingId: "drawing",
       drawingName: "Drawing",
@@ -91,9 +90,7 @@ const mountEditor = async () => {
       enqueueSceneSave: persistence.enqueueSceneSave,
       flushBroadcastChanges: vi.fn(),
       resolveSafeSnapshot,
-      setAutoHideEnabled: vi.fn(),
       setDrawingName: vi.fn(),
-      setIsHeaderVisible: vi.fn(),
       setIsRenaming: vi.fn(),
       setIsSavingOnLeave: vi.fn(),
       setNewName: vi.fn(),

@@ -1,94 +1,76 @@
 import React, { useEffect } from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { useEditorChrome } from "../src/pages/editor/useEditorChrome";
 
-let visible: boolean | undefined;
-const Probe = ({ autoHideEnabled }: { autoHideEnabled: boolean }) => {
-  const { isHeaderVisible } = useEditorChrome({
-    drawingName: "Drawing",
-    autoHideEnabled,
-    isRenaming: false,
-    isShareOpen: false,
-  });
+let touchOnly: boolean | undefined;
+const Probe = () => {
+  const { isTouchOnly } = useEditorChrome({ drawingName: "Drawing" });
   useEffect(() => {
-    visible = isHeaderVisible;
-  }, [isHeaderVisible]);
+    touchOnly = isTouchOnly;
+  }, [isTouchOnly]);
   return null;
 };
 
-let pointerListeners: Array<() => void> = [];
+let listeners: Array<() => void> = [];
 let hoverNoneNow = false;
+let doc: { title: string };
 const stubEnvironment = (hoverNone: boolean) => {
   hoverNoneNow = hoverNone;
-  pointerListeners = [];
-  vi.stubGlobal("document", { title: "" });
+  listeners = [];
+  doc = { title: "" };
+  vi.stubGlobal("document", doc);
   vi.stubGlobal("window", {
     matchMedia: (query: string) => ({
       get matches() {
         return query === "(hover: none)" && hoverNoneNow;
       },
       addEventListener: (_type: string, listener: () => void) =>
-        pointerListeners.push(listener),
+        listeners.push(listener),
       removeEventListener: (_type: string, listener: () => void) => {
-        pointerListeners = pointerListeners.filter((l) => l !== listener);
+        listeners = listeners.filter((l) => l !== listener);
       },
     }),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-  });
-};
-const switchPointer = async (hoverNone: boolean) => {
-  hoverNoneNow = hoverNone;
-  await act(async () => {
-    pointerListeners.forEach((listener) => listener());
   });
 };
 
 let renderer: ReactTestRenderer | undefined;
-const render = async (autoHideEnabled: boolean) => {
+const render = async () => {
   await act(async () => {
-    renderer = create(<Probe autoHideEnabled={autoHideEnabled} />);
+    renderer = create(<Probe />);
   });
 };
 
-describe("useEditorChrome auto-hide", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    visible = undefined;
-  });
+describe("useEditorChrome", () => {
   afterEach(() => {
     act(() => renderer?.unmount());
     renderer = undefined;
-    vi.useRealTimers();
+    touchOnly = undefined;
     vi.unstubAllGlobals();
   });
 
-  it("hides the header after the delay on devices with a hover pointer", async () => {
-    stubEnvironment(false);
-    await render(true);
-    await act(async () => {
-      vi.advanceTimersByTime(3500);
-    });
-    expect(visible).toBe(false);
-  });
-
-  it("keeps the header visible on touch devices, which have no way to bring it back", async () => {
+  it("reports touch-only on devices without a hover pointer", async () => {
     stubEnvironment(true);
-    await render(true);
-    await act(async () => {
-      vi.advanceTimersByTime(3500);
-    });
-    expect(visible).toBe(true);
+    await render();
+    expect(touchOnly).toBe(true);
   });
 
   it("follows a pointer change at runtime, e.g. a trackpad attached to the iPad", async () => {
     stubEnvironment(true);
-    await render(true);
-    await switchPointer(false);
+    await render();
+    hoverNoneNow = false;
     await act(async () => {
-      vi.advanceTimersByTime(3500);
+      listeners.forEach((listener) => listener());
     });
-    expect(visible).toBe(false);
+    expect(touchOnly).toBe(false);
+  });
+
+  it("sets the document title and restores it on unmount", async () => {
+    stubEnvironment(false);
+    await render();
+    expect(doc.title).toBe("Drawing - ExcaliDash");
+    act(() => renderer?.unmount());
+    renderer = undefined;
+    expect(doc.title).toBe("ExcaliDash");
   });
 });
