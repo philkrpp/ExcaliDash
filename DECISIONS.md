@@ -12,6 +12,12 @@ Quelle: <Spec-/Plan-Pfad oder "Chat YYYY-MM-DD">
 Ersetzt: YYYY-MM-DD – <Titel>   (nur bei Revision)
 -->
 
+## 2026-11-25 – Admin-Nutzerliste: Karten bis xl
+
+Entscheidung: Die Nutzerliste im Admin zeigt Karten bis unter `xl` (1280 px), die Tabelle erst ab `xl` (Spec A1 sagte „unter `md`“). Eine Sprache mit derselben Basissprache wie die UI (z. B. `en-US`) erscheint als „English“ ohne Zusatzeintrag.
+Grund: Auf dem iPad quer (1194 px, ~886 px Inhalt) brach die Tabelle die Aktions-Buttons um und stieß an den Kartenrand (Impeccable-Critique, Runde 1); „English (editor only)“ war für en-US falsch.
+Quelle: Review-Runde 1, `docs/superpowers/specs/2026-11-25-pages-touch-pass-design.md`
+
 ## 2026-11-25 – Seiten-Review: alle 23 Punkte umsetzen
 
 Entscheidung: Alle Vorschläge aus `.impeccable/mocks/pages-review.html` werden umgesetzt; die Mocks dort gelten als gewählte Varianten. Neue Texte auf Englisch (Sidebar zusätzlich zh-CN über `i18n.ts`). ST2: Zusatzeintrag mit Sprachnamen statt Locale-Code. D6: Collection-Chip bleibt Picker, auf Touch 44 px Trefferfläche. S2: Trash steht immer in der Library, bewusst abweichend vom Upstream-Verhalten der Compact-Sidebar.

@@ -44,7 +44,7 @@ Dashboard and `/collections`, sidebar/layout, Settings, Profile, Admin, and the 
 10. **P1, P2:** "Change password" is a secondary button. Avatar initials are dark on amber (≥ 4.5:1).
 11. **ST1, ST2:** Tapping a settings row title toggles its switch. The switch is 52×30 on touch. The extra language entry reads e.g. "Deutsch (editor only)".
 12. **A1, A2, A3:**
-    - Below `md` the users list renders as cards without horizontal scroll.
+    - Below `xl` the users list renders as cards without horizontal scroll (was `md`; changed in review round 1, see `DECISIONS.md`).
     - The status is a switch, and deactivating asks for confirmation through `ConfirmModal`.
     - "Must change password" is a labeled switch.
     - Impersonate is disabled for the current user.
