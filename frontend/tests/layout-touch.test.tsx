@@ -67,7 +67,7 @@ describe("Layout resize handle", () => {
     });
   }
 
-  it("uses md:p-6 content padding instead of lg:p-8", async () => {
+  it("keeps 24px content padding from sm up instead of growing to lg:p-8", async () => {
     stubViewport(false);
     const renderer = await render(
       <Layout {...layoutProps}>
@@ -75,7 +75,7 @@ describe("Layout resize handle", () => {
       </Layout>,
     );
     const html = JSON.stringify(renderer.toJSON());
-    expect(html).toContain("md:p-6");
+    expect(html).toContain("sm:p-6");
     expect(html).not.toContain("lg:p-8");
   });
 });

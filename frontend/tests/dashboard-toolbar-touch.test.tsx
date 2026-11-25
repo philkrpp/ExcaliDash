@@ -16,7 +16,10 @@ afterEach(async () => {
   renderer = undefined;
 });
 
-const toolbar = async (hasSelection: boolean) => {
+const toolbar = async (
+  hasSelection: boolean,
+  onClearSelection: () => void = vi.fn(),
+) => {
   await act(async () => {
     renderer = create(
       <DashboardToolbar
@@ -39,6 +42,7 @@ const toolbar = async (hasSelection: boolean) => {
         onSortFieldChange={vi.fn()}
         onSortDirectionToggle={vi.fn()}
         onSelectAll={vi.fn()}
+        onClearSelection={onClearSelection}
         onBulkDeleteClick={vi.fn()}
         onBulkDuplicate={vi.fn()}
         onShowBulkMoveMenuChange={vi.fn()}
@@ -70,6 +74,15 @@ describe("dashboard toolbar on phones (D5)", () => {
     expect(classes).toContain("max-md:w-full");
     expect(classes).toContain("max-md:order-last");
     expect(JSON.stringify(renderer!.toJSON())).toContain("selected");
+  });
+
+  it("offers a phone-only ✕ that clears the selection", async () => {
+    const onClearSelection = vi.fn();
+    const root = await toolbar(true, onClearSelection);
+    const clear = root.findByProps({ "aria-label": "Clear selection" });
+    expect(clear.props.className).toContain("md:hidden");
+    clear.props.onClick();
+    expect(onClearSelection).toHaveBeenCalled();
   });
 
   it("shows import and new as icon-only buttons below md", async () => {

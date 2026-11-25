@@ -275,6 +275,7 @@ const DashboardView: React.FC = () => {
         onSortFieldChange={handleSortFieldChange}
         onSortDirectionToggle={handleSortDirectionToggle}
         onSelectAll={selection.handleSelectAll}
+        onClearSelection={selection.resetSelection}
         onBulkDeleteClick={actions.handleBulkDeleteClick}
         onBulkDuplicate={actions.handleBulkDuplicate}
         onShowBulkMoveMenuChange={setShowBulkMoveMenu}

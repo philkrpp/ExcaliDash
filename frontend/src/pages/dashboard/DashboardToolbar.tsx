@@ -47,6 +47,7 @@ type DashboardToolbarProps = {
   onSortFieldChange: (field: DrawingSortField) => void;
   onSortDirectionToggle: () => void;
   onSelectAll: () => void;
+  onClearSelection: () => void;
   onBulkDeleteClick: () => void;
   onBulkDuplicate: () => void;
   onShowBulkMoveMenuChange: (value: boolean) => void;
@@ -75,6 +76,7 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
   onSortFieldChange,
   onSortDirectionToggle,
   onSelectAll,
+  onClearSelection,
   onBulkDeleteClick,
   onBulkDuplicate,
   onShowBulkMoveMenuChange,
@@ -258,6 +260,17 @@ export const DashboardToolbar: React.FC<DashboardToolbarProps> = ({
             <span className="whitespace-nowrap rounded-lg bg-indigo-50 px-2 py-1 max-md:ml-auto text-xs font-bold tabular-nums text-indigo-700 animate-in fade-in zoom-in-95 duration-150 dark:bg-indigo-500/15 dark:text-indigo-300">
               {selectedCount} selected
             </span>
+          )}
+          {hasSelection && (
+            <button
+              type="button"
+              onClick={onClearSelection}
+              className="ui-icon-button md:hidden [@media(hover:none)]:h-11 [@media(hover:none)]:w-11"
+              title="Clear selection"
+              aria-label="Clear selection"
+            >
+              <X size={18} />
+            </button>
           )}
         </div>
         <div className="contents md:ml-auto md:flex md:w-auto md:items-center md:gap-2">
