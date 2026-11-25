@@ -61,9 +61,10 @@ const getEditorLanguageLabel = (language: string) => {
 /** Maps a stored locale to the UI language option that already covers it (en-US → en). */
 const getLanguageOption = (language: string) => {
   try {
-    const base = new Intl.Locale(language).language;
-    if (base === "en") return "en";
-    if (base === "zh") return "zh-CN";
+    const locale = new Intl.Locale(language).maximize();
+    if (locale.language === "en") return "en";
+    // Only Simplified Chinese is covered by the zh-CN UI; zh-TW/zh-HK stay editor-only.
+    if (locale.language === "zh" && locale.script === "Hans") return "zh-CN";
   } catch {
     // An invalid tag keeps its own "(editor only)" entry.
   }

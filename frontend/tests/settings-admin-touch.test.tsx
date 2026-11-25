@@ -152,6 +152,18 @@ describe("SettingsMainGrid", () => {
     expect(select.props.options).toHaveLength(2);
   });
 
+  it("keeps Traditional Chinese as its own editor-only entry", async () => {
+    locale.language = "zh-TW";
+    const r = await render(<SettingsMainGrid {...gridProps} />);
+    const select = r.root.findAll(
+      (n) =>
+        Array.isArray(n.props.options) &&
+        n.props.ariaLabel === "settings.language",
+    )[0];
+    expect(select.props.value).toBe("zh-TW");
+    expect(select.props.options).toHaveLength(3);
+  });
+
   it("falls back to the code when Intl.DisplayNames throws", async () => {
     locale.language = "de-DE";
     vi.spyOn(Intl, "DisplayNames").mockImplementation(() => {

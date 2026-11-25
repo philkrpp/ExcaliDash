@@ -107,7 +107,8 @@ const describeAuthStatusError = (error: unknown): string => {
   if (response && !isGatewayError) {
     return `The backend answered with HTTP ${response.status} while loading the authentication status. Check the backend logs and your reverse proxy configuration.`;
   }
-  return "Unable to reach the backend API. Check BACKEND_URL, FRONTEND_URL, and your reverse proxy configuration.";
+  const proxyStatus = isGatewayError ? ` (HTTP ${response.status} from the proxy)` : "";
+  return `Unable to reach the backend API${proxyStatus}. Check BACKEND_URL, FRONTEND_URL, and your reverse proxy configuration.`;
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({

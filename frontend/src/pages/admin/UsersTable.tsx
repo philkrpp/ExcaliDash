@@ -187,6 +187,8 @@ export const UsersTable: React.FC<UsersTableProps> = ({
       </SettingsSectionHeader>
 
       <div className="overflow-hidden rounded-2xl border-2 border-slate-800 bg-white shadow-[3px_3px_0px_0px_rgba(30,41,59,0.9)] dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.18)]">
+        {/* shortcut: viewport breakpoint, so a very wide sidebar at 1280–1500 px
+            still gets the (horizontally scrollable) table; use a container query if that matters. */}
         <ul className="divide-y divide-slate-100 dark:divide-neutral-800 xl:hidden">
           {users.map((user) => (
             <li key={user.id} className="space-y-3 px-4 py-3.5 text-sm">

@@ -112,9 +112,10 @@ describe("auth status errors", () => {
   it.each([502, 503, 504])(
     "treats a gateway error (%i) as an unreachable backend",
     async (status) => {
-      expect(await loadWith(httpError(status))).toContain(
-        "Unable to reach the backend API. Check BACKEND_URL",
-      );
+      const message = await loadWith(httpError(status));
+      expect(message).toContain("Unable to reach the backend API");
+      expect(message).toContain(`HTTP ${status} from the proxy`);
+      expect(message).toContain("Check BACKEND_URL");
     },
   );
 
