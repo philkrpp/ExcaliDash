@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Check, Copy } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Logo } from "../components/Logo";
 import * as api from "../api";
 import { getPasswordPolicy, validatePassword } from "../utils/passwordPolicy";
 import { PasswordRequirements } from "../components/PasswordRequirements";
 import { AuthStatusErrorPanel } from "../components/AuthStatusErrorPanel";
+import { CopyCommandButton } from "../components/CopyCommandButton";
 
 export const Register: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +15,6 @@ export const Register: React.FC = () => {
   const [setupCode, setSetupCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [copiedBootstrapCmd, setCopiedBootstrapCmd] = useState(false);
   const {
     register,
     authEnabled,
@@ -36,28 +35,6 @@ export const Register: React.FC = () => {
 
   const bootstrapLogsCommand =
     'docker compose -f docker-compose.prod.yml logs backend --tail=200 | grep "BOOTSTRAP SETUP"';
-
-  const copyBootstrapCommand = async () => {
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(bootstrapLogsCommand);
-      } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = bootstrapLogsCommand;
-        textarea.setAttribute("readonly", "true");
-        textarea.style.position = "fixed";
-        textarea.style.left = "-9999px";
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-      }
-      setCopiedBootstrapCmd(true);
-      window.setTimeout(() => setCopiedBootstrapCmd(false), 1500);
-    } catch {
-      // Clipboard access can be denied by the browser; the command remains visible.
-    }
-  };
 
   useEffect(() => {
     if (authStatusError) return;
@@ -173,23 +150,10 @@ export const Register: React.FC = () => {
                   <pre className="min-w-0 flex-1 whitespace-pre-wrap break-words text-[11px] leading-snug">
                     <code className="select-all">{bootstrapLogsCommand}</code>
                   </pre>
-                  <button
-                    type="button"
-                    onClick={() => void copyBootstrapCommand()}
-                    className="ui-icon-button h-7 w-7 shrink-0"
-                    aria-label={
-                      copiedBootstrapCmd
-                        ? "Copied docker command"
-                        : "Copy docker command"
-                    }
-                    title={copiedBootstrapCmd ? "Copied" : "Copy"}
-                  >
-                    {copiedBootstrapCmd ? (
-                      <Check size={14} />
-                    ) : (
-                      <Copy size={14} />
-                    )}
-                  </button>
+                  <CopyCommandButton
+                    command={bootstrapLogsCommand}
+                    label="Copy docker command"
+                  />
                 </div>
               </div>
             </div>
@@ -218,7 +182,7 @@ export const Register: React.FC = () => {
 
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="name" className="sr-only">
+              <label htmlFor="name" className="ui-field-label mb-1 block">
                 Name
               </label>
               <input
@@ -234,7 +198,7 @@ export const Register: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="email" className="sr-only">
+              <label htmlFor="email" className="ui-field-label mb-1 block">
                 Email address
               </label>
               <input
@@ -250,7 +214,7 @@ export const Register: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label htmlFor="password" className="ui-field-label mb-1 block">
                 Password
               </label>
               <input
@@ -275,7 +239,10 @@ export const Register: React.FC = () => {
             </div>
             {bootstrapRequired && (
               <div>
-                <label htmlFor="setupCode" className="sr-only">
+                <label
+                  htmlFor="setupCode"
+                  className="ui-field-label mb-1 block"
+                >
                   Bootstrap setup code
                 </label>
                 <input

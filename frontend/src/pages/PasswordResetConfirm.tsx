@@ -130,7 +130,7 @@ export const PasswordResetConfirm: React.FC = () => {
           )}
           <div className="space-y-4">
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label htmlFor="password" className="ui-field-label mb-1 block">
                 New password
               </label>
               <PasswordInput
@@ -153,7 +153,10 @@ export const PasswordResetConfirm: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="confirmPassword" className="sr-only">
+              <label
+                htmlFor="confirmPassword"
+                className="ui-field-label mb-1 block"
+              >
                 Confirm password
               </label>
               <PasswordInput

@@ -84,6 +84,25 @@ const storedIdentity = (value: string | null) => {
   }
 };
 
+const describeAuthStatusError = (error: unknown): string => {
+  const response = isAxiosError(error) ? error.response : undefined;
+  if (response?.status === 429) {
+    const retryAfter = Number.parseInt(
+      String(response.headers?.["retry-after"] ?? ""),
+      10,
+    );
+    const wait =
+      Number.isFinite(retryAfter) && retryAfter > 0
+        ? `${retryAfter} ${retryAfter === 1 ? "second" : "seconds"}`
+        : "a minute";
+    return `Too many requests. The server is rate limiting right now — try again in ${wait}.`;
+  }
+  if (response) {
+    return `The backend answered with HTTP ${response.status} while loading the authentication status. Check the backend logs and your reverse proxy configuration.`;
+  }
+  return "Unable to reach the backend API. Check BACKEND_URL, FRONTEND_URL, and your reverse proxy configuration.";
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
@@ -206,7 +225,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           applyUser(null);
           return;
         }
-      } catch {
+      } catch (statusError) {
         if (!isCurrent()) return;
         const cachedAuthEnabled = localStorage.getItem(AUTH_ENABLED_CACHE_KEY);
         if (cachedAuthEnabled === "false") {
@@ -224,9 +243,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           applyUser(null);
           return;
         }
-        setAuthStatusError(
-          "Unable to reach the backend API. Check BACKEND_URL, FRONTEND_URL, and your reverse proxy configuration.",
-        );
+        setAuthStatusError(describeAuthStatusError(statusError));
         setAuthEnabled(null);
         setRegistrationEnabled(false);
         setAuthMode("local");

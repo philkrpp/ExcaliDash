@@ -1,4 +1,5 @@
 import React from "react";
+import { Logo } from "./Logo";
 
 type AuthStatusErrorPanelProps = {
   message: string;
@@ -12,25 +13,28 @@ export const AuthStatusErrorPanel: React.FC<AuthStatusErrorPanelProps> = ({
   fullScreen = false,
 }) => {
   const panel = (
-    <div className="max-w-lg rounded-md bg-red-50 dark:bg-red-900/20 p-4 text-sm text-red-800 dark:text-red-200">
-      <div>{message}</div>
+    <div className="auth-panel text-sm" role="alert">
+      <div className="text-slate-700 dark:text-neutral-200">{message}</div>
       <button
         type="button"
         onClick={() => void onRetry()}
-        className="ui-button-secondary mt-3 text-xs"
+        className="ui-button-primary w-full"
       >
-        Retry connection
+        Try again
       </button>
     </div>
   );
 
   if (!fullScreen) {
-    return panel;
+    return <div className="max-w-lg">{panel}</div>;
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      {panel}
+    <div className="auth-page">
+      <div className="auth-wrap">
+        <Logo className="mx-auto h-12 w-auto" />
+        {panel}
+      </div>
     </div>
   );
 };

@@ -222,7 +222,10 @@ export const Login: React.FC = () => {
                 {!mustReset ? (
                   <>
                     <div>
-                      <label htmlFor="email" className="sr-only">
+                      <label
+                        htmlFor="email"
+                        className="ui-field-label mb-1 block"
+                      >
                         Email address
                       </label>
                       <input
@@ -238,7 +241,10 @@ export const Login: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label htmlFor="password" className="sr-only">
+                      <label
+                        htmlFor="password"
+                        className="ui-field-label mb-1 block"
+                      >
                         Password
                       </label>
                       <PasswordInput
@@ -256,7 +262,10 @@ export const Login: React.FC = () => {
                 ) : (
                   <>
                     <div>
-                      <label htmlFor="newPassword" className="sr-only">
+                      <label
+                        htmlFor="newPassword"
+                        className="ui-field-label mb-1 block"
+                      >
                         New password
                       </label>
                       <PasswordInput
@@ -274,7 +283,10 @@ export const Login: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label htmlFor="confirmNewPassword" className="sr-only">
+                      <label
+                        htmlFor="confirmNewPassword"
+                        className="ui-field-label mb-1 block"
+                      >
                         Confirm new password
                       </label>
                       <PasswordInput

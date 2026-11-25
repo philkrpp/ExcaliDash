@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Logo } from "../components/Logo";
 import { authPasswordResetCapability, authPasswordResetRequest } from "../api";
+import { CopyCommandButton } from "../components/CopyCommandButton";
+
+const recoveryCommand =
+  "cd backend && node scripts/admin-recover.cjs --identifier you@example.com --generate --activate --disable-login-rate-limit";
 
 export const PasswordResetRequest: React.FC = () => {
   const [enabled, setEnabled] = useState<boolean | null>(null);
@@ -59,7 +63,10 @@ export const PasswordResetRequest: React.FC = () => {
           {enabled && !submitted ? (
             <form className="ui-card p-5 space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="sr-only" htmlFor="reset-email">
+                <label
+                  className="ui-field-label mb-1 block"
+                  htmlFor="reset-email"
+                >
                   Email address
                 </label>
                 <input
@@ -99,10 +106,12 @@ export const PasswordResetRequest: React.FC = () => {
               <div className="text-xs text-gray-600 dark:text-gray-300">
                 If you are an admin and you’re locked out, run:
               </div>
-              <pre className="text-xs bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 overflow-x-auto">
-                cd backend && node scripts/admin-recover.cjs --identifier
-                you@example.com --generate --activate --disable-login-rate-limit
-              </pre>
+              <div className="flex items-start gap-2 rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900">
+                <pre className="min-w-0 flex-1 whitespace-pre-wrap break-words text-xs">
+                  <code className="select-all">{recoveryCommand}</code>
+                </pre>
+                <CopyCommandButton command={recoveryCommand} />
+              </div>
             </div>
           ) : null}
 
