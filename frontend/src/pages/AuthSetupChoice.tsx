@@ -114,7 +114,7 @@ export const AuthSetupChoice: React.FC = () => {
               ? "Choose Authentication Mode"
               : "Keep Authentication Disabled?"}
           </h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-sm text-slate-600 dark:text-neutral-400">
             {step === "choice"
               ? isMigrationMode
                 ? "Existing data detected. Create an admin account and restrict access."

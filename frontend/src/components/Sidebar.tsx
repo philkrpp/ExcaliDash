@@ -22,6 +22,7 @@ import {
   SidebarContextMenu,
   type SidebarContextMenuState,
 } from "./sidebar/SidebarContextMenu";
+import { anchorBelow } from "../utils/clampToViewport";
 import { useLocale } from "../context/useLocale";
 
 interface SidebarProps {
@@ -88,11 +89,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
   const handleItemMenuButton = (e: React.MouseEvent<HTMLElement>, id: string) => {
     e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-    // Right-align the menu under the button; SidebarContextMenu clamps it into the viewport.
+    // SidebarContextMenu clamps the anchored menu into the viewport.
     setContextMenu({
-      x: rect.right - SIDEBAR_MENU_WIDTH,
-      y: rect.bottom + 4,
+      ...anchorBelow(e.currentTarget.getBoundingClientRect(), SIDEBAR_MENU_WIDTH),
       type: "item",
       id,
     });

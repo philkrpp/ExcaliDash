@@ -9,6 +9,7 @@ import {
   DRAWING_MENU_WIDTH,
   DrawingCardContextMenu,
 } from "./drawing-card/DrawingCardContextMenu";
+import { anchorBelow } from "../utils/clampToViewport";
 import { hasCachedDrawingPreview } from "./drawing-card/previewCache";
 import { useDrawingPreview } from "./drawing-card/useDrawingPreview";
 import { usePreviewVisibility } from "./drawing-card/usePreviewVisibility";
@@ -147,8 +148,9 @@ export const DrawingCard = memo(function DrawingCard({
   const handleActionsClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     // Stop here so the document click listener that closes the menu does not see this click.
     e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-    setContextMenu({ x: rect.right - DRAWING_MENU_WIDTH, y: rect.bottom + 4 });
+    setContextMenu(
+      anchorBelow(e.currentTarget.getBoundingClientRect(), DRAWING_MENU_WIDTH),
+    );
     setShowMoveSubmenu(false);
   };
 

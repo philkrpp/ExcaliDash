@@ -109,6 +109,15 @@ describe("auth status errors", () => {
     );
   });
 
+  it.each([502, 503, 504])(
+    "treats a gateway error (%i) as an unreachable backend",
+    async (status) => {
+      expect(await loadWith(httpError(status))).toContain(
+        "Unable to reach the backend API. Check BACKEND_URL",
+      );
+    },
+  );
+
   it("names the HTTP status for other server errors", async () => {
     const message = await loadWith(httpError(500));
     expect(message).toContain("HTTP 500");

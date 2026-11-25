@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clampToViewport } from "../src/utils/clampToViewport";
+import { anchorBelow, clampToViewport } from "../src/utils/clampToViewport";
 
 const viewport = { width: 1440, height: 900 };
 
@@ -20,5 +20,14 @@ describe("clampToViewport", () => {
     expect(
       clampToViewport({ x: -20, y: 5 }, { width: 2000, height: 1000 }, viewport),
     ).toEqual({ x: 8, y: 8 });
+  });
+});
+
+describe("anchorBelow", () => {
+  it("right-aligns the menu just below its trigger", () => {
+    expect(anchorBelow({ right: 300, bottom: 120 }, 192)).toEqual({
+      x: 108,
+      y: 124,
+    });
   });
 });

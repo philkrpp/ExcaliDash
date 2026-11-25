@@ -14,3 +14,10 @@ export const clampToViewport = (
     Math.min(position.y, viewport.height - size.height - margin),
   ),
 });
+
+/** Top-left corner for a menu right-aligned just below its trigger button. */
+export const anchorBelow = (
+  trigger: { right: number; bottom: number },
+  menuWidth: number,
+  gap = 4,
+): Point => ({ x: trigger.right - menuWidth, y: trigger.bottom + gap });

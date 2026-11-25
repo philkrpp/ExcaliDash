@@ -106,7 +106,7 @@ export const PasswordResetRequest: React.FC = () => {
               <div className="text-xs text-gray-600 dark:text-gray-300">
                 If you are an admin and you’re locked out, run:
               </div>
-              <div className="flex items-start gap-2 rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900">
+              <div className="flex items-start gap-2 rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-neutral-700 dark:bg-neutral-900">
                 <pre className="min-w-0 flex-1 whitespace-pre-wrap break-words text-xs">
                   <code className="select-all">{recoveryCommand}</code>
                 </pre>

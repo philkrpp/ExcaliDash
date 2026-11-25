@@ -100,7 +100,10 @@ const describeAuthStatusError = (error: unknown): string => {
         : "a minute";
     return `Too many requests. The server is rate limiting right now — try again in ${wait}.`;
   }
-  if (response) {
+  // A proxy answering 502–504 means it could not reach the backend either.
+  const isGatewayError =
+    response !== undefined && response.status >= 502 && response.status <= 504;
+  if (response && !isGatewayError) {
     return `The backend answered with HTTP ${response.status} while loading the authentication status. Check the backend logs and your reverse proxy configuration.`;
   }
   return "Unable to reach the backend API. Check BACKEND_URL, FRONTEND_URL, and your reverse proxy configuration.";
