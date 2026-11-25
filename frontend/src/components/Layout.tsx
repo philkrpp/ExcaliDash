@@ -150,7 +150,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </div>
 
             <div className="flex-1 min-w-0 overflow-y-auto no-scrollbar">
-              <div className="w-full mx-auto p-4 sm:p-6 lg:p-8 min-h-full">
+              <div className="w-full mx-auto p-4 sm:p-6 md:p-6 min-h-full">
                 <UpdateBanner />
                 <ImpersonationBanner />
                 {children}
@@ -185,7 +185,7 @@ export const Layout: React.FC<LayoutProps> = ({
             />
 
             <div
-              className={`absolute top-0 right-0 w-1.5 h-full cursor-col-resize bg-transparent hover:bg-indigo-400 dark:hover:bg-indigo-500 transition-all duration-150 ${isResizing ? "bg-indigo-500 dark:bg-indigo-400 w-2" : ""} group`}
+              className={`absolute top-0 right-0 w-1.5 h-full cursor-col-resize bg-transparent hover:bg-indigo-400 dark:hover:bg-indigo-500 transition-all duration-150 ${isResizing ? "bg-indigo-500 dark:bg-indigo-400 w-2" : ""} group [@media(hover:none)]:hidden`}
               onMouseDown={handleMouseDown}
               title="Drag to resize sidebar"
             >
@@ -211,7 +211,7 @@ export const Layout: React.FC<LayoutProps> = ({
             />
 
             <div
-              className={`absolute top-0 right-0 w-1.5 h-full cursor-col-resize bg-transparent hover:bg-indigo-400 dark:hover:bg-indigo-500 transition-all duration-150 ${isResizing ? "bg-indigo-500 dark:bg-indigo-400 w-2" : ""} group`}
+              className={`absolute top-0 right-0 w-1.5 h-full cursor-col-resize bg-transparent hover:bg-indigo-400 dark:hover:bg-indigo-500 transition-all duration-150 ${isResizing ? "bg-indigo-500 dark:bg-indigo-400 w-2" : ""} group [@media(hover:none)]:hidden`}
               onMouseDown={handleMouseDown}
               title="Drag to resize sidebar"
             >
@@ -219,7 +219,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </div>
           </aside>
           <main className="flex-1 min-w-0 bg-white/40 dark:bg-neutral-900/40 backdrop-blur-sm rounded-2xl border border-white/50 dark:border-neutral-800/50 shadow-sm h-full transition-colors duration-200 overflow-y-auto no-scrollbar">
-            <div className="w-full mx-auto p-4 sm:p-6 lg:p-8 min-h-full">
+            <div className="w-full mx-auto p-4 sm:p-6 md:p-6 min-h-full">
               <UpdateBanner />
               <ImpersonationBanner />
               {children}

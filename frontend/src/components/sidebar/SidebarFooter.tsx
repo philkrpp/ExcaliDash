@@ -2,7 +2,6 @@ import React, { useEffect, useId, useRef, useState } from "react";
 import {
   Shield,
   Settings as SettingsIcon,
-  Trash2,
   User,
   LogOut,
   ChevronUp,
@@ -26,7 +25,6 @@ interface SidebarFooterProps {
   selectedCollectionId: string | null | undefined;
   authEnabled: boolean | null;
   user: UserLike;
-  onDrop?: (e: React.DragEvent, collectionId: string | null) => void;
   onLogout: () => void;
 }
 
@@ -42,18 +40,24 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   selectedCollectionId,
   authEnabled,
   user,
-  onDrop,
   onLogout,
 }) => {
   const navigate = useNavigate();
   const { t } = useLocale();
-  const [isTrashDragOver, setIsTrashDragOver] = useState(false);
   const [compact] = usePreference("compactSidebar", true);
   const [isOpen, setIsOpen] = useState(false);
   const footerRef = useRef<HTMLDivElement>(null);
   const actionsId = useId();
   const isAdmin = user?.role === "ADMIN";
   const name = user?.name || "Workspace";
+  const pageLabel =
+    selectedCollectionId === "SETTINGS"
+      ? t("sidebar.settings")
+      : selectedCollectionId === "PROFILE"
+        ? t("sidebar.profile")
+        : selectedCollectionId === "ADMIN"
+          ? t("sidebar.admin")
+          : null;
   const selectPage = (path: string) => {
     setIsOpen(false);
     navigate(path);
@@ -87,11 +91,23 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
           aria-expanded={isOpen}
           aria-controls={actionsId}
           onClick={() => setIsOpen((open) => !open)}
-          onDragEnter={() => setIsOpen(true)}
-          className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 dark:text-neutral-200 dark:hover:bg-neutral-800"
+          aria-current={pageLabel ? "page" : undefined}
+          className={clsx(
+            "flex w-full items-center gap-3 rounded-xl px-2 py-2 text-sm font-semibold transition-colors",
+            pageLabel
+              ? "bg-indigo-50 text-indigo-900 dark:bg-neutral-700 dark:text-white"
+              : "text-slate-700 hover:bg-slate-100 dark:text-neutral-200 dark:hover:bg-neutral-800",
+          )}
         >
           <UserAvatar name={name} size="sm" />
-          <span className="min-w-0 flex-1 truncate text-left">{name}</span>
+          <span className="min-w-0 flex-1 truncate text-left">
+            {name}
+            {pageLabel && (
+              <span className="font-normal text-slate-600 dark:text-neutral-300">
+                {` · ${pageLabel}`}
+              </span>
+            )}
+          </span>
           <ChevronUp
             size={16}
             className={clsx(
@@ -110,31 +126,6 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
             : "mb-3 space-y-2",
         )}
       >
-        <button
-          onDragOver={(e) => {
-            e.preventDefault();
-            setIsTrashDragOver(true);
-          }}
-          onDragLeave={() => setIsTrashDragOver(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setIsTrashDragOver(false);
-            onDrop?.(e, "trash");
-          }}
-          onClick={() => selectPage("/collections?id=trash")}
-          className={clsx(
-            compact
-              ? "ui-menu-item"
-              : "ui-button-secondary w-full justify-start",
-            selectedCollectionId === "trash" || isTrashDragOver
-              ? "bg-rose-50 dark:bg-rose-900/30 text-rose-900 dark:text-rose-300 -translate-y-0.5"
-              : "hover:bg-rose-50 hover:text-rose-900 dark:hover:bg-rose-900/30 dark:hover:text-rose-300",
-          )}
-        >
-          <Trash2 size={18} />
-          <span className="min-w-0 flex-1 text-left">{t("sidebar.trash")}</span>
-        </button>
-
         {authEnabled !== null && (
           <button
             onClick={() => selectPage("/profile")}

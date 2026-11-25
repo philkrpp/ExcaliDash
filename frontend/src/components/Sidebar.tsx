@@ -6,6 +6,7 @@ import {
   Archive,
   FolderOpen,
   Users,
+  Trash2,
 } from "lucide-react";
 import type { Collection } from "../types";
 import clsx from "clsx";
@@ -17,6 +18,7 @@ import { displayFontFamily } from "../utils/displayFont";
 import { SidebarItem } from "./sidebar/SidebarItem";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import {
+  SIDEBAR_MENU_WIDTH,
   SidebarContextMenu,
   type SidebarContextMenuState,
 } from "./sidebar/SidebarContextMenu";
@@ -84,6 +86,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (!collection?.isOwner && collection?.isOwner !== undefined) return;
     setContextMenu({ x: e.clientX, y: e.clientY, type: "item", id });
   };
+  const handleItemMenuButton = (e: React.MouseEvent<HTMLElement>, id: string) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    // Right-align the menu under the button; SidebarContextMenu clamps it into the viewport.
+    setContextMenu({
+      x: rect.right - SIDEBAR_MENU_WIDTH,
+      y: rect.bottom + 4,
+      type: "item",
+      id,
+    });
+  };
   const handleBackgroundContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     setContextMenu({ x: e.clientX, y: e.clientY, type: "background" });
@@ -108,14 +121,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onContextMenu={handleBackgroundContextMenu}
         >
           <div className="space-y-1">
-            <div className="px-6 pb-2 text-xs font-semibold text-slate-400 dark:text-neutral-500">
+            <div className="px-6 pb-2 text-xs font-semibold text-slate-500 dark:text-neutral-400">
               {t("sidebar.library")}
             </div>
             <div className="pl-3 pr-2">
               <button
                 onClick={() => onSelectCollection(undefined)}
                 className={clsx(
-                  "w-full flex items-center gap-3 px-3 py-2 text-sm font-semibold rounded-xl border-2",
+                  "w-full flex items-center gap-3 px-3 py-2 [@media(hover:none)]:py-2.5 text-sm font-semibold rounded-xl border-2",
                   selectedCollectionId === undefined
                     ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-900 dark:text-indigo-100 border-slate-800 dark:border-neutral-600 shadow-[1.5px_1.5px_0px_0px_rgba(30,41,59,0.9)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.18)]"
                     : "text-slate-600 dark:text-neutral-400 border-transparent hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-100",
@@ -149,10 +162,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => onSelectCollection(null)}
               onDrop={onDrop}
             />
+            <SidebarItem
+              id={"trash"}
+              icon={<Trash2 size={18} />}
+              label={t("sidebar.trash")}
+              isActive={selectedCollectionId === "trash"}
+              onClick={() => onSelectCollection("trash")}
+              onDrop={onDrop}
+            />
           </div>
           <div className="space-y-1">
             <div className="flex items-center justify-between px-6 pb-2 group/header">
-              <span className="text-xs font-semibold text-slate-400 dark:text-neutral-500">
+              <span className="text-xs font-semibold text-slate-500 dark:text-neutral-400">
                 {t("sidebar.collections")}
               </span>
               <button
@@ -160,7 +181,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   e.stopPropagation();
                   setIsCreating(true);
                 }}
-                className="ui-icon-button h-7 w-7 border-transparent bg-transparent text-slate-400 shadow-none opacity-70 hover:opacity-100 group-hover/header:opacity-100 dark:border-transparent dark:bg-transparent dark:text-neutral-500 dark:shadow-none"
+                className="ui-icon-button h-7 w-7 border-transparent bg-transparent text-slate-400 shadow-none opacity-70 hover:opacity-100 group-hover/header:opacity-100 dark:border-transparent dark:bg-transparent dark:text-neutral-500 dark:shadow-none [@media(hover:none)]:h-11 [@media(hover:none)]:w-11 [@media(hover:none)]:opacity-100"
+                aria-label="New collection"
                 title={t("sidebar.newCollection")}
               >
                 <Plus size={14} strokeWidth={2.5} />
@@ -217,6 +239,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     setEditName(collection.name);
                   }}
                   onContextMenu={(e) => handleItemContextMenu(e, collection.id)}
+                  onMenuClick={
+                    collection.isOwner === false
+                      ? undefined
+                      : (e) => handleItemMenuButton(e, collection.id)
+                  }
                   isEditing={editingId === collection.id}
                   editValue={editName}
                   onEditChange={setEditName}
@@ -256,7 +283,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           selectedCollectionId={selectedCollectionId}
           authEnabled={authEnabled}
           user={user}
-          onDrop={onDrop}
           onLogout={logout}
         />
       </div>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import clsx from "clsx";
+import { MoreHorizontal } from "lucide-react";
 import { InlineEditInput } from "../InlineEditInput";
 
 interface SidebarItemProps {
@@ -10,6 +11,8 @@ interface SidebarItemProps {
   onClick: () => void;
   onDoubleClick?: () => void;
   onContextMenu?: (e: React.MouseEvent) => void;
+  /** Opens the item menu from a visible button (touch has no right-click). */
+  onMenuClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   extraAction?: React.ReactNode;
   isEditing?: boolean;
   editValue?: string;
@@ -27,6 +30,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   onClick,
   onDoubleClick,
   onContextMenu,
+  onMenuClick,
   extraAction,
   isEditing,
   editValue,
@@ -74,7 +78,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
             onDrop?.(e, id);
           }}
           className={clsx(
-            "w-full flex items-center gap-3 px-3 py-2 text-sm font-semibold rounded-xl border-2 group cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-2 dark:focus-visible:ring-neutral-500",
+            "w-full flex items-center gap-3 px-3 py-2 [@media(hover:none)]:py-2.5 text-sm font-semibold rounded-xl border-2 group cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-2 dark:focus-visible:ring-neutral-500",
             isActive || isDragOver
               ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-900 dark:text-indigo-100 border-slate-800 dark:border-neutral-600 shadow-[1.5px_1.5px_0px_0px_rgba(30,41,59,0.9)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,0.18)]"
               : "text-slate-600 dark:text-neutral-400 border-transparent hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-100",
@@ -96,6 +100,19 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
             <div className="flex items-center gap-1 flex-shrink-0">
               {extraAction}
             </div>
+          )}
+          {onMenuClick && (
+            <button
+              type="button"
+              aria-label={`Actions for ${label}`}
+              aria-haspopup="menu"
+              onClick={onMenuClick}
+              onDoubleClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+              className="ui-icon-button -mr-1 h-7 w-7 flex-shrink-0 border-transparent bg-transparent text-slate-500 opacity-0 shadow-none focus-visible:opacity-100 group-hover/item:opacity-100 group-focus-within/item:opacity-100 dark:border-transparent dark:bg-transparent dark:text-neutral-400 dark:shadow-none [@media(hover:none)]:-my-3 [@media(hover:none)]:-mr-2 [@media(hover:none)]:h-11 [@media(hover:none)]:w-11 [@media(hover:none)]:opacity-100"
+            >
+              <MoreHorizontal size={16} />
+            </button>
           )}
         </div>
       )}

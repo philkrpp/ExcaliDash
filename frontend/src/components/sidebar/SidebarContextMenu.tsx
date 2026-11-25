@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { Edit2, Plus, Share2, Trash2 } from "lucide-react";
 import type { Collection } from "../../types";
+import { clampToViewport } from "../../utils/clampToViewport";
+
+/** Matches the `w-52` class on the menu; used to right-align it under a button. */
+export const SIDEBAR_MENU_WIDTH = 208;
 
 export type SidebarContextMenuState = {
   x: number;
@@ -27,7 +31,28 @@ export const SidebarContextMenu: React.FC<SidebarContextMenuProps> = ({
   onRenameCollection,
   onShareCollection,
   onDeleteCollection,
-}) => (
+}) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({
+    x: contextMenu.x,
+    y: contextMenu.y,
+  });
+
+  useLayoutEffect(() => {
+    const requested = { x: contextMenu.x, y: contextMenu.y };
+    const rect = menuRef.current?.getBoundingClientRect();
+    setPosition(
+      rect
+        ? clampToViewport(
+            requested,
+            { width: rect.width, height: rect.height },
+            { width: window.innerWidth, height: window.innerHeight },
+          )
+        : requested,
+    );
+  }, [contextMenu.x, contextMenu.y, contextMenu.type, contextMenu.id]);
+
+  return (
   <div
     className="fixed inset-0 z-50"
     onClick={onClose}
@@ -37,8 +62,9 @@ export const SidebarContextMenu: React.FC<SidebarContextMenuProps> = ({
     }}
   >
     <div
+      ref={menuRef}
       className="ui-menu absolute w-52 animate-in fade-in zoom-in-95 duration-100"
-      style={{ top: contextMenu.y, left: contextMenu.x }}
+      style={{ top: position.y, left: position.x }}
       onClick={(e) => e.stopPropagation()}
     >
       {contextMenu.type === "item" && contextMenu.id ? (
@@ -88,4 +114,5 @@ export const SidebarContextMenu: React.FC<SidebarContextMenuProps> = ({
       )}
     </div>
   </div>
-);
+  );
+};
