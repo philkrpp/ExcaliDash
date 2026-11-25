@@ -12,4 +12,4 @@ to https://whiteboard.philippkrapp.de on every push, using `docker-compose.cooli
   git switch philippkrapp && git merge v<new-tag>   # a release tag, not an arbitrary main commit
   git push origin philippkrapp                        # deploys
   ```
-- Runbook (secrets, DB, R2, Authentik, restore): compleadly-proxmox `docs/whiteboard.md`.
+- Runbook (secrets, DB, R2, Authentik, restore): proxmox `docs/whiteboard.md`.
