@@ -16,8 +16,19 @@ const searchPlaceholder = "Search drawings...";
 async function applyDashboardSearch(page: Page, term: string) {
   const searchInput = page.getByPlaceholder(searchPlaceholder);
   await searchInput.waitFor();
-  await searchInput.fill("");
+  // Same term: the debounced value would not change, so no request follows.
+  if ((await searchInput.inputValue()) === term) return;
+  // The grid filters live, but the debounced server refresh that follows
+  // resets the selection; wait for it so a following "Select All" sticks.
+  const refreshed = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return (
+      url.pathname.endsWith("/drawings") &&
+      url.searchParams.get("search") === term
+    );
+  });
   await searchInput.fill(term);
+  await refreshed;
 }
 
 async function ensureCardVisible(
