@@ -95,6 +95,11 @@
     @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-0 bg-transparent text-slate-600 shadow-none transition-colors hover:bg-slate-100 hover:text-indigo-600 disabled:pointer-events-none disabled:opacity-40 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-indigo-300;
   }
 
+  /* Floating editor chrome; matches Excalidraw's island surface (--island-bg-color, --shadow-island). */
+  .editor-island {
+    @apply pointer-events-auto flex h-11 min-w-0 items-center rounded-lg bg-white px-0.5 shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.06),0_2px_8px_rgba(0,0,0,0.07)] dark:bg-[#232329] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_2px_8px_rgba(0,0,0,0.4)] [@media(hover:none)]:px-0;
+  }
+
   /* 44px touch targets on touch screens (iPad) */
   @media (hover: none) {
     .ui-toolbar-button {
@@ -259,4 +264,13 @@ html.dark body {
 }
 .dark .drawing-preview [data-preview-raster="true"] {
   filter: invert(100%) hue-rotate(180deg) saturate(1.25);
+}
+
+/* Library trigger as icon only: its label pushed the button off-screen on iPad mini portrait
+   and takes room the editor's action island needs. */
+[data-editor-root]
+  .excalidraw
+  .default-sidebar-trigger
+  .sidebar-trigger__label {
+  display: none;
 }

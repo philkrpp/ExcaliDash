@@ -2,379 +2,215 @@ import React from "react";
 import type { DrawingSnapshotFull } from "../../api";
 import { HistoryPreviewCanvas } from "./HistoryPreviewCanvas";
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
-import {
-  ArrowLeft,
-  CloudOff,
-  Download,
-  History,
-  Loader2,
-  Share2,
-} from "lucide-react";
-import clsx from "clsx";
 import { Toaster } from "sonner";
 import { LanguageSelector } from "../../components/LanguageSelector";
-import { InlineEditInput } from "../../components/InlineEditInput";
 import { GridStepSelector } from "../../components/GridStepSelector";
 import { ShareModal } from "../../components/ShareModal";
-import { UserAvatar as ProfileAvatar } from "../../components/UserAvatar";
-import type { UserIdentity } from "../../utils/identity";
 import { UIOptions, validateEmbeddableUrl } from "./shared";
-import type { Peer } from "./useEditorCollaboration";
+import {
+  EditorActionsIsland,
+  EditorOverflowIsland,
+  EditorTitleIsland,
+  type EditorChromeProps,
+} from "./EditorChrome";
+import type { EditorChromeLayout } from "./useEditorChrome";
 
-type EditorViewProps = {
-  id?: string;
-  accessLevel: "none" | "view" | "edit" | "owner";
-  autosaveFailing: boolean;
-  canEdit: boolean;
-  drawingName: string;
-  editorContainerRef: React.RefObject<HTMLDivElement>;
-  initialData: any;
-  isTouchOnly: boolean;
-  isHistoryOpen: boolean;
-  historyPreview: DrawingSnapshotFull | null;
+type EditorViewProps = EditorChromeProps & {
+  chromeLayout?: EditorChromeLayout;
   historyButtonRef: React.RefObject<HTMLButtonElement>;
   shareButtonRef: React.RefObject<HTMLButtonElement>;
-  isRenaming: boolean;
-  isSavingOnLeave: boolean;
+  editorContainerRef: React.RefObject<HTMLDivElement>;
+  initialData: any;
+  isHistoryOpen: boolean;
+  historyPreview: DrawingSnapshotFull | null;
   isSceneLoading: boolean;
   langCode: string;
   loadError: string | null;
-  me: UserIdentity;
-  newName: string;
-  peers: Peer[];
-  followedUserId: string | null;
-  onToggleFollow: (peer: Peer) => void;
   theme: string;
-  onBackClick: () => void;
-  onBackIntent: () => void;
   onCanvasChange: (
     elements: readonly any[],
     appState: any,
     files?: Record<string, any>,
   ) => void;
   onCanvasDropCapture: (event: React.DragEvent<HTMLDivElement>) => void;
-  onExportClick: () => void;
   onLibraryChange: (items: readonly any[]) => void;
   onNavigateHome: () => void;
-  onNewNameChange: (value: string) => void;
   onPointerUpdate: (payload: any) => void;
-  onRenameCancel: () => void;
-  onRenameStart: () => void;
-  onRenameSubmit: () => void;
   onSetExcalidrawAPI: (api: any) => void;
   onSetLangCode: (langCode: string) => void;
   gridStep: number;
   onSetGridStep: (gridStep: number) => void;
-  onShareOpen: () => void;
   isShareOpen: boolean;
   onCloseShare: () => void;
-  onHistoryOpen: () => void;
   onToggleTheme: () => void;
 };
 
-const CollaboratorAvatar = ({
-  user,
-  label,
-  inactive = false,
-  followed = false,
-  onClick,
-}: {
-  user: UserIdentity;
-  label: string;
-  inactive?: boolean;
-  followed?: boolean;
-  onClick?: () => void;
+export const EditorView: React.FC<EditorViewProps> = ({
+  historyButtonRef,
+  shareButtonRef,
+  ...chrome
 }) => {
-  const title = onClick
-    ? `${followed ? "Stop following" : "Follow"} ${label}`
-    : label;
-  const avatar = (
-    <ProfileAvatar
-      name={user.name}
-      size="toolbar"
-      className={clsx(
-        "transition-all duration-300",
-        inactive && "opacity-30 grayscale",
-      )}
-    />
-  );
+  const {
+    id,
+    accessLevel,
+    canEdit,
+    chromeLayout = "wide",
+    drawingName,
+    editorContainerRef,
+    initialData,
+    isHistoryOpen,
+    historyPreview,
+    isSceneLoading,
+    langCode,
+    loadError,
+    theme,
+    onCanvasChange,
+    onCanvasDropCapture,
+    onLibraryChange,
+    onNavigateHome,
+    onPointerUpdate,
+    onSetExcalidrawAPI,
+    onSetLangCode,
+    gridStep,
+    onSetGridStep,
+    isShareOpen,
+    onCloseShare,
+    onToggleTheme,
+  } = chrome;
+
   return (
-    <div className="relative group" data-testid="collaborator-avatar">
-      {onClick ? (
-        <button
-          type="button"
-          onClick={onClick}
-          aria-pressed={followed}
-          aria-label={title}
-          className={clsx(
-            "block rounded-[38%]",
-            followed &&
-              "ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-neutral-900",
-          )}
-        >
-          {avatar}
-        </button>
-      ) : (
-        avatar
-      )}
-      <div className="pointer-events-none absolute right-0 top-full z-50 mt-2 whitespace-nowrap rounded-lg bg-slate-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-        {title}
+    <div
+      data-editor-root
+      className="h-dvh bg-white dark:bg-neutral-950 overflow-hidden"
+      onKeyDownCapture={(event) => {
+        if (event.altKey && event.shiftKey && event.code === "KeyD") {
+          event.preventDefault();
+          event.stopPropagation();
+          onToggleTheme();
+        }
+      }}
+    >
+      {accessLevel === "owner" && id ? (
+        <ShareModal
+          drawingId={id}
+          drawingName={drawingName}
+          isOpen={isShareOpen}
+          onClose={onCloseShare}
+          anchorRef={shareButtonRef}
+        />
+      ) : null}
+      <div
+        ref={editorContainerRef}
+        className="relative h-full w-full"
+        onDropCapture={(event) => {
+          if (isHistoryOpen) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          onCanvasDropCapture(event);
+        }}
+      >
+        {loadError ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white dark:bg-neutral-950 px-6">
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                Unable to open drawing
+              </h2>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                {loadError}
+              </p>
+            </div>
+            <button
+              onClick={onNavigateHome}
+              className="ui-button-secondary px-4"
+            >
+              Back to dashboard
+            </button>
+          </div>
+        ) : initialData ? (
+          <Excalidraw
+            key={id}
+            theme={theme === "dark" ? "dark" : "light"}
+            langCode={langCode}
+            initialData={initialData}
+            onChange={onCanvasChange}
+            onPointerUpdate={onPointerUpdate}
+            onLibraryChange={onLibraryChange}
+            excalidrawAPI={onSetExcalidrawAPI}
+            UIOptions={UIOptions}
+            validateEmbeddable={validateEmbeddableUrl}
+            viewModeEnabled={!canEdit || isHistoryOpen}
+            renderTopRightUI={(isMobile) =>
+              !isMobile && chromeLayout === "wide" ? (
+                // Only the wide layout has visible history/share buttons for popovers to anchor to;
+                // otherwise the refs stay empty and the popovers use their default top-right spot.
+                <EditorActionsIsland
+                  {...chrome}
+                  historyButtonRef={historyButtonRef}
+                  shareButtonRef={shareButtonRef}
+                />
+              ) : null
+            }
+          >
+            <MainMenu>
+              <MainMenu.Item onSelect={onToggleTheme} shortcut="Shift+Alt+D">
+                {theme === "dark" ? "Light mode" : "Dark mode"}
+              </MainMenu.Item>
+              <MainMenu.DefaultItems.SaveAsImage />
+              <MainMenu.DefaultItems.ClearCanvas />
+              <MainMenu.DefaultItems.ChangeCanvasBackground />
+              <MainMenu.DefaultItems.Help />
+              <MainMenu.Separator />
+              <MainMenu.ItemCustom>
+                <GridStepSelector
+                  gridStep={gridStep}
+                  onChange={onSetGridStep}
+                />
+              </MainMenu.ItemCustom>
+              <MainMenu.ItemCustom>
+                <LanguageSelector
+                  langCode={langCode}
+                  onChange={onSetLangCode}
+                />
+              </MainMenu.ItemCustom>
+            </MainMenu>
+          </Excalidraw>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-gray-500 dark:text-gray-400">
+            <span className="text-sm font-medium">
+              {isSceneLoading ? "Loading drawing..." : "Preparing canvas..."}
+            </span>
+          </div>
+        )}
+        {historyPreview ? (
+          <HistoryPreviewCanvas
+            snapshot={historyPreview}
+            theme={theme}
+            langCode={langCode}
+          />
+        ) : null}
+        {!loadError &&
+        (chromeLayout === "wide" || chromeLayout === "narrow") ? (
+          <EditorTitleIsland {...chrome} showTitle={chromeLayout === "wide"} />
+        ) : null}
+        {!loadError && chromeLayout !== "wide" ? (
+          <div
+            className={
+              chromeLayout === "mobile"
+                ? // shortcut: clears Excalidraw's ~50px mobile bottom bar; measure it if that bar changes.
+                  "absolute bottom-[72px] right-4 z-[3]"
+                : "absolute bottom-4 right-[60px] z-[3]"
+            }
+          >
+            <EditorOverflowIsland
+              {...chrome}
+              showBack={chromeLayout !== "narrow"}
+            />
+          </div>
+        ) : null}
+        <Toaster position="bottom-center" />
       </div>
     </div>
   );
 };
-
-export const EditorView: React.FC<EditorViewProps> = ({
-  id,
-  accessLevel,
-  autosaveFailing,
-  canEdit,
-  drawingName,
-  editorContainerRef,
-  initialData,
-  isTouchOnly,
-  isHistoryOpen,
-  historyPreview,
-  historyButtonRef,
-  shareButtonRef,
-  isRenaming,
-  isSavingOnLeave,
-  isSceneLoading,
-  langCode,
-  loadError,
-  me,
-  newName,
-  peers,
-  followedUserId,
-  onToggleFollow,
-  theme,
-  onBackClick,
-  onBackIntent,
-  onCanvasChange,
-  onCanvasDropCapture,
-  onExportClick,
-  onLibraryChange,
-  onNavigateHome,
-  onNewNameChange,
-  onPointerUpdate,
-  onRenameCancel,
-  onRenameStart,
-  onRenameSubmit,
-  onSetExcalidrawAPI,
-  onSetLangCode,
-  gridStep,
-  onSetGridStep,
-  onShareOpen,
-  isShareOpen,
-  onCloseShare,
-  onHistoryOpen,
-  onToggleTheme,
-}) => (
-  <div
-    data-editor-root
-    className="h-dvh flex flex-col bg-white dark:bg-neutral-950 overflow-hidden"
-    onKeyDownCapture={(event) => {
-      if (event.altKey && event.shiftKey && event.code === "KeyD") {
-        event.preventDefault();
-        event.stopPropagation();
-        onToggleTheme();
-      }
-    }}
-  >
-    <header className="h-16 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 flex items-center gap-3 px-4 justify-between z-10 fixed top-0 left-0 right-0">
-      <div className="flex min-w-0 flex-1 items-center gap-4">
-        <button
-          onClick={onBackClick}
-          onPointerEnter={onBackIntent}
-          onFocus={onBackIntent}
-          disabled={isSavingOnLeave}
-          className={`flex shrink-0 items-center gap-2 p-2 [@media(hover:none)]:p-3 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-full text-gray-600 dark:text-gray-300 disabled:opacity-50 disabled:cursor-wait transition-all duration-200 ${isSavingOnLeave ? "pr-4" : ""}`}
-        >
-          {isSavingOnLeave ? (
-            <>
-              <Loader2 size={20} className="animate-spin" />
-              <span className="text-sm font-medium">Saving changes...</span>
-            </>
-          ) : (
-            <ArrowLeft size={20} />
-          )}
-        </button>
-        {isRenaming ? (
-          <InlineEditInput
-            aria-label="Drawing name"
-            value={newName}
-            onChange={(e) => onNewNameChange(e.target.value)}
-            onCommit={onRenameSubmit}
-            onCancel={onRenameCancel}
-            className="font-medium text-gray-900 dark:text-white bg-transparent px-2 py-1 border-2 border-indigo-500 rounded-md outline-none min-w-0 max-w-full"
-            style={{ width: `${Math.max(200, newName.length * 9 + 20)}px` }}
-          />
-        ) : (
-          <h1
-            className="min-w-0 truncate touch-manipulation font-medium text-gray-900 dark:text-white px-2 py-1 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded cursor-text"
-            title={drawingName}
-            onDoubleClick={onRenameStart}
-            // Touch screens have no tooltip or dblclick: a tap shows the full (truncated) name in the rename field.
-            onClick={isTouchOnly ? onRenameStart : undefined}
-          >
-            {drawingName}
-          </h1>
-        )}
-      </div>
-      <div className="flex shrink-0 items-center gap-3">
-        {canEdit && autosaveFailing ? (
-          <span
-            className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800"
-            title="Your recent changes could not be saved. Check your connection and try again."
-            role="status"
-          >
-            <CloudOff size={14} />
-            Unsaved changes
-          </span>
-        ) : null}
-        {!canEdit ? (
-          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
-            Read-only
-          </span>
-        ) : null}
-        {canEdit && id ? (
-          <button
-            ref={historyButtonRef}
-            onClick={onHistoryOpen}
-            className="ui-toolbar-button"
-            title="Version History"
-          >
-            <History size={20} />
-          </button>
-        ) : null}
-        {accessLevel === "owner" && id ? (
-          <div className="relative inline-flex">
-            <button
-              ref={shareButtonRef}
-              onClick={onShareOpen}
-              className="ui-toolbar-button"
-              title="Share"
-            >
-              <Share2 size={20} />
-            </button>
-          </div>
-        ) : null}
-        <div className="h-6 w-px bg-gray-300 dark:bg-gray-700" />
-        <button
-          onClick={onExportClick}
-          className="ui-toolbar-button"
-          title="Export drawing"
-        >
-          <Download size={20} />
-        </button>
-        <div className="h-6 w-px bg-gray-300 dark:bg-gray-700" />
-        <div className="flex items-center">
-          <CollaboratorAvatar user={me} label={`${me.name} (You)`} />
-          {peers.length > 0 ? (
-            <>
-              <div className="h-6 w-px bg-gray-300 dark:bg-gray-700 mx-2" />
-              <div className="flex items-center gap-2">
-                {peers.map((peer) => (
-                  <CollaboratorAvatar
-                    key={peer.id}
-                    user={peer}
-                    label={peer.name}
-                    inactive={!peer.isActive}
-                    followed={peer.id === followedUserId}
-                    onClick={() => onToggleFollow(peer)}
-                  />
-                ))}
-              </div>
-            </>
-          ) : null}
-        </div>
-      </div>
-    </header>
-    {accessLevel === "owner" && id ? (
-      <ShareModal
-        drawingId={id}
-        drawingName={drawingName}
-        isOpen={isShareOpen}
-        onClose={onCloseShare}
-        anchorRef={shareButtonRef}
-      />
-    ) : null}
-    <div
-      ref={editorContainerRef}
-      className="relative w-full flex-1"
-      onDropCapture={(event) => {
-        if (isHistoryOpen) {
-          event.preventDefault();
-          event.stopPropagation();
-          return;
-        }
-        onCanvasDropCapture(event);
-      }}
-      style={{
-        height: "calc(100dvh - 4rem)",
-        marginTop: "4rem",
-      }}
-    >
-      {loadError ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white dark:bg-neutral-950 px-6">
-          <div className="text-center">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              Unable to open drawing
-            </h2>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              {loadError}
-            </p>
-          </div>
-          <button onClick={onNavigateHome} className="ui-button-secondary px-4">
-            Back to dashboard
-          </button>
-        </div>
-      ) : initialData ? (
-        <Excalidraw
-          key={id}
-          theme={theme === "dark" ? "dark" : "light"}
-          langCode={langCode}
-          initialData={initialData}
-          onChange={onCanvasChange}
-          onPointerUpdate={onPointerUpdate}
-          onLibraryChange={onLibraryChange}
-          excalidrawAPI={onSetExcalidrawAPI}
-          UIOptions={UIOptions}
-          validateEmbeddable={validateEmbeddableUrl}
-          viewModeEnabled={!canEdit || isHistoryOpen}
-        >
-          <MainMenu>
-            <MainMenu.Item onSelect={onToggleTheme} shortcut="Shift+Alt+D">
-              {theme === "dark" ? "Light mode" : "Dark mode"}
-            </MainMenu.Item>
-            <MainMenu.DefaultItems.SaveAsImage />
-            <MainMenu.DefaultItems.ClearCanvas />
-            <MainMenu.DefaultItems.ChangeCanvasBackground />
-            <MainMenu.DefaultItems.Help />
-            <MainMenu.Separator />
-            <MainMenu.ItemCustom>
-              <GridStepSelector gridStep={gridStep} onChange={onSetGridStep} />
-            </MainMenu.ItemCustom>
-            <MainMenu.ItemCustom>
-              <LanguageSelector langCode={langCode} onChange={onSetLangCode} />
-            </MainMenu.ItemCustom>
-          </MainMenu>
-        </Excalidraw>
-      ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-gray-500 dark:text-gray-400">
-          <span className="text-sm font-medium">
-            {isSceneLoading ? "Loading drawing..." : "Preparing canvas..."}
-          </span>
-        </div>
-      )}
-      {historyPreview ? (
-        <HistoryPreviewCanvas
-          snapshot={historyPreview}
-          theme={theme}
-          langCode={langCode}
-        />
-      ) : null}
-      <Toaster position="bottom-center" />
-    </div>
-  </div>
-);

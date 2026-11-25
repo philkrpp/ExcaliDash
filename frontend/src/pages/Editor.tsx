@@ -67,7 +67,7 @@ const ExcalidrawEditor: React.FC = () => {
   const shareButtonRef = useRef<HTMLButtonElement>(null);
   const [historyPreview, setHistoryPreview] =
     useState<api.DrawingSnapshotFull | null>(null);
-  const { isTouchOnly } = useEditorChrome({ drawingName });
+  const { isTouchOnly, chromeLayout } = useEditorChrome({ drawingName });
   const me: UserIdentity = useEditorIdentity(user);
   const [isReady, setIsReady] = useState(false);
   const { elementVersionMap, hasElementChanged, recordElementVersion } =
@@ -366,6 +366,7 @@ const ExcalidrawEditor: React.FC = () => {
         editorContainerRef={editorContainerRef}
         initialData={initialData}
         isTouchOnly={isTouchOnly}
+        chromeLayout={chromeLayout}
         isHistoryOpen={isHistoryOpen}
         historyPreview={isHistoryOpen ? historyPreview : null}
         historyButtonRef={historyButtonRef}
