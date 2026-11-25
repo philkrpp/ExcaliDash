@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "frontend/src/components/Layout.tsx"
+        ],
+        "createdAt": "2026-11-25T07:52:21.937Z",
+        "reason": "agent triage: Layout.tsx:188/214 are the 6px sidebar resize handles, not card accents; classified as false positive in .impeccable/mocks/pages-review.html (Methode)"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "frontend/src/components/DrawingCard.tsx"
+        ],
+        "createdAt": "2026-11-25T07:52:21.967Z",
+        "reason": "agent triage: the card's 2px slate border is the project's documented playful card style (index.css), not an accent; false positive per pages-review.html (Methode)"
+      }
+    ]
+  }
+}
