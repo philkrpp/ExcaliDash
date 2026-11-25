@@ -256,6 +256,20 @@ describe("editor floating chrome", () => {
     }
   });
 
+  it("lifts the wide actions island above the history preview", async () => {
+    const preview = { id: "old", elements: [], appState: {}, files: {} };
+    const renderer = await render(
+      view({ chromeLayout: "wide", historyPreview: preview, isHistoryOpen: true })
+        .element,
+    );
+    const share = byLabel(renderer.root, "Share")[0];
+    let node = share.parent;
+    while (node && !String(node.props.className ?? "").includes("z-[25]")) {
+      node = node.parent;
+    }
+    expect(node).toBeTruthy();
+  });
+
   it("caps visible peers and keeps the followed one visible", async () => {
     const peer = (id: string) => ({
       id,

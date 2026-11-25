@@ -83,6 +83,16 @@ export const EditorView: React.FC<EditorViewProps> = ({
   } = chrome;
   // Below Excalidraw's own UI (z 4: sidebars, panels) normally; above the history preview (z-20) while it is shown.
   const chromeZ = historyPreview ? "z-[25]" : "z-[3]";
+  const actionsIsland = (
+    <EditorActionsIsland
+      {...chrome}
+      historyButtonRef={historyButtonRef}
+      shareButtonRef={shareButtonRef}
+    />
+  );
+  // The preview canvas covers Excalidraw's top-right slot, so the wide actions move into our own raised layer;
+  // the preview only shows in view mode, where that slot sits at top/right 16px.
+  const actionsOverPreview = chromeLayout === "wide" && Boolean(historyPreview);
 
   return (
     <div
@@ -148,15 +158,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
             validateEmbeddable={validateEmbeddableUrl}
             viewModeEnabled={!canEdit || isHistoryOpen}
             renderTopRightUI={(isMobile) =>
-              !isMobile && chromeLayout === "wide" ? (
-                // Only the wide layout has visible history/share buttons for popovers to anchor to;
-                // otherwise the refs stay empty and the popovers use their default top-right spot.
-                <EditorActionsIsland
-                  {...chrome}
-                  historyButtonRef={historyButtonRef}
-                  shareButtonRef={shareButtonRef}
-                />
-              ) : null
+              // Only the wide layout has visible history/share buttons for popovers to anchor to;
+              // otherwise the refs stay empty and the popovers use their default top-right spot.
+              !isMobile && chromeLayout === "wide" && !actionsOverPreview
+                ? actionsIsland
+                : null
             }
           >
             <MainMenu>
@@ -195,6 +201,11 @@ export const EditorView: React.FC<EditorViewProps> = ({
             theme={theme}
             langCode={langCode}
           />
+        ) : null}
+        {actionsOverPreview ? (
+          <div className={clsx("absolute right-4 top-4", chromeZ)}>
+            {actionsIsland}
+          </div>
         ) : null}
         {!loadError &&
         (chromeLayout === "wide" || chromeLayout === "narrow") ? (
