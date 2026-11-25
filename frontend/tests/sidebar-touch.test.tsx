@@ -112,6 +112,22 @@ describe("SidebarFooter active page", () => {
     expect(button.props.className).not.toContain("bg-indigo-50");
   });
 
+  it("offers only Settings without login (Profile and Admin would be empty)", async () => {
+    const renderer = await render(
+      <SidebarFooter
+        selectedCollectionId={undefined}
+        authEnabled={false}
+        user={null}
+        onLogout={vi.fn()}
+      />,
+    );
+    await act(async () => account(renderer).props.onClick());
+    const html = text(renderer);
+    expect(html).toContain("Settings");
+    expect(html).not.toContain("Profile");
+    expect(html).not.toContain("Admin");
+  });
+
   it("no longer carries a Trash entry (it lives in the Library)", async () => {
     const renderer = await render(footer("trash"));
     expect(text(renderer)).not.toContain("Trash");

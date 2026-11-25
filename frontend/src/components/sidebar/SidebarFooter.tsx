@@ -126,7 +126,8 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
             : "mb-3 space-y-2",
         )}
       >
-        {authEnabled !== null && (
+        {/* Without login both pages have nothing to show. */}
+        {authEnabled && (
           <button
             onClick={() => selectPage("/profile")}
             className={footerButtonClass(
@@ -141,7 +142,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
           </button>
         )}
 
-        {authEnabled !== null && (isAdmin || authEnabled === false) && (
+        {authEnabled && isAdmin && (
           <button
             onClick={() => selectPage("/admin")}
             className={footerButtonClass(

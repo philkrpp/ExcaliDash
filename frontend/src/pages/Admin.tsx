@@ -60,7 +60,8 @@ export const Admin: React.FC = () => {
     setSuccess,
   });
   useEffect(() => {
-    if (authEnabled && !isAdmin) {
+    // Without login there is nothing to administer (the menu hides the page too).
+    if (authEnabled === false || (authEnabled && !isAdmin)) {
       navigate("/", { replace: true });
       return;
     }

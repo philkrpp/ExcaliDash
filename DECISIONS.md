@@ -12,6 +12,12 @@ Quelle: <Spec-/Plan-Pfad oder "Chat YYYY-MM-DD">
 Ersetzt: YYYY-MM-DD – <Titel>   (nur bei Revision)
 -->
 
+## 2026-11-25 – Ohne Login kein Profile und Admin
+
+Entscheidung: Ohne Login (`AUTH` aus, Einzelnutzer-Modus) zeigt das Account-Menü nur Settings; `/profile` und `/admin` leiten aufs Dashboard um. Mit Login bleibt alles wie bisher (Admin nur für Admins).
+Grund: Beide Seiten hängen jeden Inhalt an `authEnabled` und zeigten ohne Login nur ihre Überschrift.
+Quelle: Chat 2026-11-25
+
 ## 2026-11-25 – Dashboard-Auswahl beim Refresh: ganz oder gar nicht
 
 Entscheidung: Ein Neuladen der Liste behält die Auswahl nur, wenn alle gewählten Zeichnungen noch in der Liste stehen; sonst wird sie wie früher komplett geleert (nicht einzeln gekürzt). Solange die Liste noch lädt (Platzhalter), bleibt sie unverändert.

@@ -37,6 +37,11 @@ export const Profile: React.FC = () => {
   const [emailCurrentPassword, setEmailCurrentPassword] = useState("");
   const [emailLoading, setEmailLoading] = useState(false);
 
+  // Without login there is no profile (the menu hides the page too).
+  useEffect(() => {
+    if (authEnabled === false) navigate("/", { replace: true });
+  }, [authEnabled, navigate]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
